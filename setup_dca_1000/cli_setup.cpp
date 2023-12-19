@@ -1860,8 +1860,8 @@ void stopRecording()
 SINT32 main(SINT32 argc, SINT8* argv[])
 {
     startRecording();
-//    std::this_thread::sleep_for(std::chrono::seconds(5));
-//    stopRecording();
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    stopRecording();
     UINT16 u16CmdCode = 0;
     cli_DisconnectRFDCCard(u16CmdCode);
     return 1;

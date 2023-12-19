@@ -3142,17 +3142,16 @@ int MMWL_SOPControl(unsigned char deviceMap, int SOPmode)
 	rlImpl_devHdl = rlsGetDeviceCtx(0);
 	if (rlImpl_devHdl != NULL)
 	{
-        printf("rlImpl_devHdl is not NULL");
 		retVal = rlsOpenGenericGpioIf(rlImpl_devHdl);
-        printf("rlsOpenGenericGpioIf: %d\n", retVal);
+        if (retVal != 0) printf("Error: rlsOpenGenericGpioIf returned %d\n", retVal);
 		retVal = rlsSOPControl(rlImpl_devHdl, SOPmode);
-        printf("rlsSOPControl: %d\n", retVal);
+        if (retVal != 0) printf("Error: rlsSOPControl returned %d\n", retVal);
 		retVal = rlsOpenBoardControlIf(rlImpl_devHdl);
-        printf("rlsOpenBoardControlIf: %d\n", retVal);
+        if (retVal != 0) printf("Error: rlsOpenBoardControlIf returned %d\n", retVal);
 	}
 	else
 	{
-        printf("rlImpl_devHdl is NULL");
+        printf("Error: rlsGetDeviceCtx returned NULL\n");
 		retVal = RL_RET_CODE_INVALID_STATE_ERROR;
 	}
 	return retVal;
@@ -3589,18 +3588,18 @@ int MMWL_App()
         printf("Sensor Start successful for deviceMap %u \n\n", deviceMap);
     }
     printf("======================================================================\n\n");
-//
+
 //    if (rlDevGlobalCfgArgs.LinkDynProfileTest == TRUE)
 //    {
 //        /* Host can update profile configurations dynamically while frame is ongoing.
 //           This test has been added in this example to demostrate dynamic profile update feature
 //           of mmWave sensor device, developer must check the validity of parameters at the system
 //           level before implementing the application. */
-//
+
 //        /* wait for few frames worth of time before updating profile config */
-//		rlNonOsMainLoopTask();
-//		rlAppSleep(30 * framePeriodicity);
-//
+// 		rlNonOsMainLoopTask();
+// 		rlAppSleep(30 * framePeriodicity);
+
 //        /* update few of existing profile parameters */
 //        profileCfgArgs[0].rxGain = 222;
 //        profileCfgArgs[0].pfCalLutUpdate = 0x1; /* bit0: 1, bit1: 0 */
@@ -3608,7 +3607,7 @@ int MMWL_App()
 //        profileCfgArgs[0].hpfCornerFreq2 = 1;
 //        profileCfgArgs[0].txStartTime = 2;
 //        profileCfgArgs[0].rampEndTime = 7000;
-//
+
 //        /* Dynamically configure 1 profile (max 4 profiles) while frame is ongoing */
 //        retVal = rlSetProfileConfig(deviceMap, 1U, &profileCfgArgs[0U]);
 //        if (retVal != RL_RET_CODE_OK)
@@ -3621,13 +3620,13 @@ int MMWL_App()
 //        {
 //            printf("Dynamic Profile Configuration success for deviceMap %u \n\n", deviceMap);
 //        }
-//
+
 //        /* wait for few frames worth of time before reading profile config.
 //           Dynamic profile configuration will come in effect during next frame, so wait for that time
 //           before reading back profile config */
-//		rlNonOsMainLoopTask();
-//		rlAppSleep(20 * framePeriodicity);
-//
+// 		rlNonOsMainLoopTask();
+// 		rlAppSleep(20 * framePeriodicity);
+
 //        /* To verify that profile configuration parameters are applied to device while frame is ongoing,
 //           read back profile configurationn from device */
 //        retVal = rlGetProfileConfig(deviceMap, 0, &profileCfgArgs[1]);
@@ -3651,16 +3650,16 @@ int MMWL_App()
 //                printf("Dynamic profile cfg matched \n\n");
 //        }
 //    }
-//
+
 //    if (rlDevGlobalCfgArgs.LinkDynChirpTest == TRUE)
 //    {
 //        /* wait for few frames to elapse before invoking Dynamic chirp config API to update
 //           new chirp config to come in effect for next frames */
-//
+
 //        /* wait for few frames worth of time */
-//		rlNonOsMainLoopTask();
-//		rlAppSleep(30 * framePeriodicity);
-//
+// 		rlNonOsMainLoopTask();
+// 		rlAppSleep(30 * framePeriodicity);
+
 //        retVal = MMWL_setDynChirpConfig(deviceMap);
 //        if (retVal != RL_RET_CODE_OK)
 //        {
@@ -3672,7 +3671,7 @@ int MMWL_App()
 //        {
 //            printf("Dynamic Chirp config successful for deviceMap %u \n\n", deviceMap);
 //        }
-//
+
 //        retVal = MMWL_dynChirpEnable(deviceMap);
 //        if (retVal != RL_RET_CODE_OK)
 //        {
@@ -3685,13 +3684,13 @@ int MMWL_App()
 //            printf("Dynamic Chirp Enable successful for deviceMap %u \n\n", deviceMap);
 //        }
 //        printf("======================================================================\n\n");
-//
+
 //        /* wait for another few mSec so that dynamic chirp come in effect,
 //         If above API reached to BSS at the end of frame then new chirp config will come in effect
 //         during next frame only */
-//		rlNonOsMainLoopTask();
-//		rlAppSleep(50 * framePeriodicity);
-//
+// 		rlNonOsMainLoopTask();
+// 		rlAppSleep(50 * framePeriodicity);
+
 //        /* read back Chirp config, which should be same as configured in dynChirpConfig for same segment */
 //        retVal = MMWL_getDynChirpConfig(deviceMap);
 //        if (retVal != RL_RET_CODE_OK)
@@ -3705,36 +3704,38 @@ int MMWL_App()
 //            printf("GetChirp Configuration success for deviceMap %u \n\n", deviceMap);
 //        }
 //    }
-//
-//    /* @Note - all these SLeep is added in this demo application to demonstrate mmWave sensor features,
-//                user can change these sleep time values as per their requirement */
-//
-//    /* wait for 10 frames worth of time */
-//    rlNonOsMainLoopTask();
-//    /* Sleep Count is based on PC where this application runs, so user needs to re-calculate
-//       this number to equate with 10-frame worth of time */
-//    rlAppSleep(0xFFFF);
-//
-//    /* Stop the frame */
-//    retVal = MMWL_sensorStop(deviceMap);
-//    if (retVal != RL_RET_CODE_OK)
-//    {
-//        if (retVal == RL_RET_CODE_FRAME_ALREADY_ENDED)
-//        {
-//            printf("Frame is already stopped when sensorStop CMD was issued\n\n");
-//        }
-//        else
-//        {
-//            printf("Sensor Stop failed for deviceMap %u with error code %d \n\n",
-//                deviceMap, retVal);
-//            return -1;
-//        }
-//    }
-//    else
-//    {
-//        printf("Sensor Stop successful for deviceMap %u \n\n", deviceMap);
-//    }
-//
+
+   /* @Note - all these SLeep is added in this demo application to demonstrate mmWave sensor features,
+               user can change these sleep time values as per their requirement */
+
+   /* wait for 10 frames worth of time */
+   rlNonOsMainLoopTask();
+   /* Sleep Count is based on PC where this application runs, so user needs to re-calculate
+      this number to equate with 10-frame worth of time */
+//    printf("sleeping for %d sec", 2);
+//    fflush(stdout);
+   rlAppSleep(2000);
+
+   /* Stop the frame */
+   retVal = MMWL_sensorStop(deviceMap);
+   if (retVal != RL_RET_CODE_OK)
+   {
+       if (retVal == RL_RET_CODE_FRAME_ALREADY_ENDED)
+       {
+           printf("Frame is already stopped when sensorStop CMD was issued\n\n");
+       }
+       else
+       {
+           printf("Sensor Stop failed for deviceMap %u with error code %d \n\n",
+               deviceMap, retVal);
+           return -1;
+       }
+   }
+   else
+   {
+       printf("Sensor Stop successful for deviceMap %u \n\n", deviceMap);
+   }
+
 //    /* Note- Before Calling this API user must feed in input signal to device's pins,
 //    else device will return garbage data in GPAdc measurement over Async event.
 //    Measurement data is stored in 'rcvGpAdcData' structure after this API call. */
@@ -3749,19 +3750,19 @@ int MMWL_App()
 //    {
 //        printf("GPAdc measurement API success for deviceMap %u \n\n", deviceMap);
 //    }
-//
-//    /* Switch off the device */
-//    retVal = MMWL_powerOff(deviceMap);
-//    if (retVal != RL_RET_CODE_OK)
-//    {
-//        printf("Device power off failed for deviceMap %u with error code %d \n\n",
-//                deviceMap, retVal);
-//        return -1;
-//    }
-//    else
-//    {
-//        printf("Device power off success for deviceMap %u \n\n", deviceMap);
-//    }
+
+   /* Switch off the device */
+   retVal = MMWL_powerOff(deviceMap);
+   if (retVal != RL_RET_CODE_OK)
+   {
+       printf("Device power off failed for deviceMap %u with error code %d \n\n",
+               deviceMap, retVal);
+       return -1;
+   }
+   else
+   {
+       printf("Device power off success for deviceMap %u \n\n", deviceMap);
+   }
 
     /* Close Configuraiton file */
     MMWL_closeConfigFile();
