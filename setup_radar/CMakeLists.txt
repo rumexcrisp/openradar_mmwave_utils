@@ -43,4 +43,4 @@ add_executable(setup_radar
         ti/control/mmwavelink/src/rl_sensor.c
         )
 
-target_link_libraries(setup_radar /usr/local/lib/libftd2xx.so)
+target_link_libraries(setup_radar /usr/lib/libftd2xx.so)

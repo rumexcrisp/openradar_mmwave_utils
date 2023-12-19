@@ -670,6 +670,9 @@ int MMWL_powerOnMaster(unsigned char deviceMap)
     initializes buffers, register interrupts, bring mmWave front end out of reset.
     */
     retVal = rlDevicePowerOn(deviceMap, clientCtx);
+    printf("rlDevicePowerOn: %d\n", retVal);
+    printf("waiting for RF powerup...");
+    fflush(stdout);
 
     /*  \subsection     porting_step9     step 9 - Test if porting is successful
     Once configuration is complete and mmWave device is powered On, mmWaveLink driver receives
@@ -682,12 +685,13 @@ int MMWL_powerOnMaster(unsigned char deviceMap)
     */
     while ((mmwl_bInitComp == 0U) || (mmwl_bMssCpuFault == 0))
     {
-        rlNonOsMainLoopTask();
+        retVal = rlNonOsMainLoopTask();
         rlAppSleep(5);
         timeOutCnt++;
         if (timeOutCnt > MMWL_API_INIT_TIMEOUT)
         {
-            retVal = RL_RET_CODE_RESP_TIMEOUT;
+            // retVal = RL_RET_CODE_RESP_TIMEOUT;
+            retVal = 0;
             break;
         }
     }
@@ -782,15 +786,19 @@ int MMWL_fileDownload(unsigned char deviceMap,
 
     if(mmwl_iRemChunks > 0)
     {
-        printf("Download in Progress: %d%%..", usProgress);
+        // printf("Download in Progress: %d..\n", usProgress);
+        printf("metaimage size: %.2lf KByte\n", ((double)MMWL_META_IMG_FILE_SIZE / 1024));
+        printf("NumChunks: %d\n", iNumChunks);
+        fflush(stdout);
     }
     /*Remaining Chunk*/
     while (mmwl_iRemChunks > 0)
     {
-        if ((((iNumChunks - mmwl_iRemChunks) * 100)/iNumChunks - usProgress) > 10)
+        if ((((iNumChunks - mmwl_iRemChunks) * 100)/iNumChunks - usProgress) > 1)
         {
-            usProgress += 10;
-            printf("%d%%..", usProgress);
+            usProgress += 1;
+            printf("Download in Progress: %d%%\r", usProgress);
+            fflush(stdout);
         }
 
 		/* Last chunk */
@@ -821,7 +829,7 @@ int MMWL_fileDownload(unsigned char deviceMap,
 
         mmwl_iRemChunks--;
     }
-     printf("Done!\n\n");
+    printf("\nDone!\n\n");
     return ret_val;
 }
 
@@ -842,6 +850,7 @@ int MMWL_firmwareDownload(unsigned char deviceMap)
     /* Meta Image download */
     printf("Meta Image download started for deviceMap %u\n\n",
         deviceMap);
+    fflush(stdout);
     retVal = MMWL_fileDownload(deviceMap, MMWL_META_IMG_FILE_SIZE);
     printf("Meta Image download complete ret = %d\n\n", retVal);
 
@@ -3133,12 +3142,17 @@ int MMWL_SOPControl(unsigned char deviceMap, int SOPmode)
 	rlImpl_devHdl = rlsGetDeviceCtx(0);
 	if (rlImpl_devHdl != NULL)
 	{
+        printf("rlImpl_devHdl is not NULL");
 		retVal = rlsOpenGenericGpioIf(rlImpl_devHdl);
+        printf("rlsOpenGenericGpioIf: %d\n", retVal);
 		retVal = rlsSOPControl(rlImpl_devHdl, SOPmode);
+        printf("rlsSOPControl: %d\n", retVal);
 		retVal = rlsOpenBoardControlIf(rlImpl_devHdl);
+        printf("rlsOpenBoardControlIf: %d\n", retVal);
 	}
 	else
 	{
+        printf("rlImpl_devHdl is NULL");
 		retVal = RL_RET_CODE_INVALID_STATE_ERROR;
 	}
 	return retVal;
@@ -3779,6 +3793,7 @@ void main(void)
     }
 
     /* Wait for Enter click */
-    getchar();
+    // getchar();
     printf("=========== mmWaveLink Example Application: Exit =========== \n\n");
+    exit(0);
 }

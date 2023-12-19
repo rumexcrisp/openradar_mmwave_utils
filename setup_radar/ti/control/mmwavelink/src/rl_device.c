@@ -66,6 +66,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <ti/control/mmwavelink/mmwavelink.h>
 #include <ti/control/mmwavelink/include/rl_device.h>
 #include <ti/control/mmwavelink/include/rl_driver.h>
@@ -139,10 +140,10 @@ rlReturnVal_t rlDevicePowerOn(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
                     {
                         /* set return error code */
                         retVal += RL_RET_CODE_RADAR_IF_ERROR;
-                        RL_LOGE_ARG0("mmWaveLink: Enabling device failed \n");
+                        printf("mmWaveLink: Enabling device failed \n");
                         /* if device enable is failed the de-init mmwavelink driver */
                         (void)rlDriverDeInit();
-                        RL_LOGW_ARG0("mmWaveLink Driver DeInit done\n");
+                        printf("mmWaveLink Driver DeInit done\n");
                     }
                     /* Reset device Index in DeviceMap for which device has been enabled */
                     deviceMap &= ~(1U << index);
@@ -153,7 +154,7 @@ rlReturnVal_t rlDevicePowerOn(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
             while ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));
         }
     }
-    RL_LOGV_ARG0("mmWaveLink Power Up completes\n");
+    printf("mmWaveLink Power Up completes\n");
 
     return retVal;
 }
