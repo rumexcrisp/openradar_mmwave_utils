@@ -1,60 +1,60 @@
 /****************************************************************************************
-* FileName     : mmw_config.h
-*
-* Description  : This file implements mmwave link example application.
-*
-****************************************************************************************
-* (C) Copyright 2014, Texas Instruments Incorporated. - TI web address www.ti.com
-*---------------------------------------------------------------------------------------
-*
-*  Redistribution and use in source and binary forms, with or without modification,
-*  are permitted provided that the following conditions are met:
-*
-*    Redistributions of source code must retain the above copyright notice,
-*    this list of conditions and the following disclaimer.
-*
-*    Redistributions in binary form must reproduce the above copyright notice,
-*    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution.
-*
-*    Neither the name of Texas Instruments Incorporated nor the names of its
-*    contributors may be used to endorse or promote products derived from this
-*    software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-*  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-*  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  OWNER OR CONTRIBUTORS
-*  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-*  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-*  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-*  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-*  CONTRACT,  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-*  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-*/
+ * FileName     : mmw_config.h
+ *
+ * Description  : This file implements mmwave link example application.
+ *
+ ****************************************************************************************
+ * (C) Copyright 2014, Texas Instruments Incorporated. - TI web address www.ti.com
+ *---------------------------------------------------------------------------------------
+ *
+ *  Redistribution and use in source and binary forms, with or without modification,
+ *  are permitted provided that the following conditions are met:
+ *
+ *    Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ *    Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ *    Neither the name of Texas Instruments Incorporated nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  OWNER OR CONTRIBUTORS
+ *  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *  CONTRACT,  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 /******************************************************************************
-* INCLUDE FILES
-*******************************************************************************
-*/
+ * INCLUDE FILES
+ *******************************************************************************
+ */
 #include <ti/control/mmwavelink/mmwavelink.h>
 
 /******************************************************************************
-* MACROS
-*******************************************************************************
-*/
+ * MACROS
+ *******************************************************************************
+ */
 /*string length for reading from config file*/
 #define STRINGLEN 100
 
 /******************************************************************************
-* ADVANCED CHIRP PARAMS STRUCTURES
-******************************************************************************
-*/
+ * ADVANCED CHIRP PARAMS STRUCTURES
+ ******************************************************************************
+ */
 /*! \brief
-* Advanced Chirp LUT Profile Configuration Structure
-*/
+ * Advanced Chirp LUT Profile Configuration Structure
+ */
 typedef struct rlAdvChirpLUTProfileCfg
 {
 	/**
@@ -65,14 +65,14 @@ typedef struct rlAdvChirpLUTProfileCfg
 	 * @brief  Profile Cfg Data
 	 */
 	/* This is a reference code that shows how to populate and use 4 unique parameters
-	   in adv chirp generic LUT. 
+	   in adv chirp generic LUT.
 	   Any number of unique parameters can be populated */
 	rlUInt8_t ProfileCfgData[4];
 } rlAdvChirpLUTProfileCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT Start Freq Configuration Structure
-*/
+ * Advanced Chirp LUT Start Freq Configuration Structure
+ */
 typedef struct rlAdvChirpLUTStartFreqCfg
 {
 	/**
@@ -80,8 +80,8 @@ typedef struct rlAdvChirpLUTStartFreqCfg
 	 */
 	rlUInt16_t LUTAddrOff;
 	/**
-	* @brief  Param size
-	*/
+	 * @brief  Param size
+	 */
 	rlUInt8_t ParamSize;
 	/**
 	 * @brief  Param scale
@@ -97,8 +97,8 @@ typedef struct rlAdvChirpLUTStartFreqCfg
 } rlAdvChirpLUTStartFreqCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT Freq Slope Configuration Structure
-*/
+ * Advanced Chirp LUT Freq Slope Configuration Structure
+ */
 typedef struct rlAdvChirpLUTFreqSlopeCfg
 {
 	/**
@@ -108,15 +108,15 @@ typedef struct rlAdvChirpLUTFreqSlopeCfg
 	/**
 	 * @brief  Freq Slope Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	double FreqSlopeCfgData[4];
 } rlAdvChirpLUTFreqSlopeCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT Idle time Configuration Structure
-*/
+ * Advanced Chirp LUT Idle time Configuration Structure
+ */
 typedef struct rlAdvChirpLUTIdleTimeCfg
 {
 	/**
@@ -124,8 +124,8 @@ typedef struct rlAdvChirpLUTIdleTimeCfg
 	 */
 	rlUInt16_t LUTAddrOff;
 	/**
-	* @brief  Param size
-	*/
+	 * @brief  Param size
+	 */
 	rlUInt8_t ParamSize;
 	/**
 	 * @brief  Param scale
@@ -134,15 +134,15 @@ typedef struct rlAdvChirpLUTIdleTimeCfg
 	/**
 	 * @brief  Idle time Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	double IdleTimeCfgData[4];
 } rlAdvChirpLUTIdleTimeCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT ADC start time Configuration Structure
-*/
+ * Advanced Chirp LUT ADC start time Configuration Structure
+ */
 typedef struct rlAdvChirpLUTADCTimeCfg
 {
 	/**
@@ -150,8 +150,8 @@ typedef struct rlAdvChirpLUTADCTimeCfg
 	 */
 	rlUInt16_t LUTAddrOff;
 	/**
-	* @brief  Param size
-	*/
+	 * @brief  Param size
+	 */
 	rlUInt8_t ParamSize;
 	/**
 	 * @brief  Param scale
@@ -160,15 +160,15 @@ typedef struct rlAdvChirpLUTADCTimeCfg
 	/**
 	 * @brief  ADC start time Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	double ADCTimeCfgData[4];
 } rlAdvChirpLUTADCTimeCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT Tx Enable Configuration Structure
-*/
+ * Advanced Chirp LUT Tx Enable Configuration Structure
+ */
 typedef struct rlAdvChirpLUTTxEnCfg
 {
 	/**
@@ -178,15 +178,15 @@ typedef struct rlAdvChirpLUTTxEnCfg
 	/**
 	 * @brief  Tx Enable Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	rlUInt8_t TxEnCfgData[4];
 } rlAdvChirpLUTTxEnCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT BPM Enable Configuration Structure
-*/
+ * Advanced Chirp LUT BPM Enable Configuration Structure
+ */
 typedef struct rlAdvChirpLUTBpmEnCfg
 {
 	/**
@@ -196,15 +196,15 @@ typedef struct rlAdvChirpLUTBpmEnCfg
 	/**
 	 * @brief  BPM Enable Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	rlUInt8_t BpmEnCfgData[4];
 } rlAdvChirpLUTBpmEnCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT TX0 Phase shifter Configuration Structure
-*/
+ * Advanced Chirp LUT TX0 Phase shifter Configuration Structure
+ */
 typedef struct rlAdvChirpLUTTx0PhShiftCfg
 {
 	/**
@@ -214,15 +214,15 @@ typedef struct rlAdvChirpLUTTx0PhShiftCfg
 	/**
 	 * @brief  TX0 Phase shifter Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	double Tx0PhShiftCfgData[4];
 } rlAdvChirpLUTTx0PhShiftCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT TX1 Phase shifter Configuration Structure
-*/
+ * Advanced Chirp LUT TX1 Phase shifter Configuration Structure
+ */
 typedef struct rlAdvChirpLUTTx1PhShiftCfg
 {
 	/**
@@ -232,15 +232,15 @@ typedef struct rlAdvChirpLUTTx1PhShiftCfg
 	/**
 	 * @brief  TX1 Phase shifter Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	double Tx1PhShiftCfgData[4];
 } rlAdvChirpLUTTx1PhShiftCfg_t;
 
 /*! \brief
-* Advanced Chirp LUT TX2 Phase shifter Configuration Structure
-*/
+ * Advanced Chirp LUT TX2 Phase shifter Configuration Structure
+ */
 typedef struct rlAdvChirpLUTTx2PhShiftCfg
 {
 	/**
@@ -250,15 +250,15 @@ typedef struct rlAdvChirpLUTTx2PhShiftCfg
 	/**
 	 * @brief  TX2 Phase shifter Cfg Data
 	 */
-	 /* This is a reference code that shows how to populate and use 4 unique parameters
-		in adv chirp generic LUT.
-		Any number of unique parameters can be populated */
+	/* This is a reference code that shows how to populate and use 4 unique parameters
+	   in adv chirp generic LUT.
+	   Any number of unique parameters can be populated */
 	double Tx2PhShiftCfgData[4];
 } rlAdvChirpLUTTx2PhShiftCfg_t;
 
 /*! \brief
-* Global Configuration Structure
-*/
+ * Global Configuration Structure
+ */
 typedef struct rlDevGlobalCfg
 {
 	/**
@@ -317,9 +317,9 @@ typedef struct rlDevGlobalCfg
 } rlDevGlobalCfg_t;
 
 /******************************************************************************
-* PARSE FUNCTION DECLARATION
-******************************************************************************
-*/
+ * PARSE FUNCTION DECLARATION
+ ******************************************************************************
+ */
 
 /*read PowerOn configurations*/
 void MMWL_readPowerOnMaster(rlClientCbs_t *clientCtx);
@@ -361,8 +361,8 @@ void MMWL_readDataFmtConfig(rlDevDataFmtCfg_t *dataFmtCfgArgs);
 void MMWL_readAdcOutConfig(rlAdcOutCfg_t *adcOutCfgArgs);
 
 /*read channel config parameters*/
-void MMWL_readChannelConfig(rlChanCfg_t *rfChanCfgArgs, 
-                            unsigned short cascade);
+void MMWL_readChannelConfig(rlChanCfg_t *rfChanCfgArgs,
+							unsigned short cascade);
 
 /*read the parameters for power on master*/
 void MMWL_readPowerOnMaster(rlClientCbs_t *clientCtx);
@@ -371,31 +371,31 @@ void MMWL_readPowerOnMaster(rlClientCbs_t *clientCtx);
 void MMWL_getGlobalConfigStatus(rlDevGlobalCfg_t *rlDevGlobalCfgArgs);
 
 /*read continuous mode config args*/
-void MMWL_readContModeConfig(rlContModeCfg_t * rlContModeCfgArgs);
+void MMWL_readContModeConfig(rlContModeCfg_t *rlContModeCfgArgs);
 
 /*read Dynamic Chirp config args*/
-void MMWL_readDynChirpConfig(rlDynChirpCfg_t* rldynChirpCfgArgs);
+void MMWL_readDynChirpConfig(rlDynChirpCfg_t *rldynChirpCfgArgs);
 
 /*read Programmable filter config args*/
-void MMWL_readProgFiltConfig(rlRfProgFiltConf_t* rlProgFiltCnfgArgs);
+void MMWL_readProgFiltConfig(rlRfProgFiltConf_t *rlProgFiltCnfgArgs);
 
 /*read Adv chirp config args*/
 void MMWL_readAdvChirpConfig(rlAdvChirpCfg_t *AdvChirpCfgArgs);
 
 /*read Adv Chirp LUT config args*/
-void MMWL_readAdvChirpProfileConfig(rlAdvChirpLUTProfileCfg_t* rlAdvChirpLUTProfileCfgArgs);
-void MMWL_readAdvChirpStartFreqConfig(rlAdvChirpLUTStartFreqCfg_t* rlAdvChirpLUTStartFreqCfgArgs);
-void MMWL_readAdvChirpFreqSlopeConfig(rlAdvChirpLUTFreqSlopeCfg_t* rlAdvChirpLUTFreqSlopeCfgArgs);
-void MMWL_readAdvChirpIdleTimeConfig(rlAdvChirpLUTIdleTimeCfg_t* rlAdvChirpLUTIdleTimeCfgArgs);
-void MMWL_readAdvChirpADCTimeConfig(rlAdvChirpLUTADCTimeCfg_t* rlAdvChirpLUTADCTimeCfgArgs);
-void MMWL_readAdvChirpTxEnConfig(rlAdvChirpLUTTxEnCfg_t* rlAdvChirpLUTTxEnCfgArgs);
-void MMWL_readAdvChirpBpmEnConfig(rlAdvChirpLUTBpmEnCfg_t* rlAdvChirpLUTBpmEnCfgArgs);
-void MMWL_readAdvChirpTx0PhShiftConfig(rlAdvChirpLUTTx0PhShiftCfg_t* rlAdvChirpLUTTx0PhShiftCfgArgs);
-void MMWL_readAdvChirpTx1PhShiftConfig(rlAdvChirpLUTTx1PhShiftCfg_t* rlAdvChirpLUTTx1PhShiftCfgArgs);
-void MMWL_readAdvChirpTx2PhShiftConfig(rlAdvChirpLUTTx2PhShiftCfg_t* rlAdvChirpLUTTx2PhShiftCfgArgs);
+void MMWL_readAdvChirpProfileConfig(rlAdvChirpLUTProfileCfg_t *rlAdvChirpLUTProfileCfgArgs);
+void MMWL_readAdvChirpStartFreqConfig(rlAdvChirpLUTStartFreqCfg_t *rlAdvChirpLUTStartFreqCfgArgs);
+void MMWL_readAdvChirpFreqSlopeConfig(rlAdvChirpLUTFreqSlopeCfg_t *rlAdvChirpLUTFreqSlopeCfgArgs);
+void MMWL_readAdvChirpIdleTimeConfig(rlAdvChirpLUTIdleTimeCfg_t *rlAdvChirpLUTIdleTimeCfgArgs);
+void MMWL_readAdvChirpADCTimeConfig(rlAdvChirpLUTADCTimeCfg_t *rlAdvChirpLUTADCTimeCfgArgs);
+void MMWL_readAdvChirpTxEnConfig(rlAdvChirpLUTTxEnCfg_t *rlAdvChirpLUTTxEnCfgArgs);
+void MMWL_readAdvChirpBpmEnConfig(rlAdvChirpLUTBpmEnCfg_t *rlAdvChirpLUTBpmEnCfgArgs);
+void MMWL_readAdvChirpTx0PhShiftConfig(rlAdvChirpLUTTx0PhShiftCfg_t *rlAdvChirpLUTTx0PhShiftCfgArgs);
+void MMWL_readAdvChirpTx1PhShiftConfig(rlAdvChirpLUTTx1PhShiftCfg_t *rlAdvChirpLUTTx1PhShiftCfgArgs);
+void MMWL_readAdvChirpTx2PhShiftConfig(rlAdvChirpLUTTx2PhShiftCfg_t *rlAdvChirpLUTTx2PhShiftCfgArgs);
 
 /*get rid of trailing and leading whitespace along with "\n"*/
-char *MMWL_trim(char * s);
+char *MMWL_trim(char *s);
 
 /* Open Configuration file in read mode */
 int MMWL_openConfigFile();
@@ -404,4 +404,4 @@ int MMWL_openConfigFile();
 void MMWL_closeConfigFile();
 
 /*Trim the string trailing and leading whitespace*/
-char *MMWL_trim(char * s);
+char *MMWL_trim(char *s);

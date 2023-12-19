@@ -1,58 +1,57 @@
 /******************************************************************************************
-* FileName     : mmw_example_nonos.c
-*
-* Description  : This file implements mmwave link example application for non-OS environment.
-*
-****************************************************************************************
-* (C) Copyright 2014, Texas Instruments Incorporated. - TI web address www.ti.com
-*---------------------------------------------------------------------------------------
-*
-*  Redistribution and use in source and binary forms, with or without modification,
-*  are permitted provided that the following conditions are met:
-*
-*    Redistributions of source code must retain the above copyright notice,
-*    this list of conditions and the following disclaimer.
-*
-*    Redistributions in binary form must reproduce the above copyright notice,
-*    this list of conditions and the following disclaimer in the documentation
-*    and/or other materials provided with the distribution.
-*
-*    Neither the name of Texas Instruments Incorporated nor the names of its
-*    contributors may be used to endorse or promote products derived from this
-*    software without specific prior written permission.
-*
-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-*  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-*  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-*  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  OWNER OR CONTRIBUTORS
-*  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-*  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-*  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-*  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-*  CONTRACT,  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-*  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-*  POSSIBILITY OF SUCH DAMAGE.
-*
-*/
-
+ * FileName     : mmw_example_nonos.c
+ *
+ * Description  : This file implements mmwave link example application for non-OS environment.
+ *
+ ****************************************************************************************
+ * (C) Copyright 2014, Texas Instruments Incorporated. - TI web address www.ti.com
+ *---------------------------------------------------------------------------------------
+ *
+ *  Redistribution and use in source and binary forms, with or without modification,
+ *  are permitted provided that the following conditions are met:
+ *
+ *    Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ *    Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ *    Neither the name of Texas Instruments Incorporated nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
+ *    software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ *  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ *  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT  OWNER OR CONTRIBUTORS
+ *  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *  CONTRACT,  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
 
 #define NON_OS_ENVIRONMENT
 
 /******************************************************************************
-* INCLUDE FILES
-******************************************************************************
-*/
-//#include <windows.h>
+ * INCLUDE FILES
+ ******************************************************************************
+ */
+// #include <windows.h>
 #include <stdio.h>
-//#include <thread>
-//#include <share.h>
+// #include <thread>
+// #include <share.h>
 #include <string.h>
 #include <stdlib.h>
 #include "mmw_example_nonos.h"
 #include "mmw_config.h"
 #include <ti/control/mmwavelink/mmwavelink.h>
 #include <math.h>
-//#include "rls_studio.h"
+// #include "rls_studio.h"
 #include "mmwl_port_ftdi.h"
 #ifdef NON_OS_ENVIRONMENT
 #include "rl_nonos.h"
@@ -64,39 +63,38 @@
 #define TRUE 1
 #define FALSE 0
 /****************************************************************************************
-* MACRO DEFINITIONS
-****************************************************************************************
-*/
+ * MACRO DEFINITIONS
+ ****************************************************************************************
+ */
 #define MMWL_FW_FIRST_CHUNK_SIZE (220U)
 #define MMWL_FW_CHUNK_SIZE (228U)
 #define MMWL_META_IMG_FILE_SIZE (sizeof(metaImage))
 
-#define GET_BIT_VALUE(data, noOfBits, location)    ((((rlUInt32_t)(data)) >> (location)) &\
-                                               (((rlUInt32_t)((rlUInt32_t)1U << (noOfBits))) - (rlUInt32_t)1U))
+#define GET_BIT_VALUE(data, noOfBits, location) ((((rlUInt32_t)(data)) >> (location)) & \
+                                                 (((rlUInt32_t)((rlUInt32_t)1U << (noOfBits))) - (rlUInt32_t)1U))
 /* Async Event Timeouts */
-#define MMWL_API_INIT_TIMEOUT                (2000) /* 2 Sec*/
-#define MMWL_API_START_TIMEOUT               (1000) /* 1 Sec*/
-#define MMWL_API_RF_INIT_TIMEOUT             (1000) /* 1 Sec*/
-
+#define MMWL_API_INIT_TIMEOUT (2000)    /* 2 Sec*/
+#define MMWL_API_START_TIMEOUT (1000)   /* 1 Sec*/
+#define MMWL_API_RF_INIT_TIMEOUT (1000) /* 1 Sec*/
 
 /* MAX unique chirp AWR2243 supports */
-#define MAX_UNIQUE_CHIRP_INDEX                (512 -1)
+#define MAX_UNIQUE_CHIRP_INDEX (512 - 1)
 
 /* MAX index to read back chirp config  */
-#define MAX_GET_CHIRP_CONFIG_IDX              4
+#define MAX_GET_CHIRP_CONFIG_IDX 4
 
 /* To enable TX2 */
-#define ENABLE_TX2                             1
+#define ENABLE_TX2 1
 
-/* LUT Buffer size for Advanced chirp 
+/* LUT Buffer size for Advanced chirp
    Max size = 12KB (12*1024) */
-#define LUT_ADVCHIRP_TABLE_SIZE                5*1024
+#define LUT_ADVCHIRP_TABLE_SIZE 5 * 1024
 
 /******************************************************************************
-* GLOBAL VARIABLES/DATA-TYPES DEFINITIONS
-******************************************************************************
-*/
-typedef int (*RL_P_OS_SPAWN_FUNC_PTR)(RL_P_OSI_SPAWN_ENTRY pEntry, const void* pValue, unsigned int flags);
+ * GLOBAL VARIABLES/DATA-TYPES DEFINITIONS
+ ******************************************************************************
+ */
+typedef int (*RL_P_OS_SPAWN_FUNC_PTR)(RL_P_OSI_SPAWN_ENTRY pEntry, const void *pValue, unsigned int flags);
 typedef int (*RL_P_OS_DELAY_FUNC_PTR)(unsigned int delay);
 
 /* Global Variable for Device Status */
@@ -114,7 +112,7 @@ unsigned char gAwr2243CrcType = RL_CRC_TYPE_32BIT;
 rlUInt16_t lutOffsetInNBytes = 0;
 
 /* Global variable configurations from config file */
-rlDevGlobalCfg_t rlDevGlobalCfgArgs = { 0 };
+rlDevGlobalCfg_t rlDevGlobalCfgArgs = {0};
 
 /* store frame periodicity */
 unsigned int framePeriodicity = 0;
@@ -125,20 +123,20 @@ unsigned int frameCount = 0;
 rlComIfHdl_t mmwl_devHdl = NULL;
 
 /* structure parameters of two profile confing and cont mode config are same */
-rlProfileCfg_t profileCfgArgs[2] = { 0 };
+rlProfileCfg_t profileCfgArgs[2] = {0};
 
 /* strcture to store dynamic chirp configuration */
-rlDynChirpCfg_t dynChirpCfgArgs[3] = { 0 };
+rlDynChirpCfg_t dynChirpCfgArgs[3] = {0};
 
 /* Strcture to store async event config */
-rlRfDevCfg_t rfDevCfg = { 0x0 };
+rlRfDevCfg_t rfDevCfg = {0x0};
 
 /* Structure to store GPADC measurement data sent by device */
 rlRecvdGpAdcData_t rcvGpAdcData = {0};
 
 /* calibData is the calibration data sent by the device which needs to store to
    sFlash and will be used for factory calibration or embedded in the application itself */
-rlCalibrationData_t calibData = { 0 };
+rlCalibrationData_t calibData = {0};
 
 /* File Handle for Calibration Data */
 FILE *CalibrationDataPtr = NULL;
@@ -150,7 +148,7 @@ FILE *CalibrationDataPtr = NULL;
    The populated array is sent over SPI to populate the RadarSS LUT RAM.
    This array is also saved into a file "AdvChirpLUTData.txt" for debug purposes */
 /* The chirp paramters start address offset should be 4 byte aligned */
-rlInt8_t AdvChirpLUTData[LUT_ADVCHIRP_TABLE_SIZE] = { 0 };
+rlInt8_t AdvChirpLUTData[LUT_ADVCHIRP_TABLE_SIZE] = {0};
 
 /* File Handle for Advanced Chirp LUT Data */
 FILE *AdvChirpLUTDataPtr = NULL;
@@ -158,7 +156,7 @@ FILE *AdvChirpLUTDataPtr = NULL;
 uint64_t computeCRC(uint8_t *p, uint32_t len, uint8_t width);
 
 /* Function to compare dynamically configured chirp data */
-int MMWL_chirpParamCompare(rlChirpCfg_t * chirpData);
+int MMWL_chirpParamCompare(rlChirpCfg_t *chirpData);
 
 #define USE_SYSTEM_TIME
 static void rlsGetTimeStamp(char *Tsbuffer)
@@ -168,30 +166,30 @@ static void rlsGetTimeStamp(char *Tsbuffer)
 //	GetLocalTime(&SystemTime);
 //	sprintf(Tsbuffer, "[%02d:%02d:%02d:%03d]: ", SystemTime.wHour, SystemTime.wMinute, SystemTime.wSecond, SystemTime.wMilliseconds);
 #else
-	__int64 tickPerSecond;
-	__int64 tick;
-	__int64 sec;
-	__int64 usec;
+    __int64 tickPerSecond;
+    __int64 tick;
+    __int64 sec;
+    __int64 usec;
 
-	/* Get accuracy */
-	QueryPerformanceFrequency((LARGE_INTEGER*)&tickPerSecond);
+    /* Get accuracy */
+    QueryPerformanceFrequency((LARGE_INTEGER *)&tickPerSecond);
 
-	/* Get tick */
-	QueryPerformanceCounter((LARGE_INTEGER*)&tick);
-	sec = (__int64)(tick / tickPerSecond);
-	usec = (__int64)((tick - (sec * tickPerSecond)) * 1000000.0 / tickPerSecond);
-	sprintf(Tsbuffer, "%07lld.%06lld: ", sec, usec);
+    /* Get tick */
+    QueryPerformanceCounter((LARGE_INTEGER *)&tick);
+    sec = (__int64)(tick / tickPerSecond);
+    usec = (__int64)((tick - (sec * tickPerSecond)) * 1000000.0 / tickPerSecond);
+    sprintf(Tsbuffer, "%07lld.%06lld: ", sec, usec);
 #endif
 }
 #define _CAPTURE_TO_FILE_
 #define DEBUG_EN
-FILE* rls_traceFp = NULL;
+FILE *rls_traceFp = NULL;
 #ifdef DEBUG_EN
 void DEBUG_PRINT(char *fmt, ...)
 {
-	char cBuffer[1000];
-	if (TRUE)
-	{
+    char cBuffer[1000];
+    if (TRUE)
+    {
 //		va_list ap;
 //		va_start(ap, fmt);
 //		vsnprintf(&cBuffer[0], sizeof(cBuffer), fmt, ap);
@@ -214,26 +212,25 @@ void DEBUG_PRINT(char *fmt, ...)
 //			fflush(rls_traceFp);
 //		}
 #endif
-//		va_end(ap);
-	}
+        //		va_end(ap);
+    }
 }
 #else
 #define DEBUG_PRINT
 #endif
 
-
 /******************************************************************************
-* all function definations starts here
-*******************************************************************************
-*/
+ * all function definations starts here
+ *******************************************************************************
+ */
 /** @fn int MMWL_SwapResetAndPowerOn(rlUInt8_t deviceMap)
-*
-*   @brief Swap ROM with RAM, resets the core and waits for power-on completion
-*   @param[in] deviceMap - device map
-*
-*   @return int Success - 0, Failure - Error Code 
-*
-*/
+ *
+ *   @brief Swap ROM with RAM, resets the core and waits for power-on completion
+ *   @param[in] deviceMap - device map
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
@@ -241,34 +238,34 @@ int MMWL_SwapResetAndPowerOn(rlUInt8_t deviceMap)
 {
     int timeOutCnt = 0;
     int retVal = RL_RET_CODE_OK;
-	
-	/* Wait for the below async events only when firmware download over SPI is done.
-	   When booting from sFlash, it is not required to wait for below async events */
-	if (rlDevGlobalCfgArgs.EnableFwDownload)
-	{
-		/* Wait for MSS ESM fault */
-		/* Wait for MSS Boot error status if flash is not connected */
-		while ((mmwl_bMssEsmFault == 0U) || (mmwl_bMssBootErrStatus == 0U))
-		{
-			rlNonOsMainLoopTask();
-			rlAppSleep(5);
-			timeOutCnt++;
-			if (timeOutCnt > MMWL_API_START_TIMEOUT)
-			{
-				break;
-			}
-			/* If flash is connected, then no need to wait for MSS boot error status */
-			if (rlDevGlobalCfgArgs.IsFlashConnected)
-			{
-				mmwl_bMssBootErrStatus = 1U;
-			}
-		}
-	}
-	mmwl_bMssEsmFault = 0U;
-	mmwl_bMssBootErrStatus = 0U;
 
-	/* Disable MSS Watchdog */
-	retVal = rlDeviceSetInternalConf(deviceMap, 0xFFFFFF0C, 0x000000AD);
+    /* Wait for the below async events only when firmware download over SPI is done.
+       When booting from sFlash, it is not required to wait for below async events */
+    if (rlDevGlobalCfgArgs.EnableFwDownload)
+    {
+        /* Wait for MSS ESM fault */
+        /* Wait for MSS Boot error status if flash is not connected */
+        while ((mmwl_bMssEsmFault == 0U) || (mmwl_bMssBootErrStatus == 0U))
+        {
+            rlNonOsMainLoopTask();
+            rlAppSleep(5);
+            timeOutCnt++;
+            if (timeOutCnt > MMWL_API_START_TIMEOUT)
+            {
+                break;
+            }
+            /* If flash is connected, then no need to wait for MSS boot error status */
+            if (rlDevGlobalCfgArgs.IsFlashConnected)
+            {
+                mmwl_bMssBootErrStatus = 1U;
+            }
+        }
+    }
+    mmwl_bMssEsmFault = 0U;
+    mmwl_bMssBootErrStatus = 0U;
+
+    /* Disable MSS Watchdog */
+    retVal = rlDeviceSetInternalConf(deviceMap, 0xFFFFFF0C, 0x000000AD);
 
     /* Swap RAM memory map with ROM memory map  */
     retVal = rlDeviceSetInternalConf(deviceMap, 0xFFFFFF20, 0x00ADAD00);
@@ -280,7 +277,7 @@ int MMWL_SwapResetAndPowerOn(rlUInt8_t deviceMap)
     retVal = rlDeviceSetInternalConf(deviceMap, 0xFFFFFF04, 0x000000AD);
 
     /* Enable the Ack*/
-	rlDeviceConfigureAckTimeout(50000);
+    rlDeviceConfigureAckTimeout(50000);
 
     /* Wait for Power ON complete */
     if (0 == retVal)
@@ -288,8 +285,8 @@ int MMWL_SwapResetAndPowerOn(rlUInt8_t deviceMap)
         timeOutCnt = 0;
         while (mmwl_bInitComp == 0)
         {
-			rlNonOsMainLoopTask();
-			rlAppSleep(5);
+            rlNonOsMainLoopTask();
+            rlAppSleep(5);
             timeOutCnt++;
             if (timeOutCnt > MMWL_API_INIT_TIMEOUT)
             {
@@ -311,23 +308,23 @@ int MMWL_SwapResetAndPowerOn(rlUInt8_t deviceMap)
 }
 
 /** @fn void MMWL_asyncEventHandler(rlUInt8_t deviceIndex, rlUInt16_t sbId,
-*    rlUInt16_t sbLen, rlUInt8_t *payload)
-*
-*   @brief Radar Async Event Handler callback
-*   @param[in] msgId - Message Id
-*   @param[in] sbId - SubBlock Id
-*   @param[in] sbLen - SubBlock Length
-*   @param[in] payload - Sub Block Payload
-*
-*   @return None
-*
-*   Radar Async Event Handler callback
-*/
+ *    rlUInt16_t sbLen, rlUInt8_t *payload)
+ *
+ *   @brief Radar Async Event Handler callback
+ *   @param[in] msgId - Message Id
+ *   @param[in] sbId - SubBlock Id
+ *   @param[in] sbLen - SubBlock Length
+ *   @param[in] payload - Sub Block Payload
+ *
+ *   @return None
+ *
+ *   Radar Async Event Handler callback
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
 void MMWL_asyncEventHandler(rlUInt8_t deviceIndex, rlUInt16_t sbId,
-    rlUInt16_t sbLen, rlUInt8_t *payload)
+                            rlUInt16_t sbLen, rlUInt8_t *payload)
 {
     unsigned int deviceMap = 0;
     rlUInt16_t msgId = sbId / RL_MAX_SB_IN_MSG;
@@ -336,160 +333,160 @@ void MMWL_asyncEventHandler(rlUInt8_t deviceIndex, rlUInt16_t sbId,
     /* Host can receive Async Event from RADARSS/MSS */
     switch (msgId)
     {
-        /* Async Event from RADARSS */
-        case RL_RF_ASYNC_EVENT_MSG:
+    /* Async Event from RADARSS */
+    case RL_RF_ASYNC_EVENT_MSG:
+    {
+        switch (asyncSB)
         {
-            switch (asyncSB)
-            {
-            case RL_RF_AE_INITCALIBSTATUS_SB:
-            {
-                mmwl_bRfInitComp = 1U;
-                printf("Async event: RF-init calibration status \n\n");
-            }
-            break;
-            case RL_RF_AE_FRAME_TRIGGER_RDY_SB:
-            {
-                mmwl_bSensorStarted = 1U;
-                printf("Async event: Frame trigger \n\n");
-            }
-            break;
-            case RL_RF_AE_FRAME_END_SB:
-            {
-                mmwl_bSensorStarted = 0U;
-                printf("Async event: Frame stopped \n\n");
-            }
-            break;
-            case RL_RF_AE_RUN_TIME_CALIB_REPORT_SB:
-            {
-                printf("Async event: Run time Calibration Report [0x%x]\n\n", ((rlRfRunTimeCalibReport_t*)payload)->calibErrorFlag);
-            }
-            break;
-            case RL_RF_AE_MON_TIMING_FAIL_REPORT_SB:
-            {
-                printf("Async event: Monitoring Timing Failed Report\n\n");
-                break;
-            }
-            case RL_RF_AE_GPADC_MEAS_DATA_SB:
-            {
-                mmwl_bGpadcDataRcv = 1U;
-                /* store the GPAdc Measurement data which AWR2243 will read from the analog test pins
-                    where user has fed the input signal */
-                memcpy(&rcvGpAdcData, payload, sizeof(rlRecvdGpAdcData_t));
-                break;
-            }
-            case RL_RF_AE_CPUFAULT_SB:
-            {
-                printf("BSS CPU fault \n\n");
-                while(1);
-                break;
-            }
-            case RL_RF_AE_ESMFAULT_SB:
-            {
-                printf("BSS ESM fault \n\n");
-                break;
-            }
-            default:
-                break;
-            }
-
+        case RL_RF_AE_INITCALIBSTATUS_SB:
+        {
+            mmwl_bRfInitComp = 1U;
+            printf("Async event: RF-init calibration status \n\n");
         }
         break;
-
-        /* Async Event from MSS */
-        case RL_DEV_ASYNC_EVENT_MSG:
+        case RL_RF_AE_FRAME_TRIGGER_RDY_SB:
         {
-            switch (asyncSB)
-            {
-                case RL_DEV_AE_MSSPOWERUPDONE_SB:
-                {
-                    mmwl_bInitComp = 1U;
-                }
-                break;
-                case RL_DEV_AE_MSS_BOOTERRSTATUS_SB:
-                {
-					mmwl_bMssBootErrStatus = 1U;
-                }
-                break;
-                case RL_DEV_AE_RFPOWERUPDONE_SB:
-                {
-                    mmwl_bStartComp = 1U;
-                }
-                break;
-                case RL_DEV_AE_MSS_ESMFAULT_SB:
-                {
-                    mmwl_bMssEsmFault = 1U;
-                    printf("MSS ESM Error \n\n");
-                }
-                break;
-                case RL_DEV_AE_MSS_CPUFAULT_SB:
-                {
-                    mmwl_bMssCpuFault = 1U;
-                    printf("MSS CPU Fault\n\n");
-                }
-                break;
-				case RL_DEV_AE_MSS_RF_ERROR_STATUS_SB:
-				{
-					printf("MSS RF Error \n\n");
-				}
-				break;
-                default:
-                {
-                    printf("Unhandled Async Event msgId: 0x%x, asyncSB:0x%x  \n\n", msgId, asyncSB);
-                    break;
-                }
-            }
+            mmwl_bSensorStarted = 1U;
+            printf("Async event: Frame trigger \n\n");
         }
         break;
-
-        /* Async Event from MMWL */
-        case RL_MMWL_ASYNC_EVENT_MSG:
+        case RL_RF_AE_FRAME_END_SB:
         {
-            case RL_MMWL_AE_MISMATCH_REPORT:
-            {
-                int errTemp = *(int32_t*)payload;
-                /* CRC mismatched in the received Async-Event msg */
-                if (errTemp == RL_RET_CODE_CRC_FAILED)
-                {
-                    printf("CRC mismatched in the received Async-Event msg \n\n" );
-                }
-                /* Checksum mismatched in the received msg */
-                else if (errTemp == RL_RET_CODE_CHKSUM_FAILED)
-                {
-                    printf("Checksum mismatched in the received msg \n\n" );
-                }
-                /* Polling to HostIRQ is timed out,
-                   i.e. Device didn't respond to CNYS from the Host */
-                else if (errTemp == RL_RET_CODE_HOSTIRQ_TIMEOUT)
-                {
-                    printf("HostIRQ polling timed out \n\n");
-                }
-                /* If any of OSI call-back function returns non-zero value */
-                else if (errTemp == RL_RET_CODE_RADAR_OSIF_ERROR)
-                {
-					printf("mmWaveLink OS_IF error \n\n");
-                }
-                break;
-            }
+            mmwl_bSensorStarted = 0U;
+            printf("Async event: Frame stopped \n\n");
+        }
+        break;
+        case RL_RF_AE_RUN_TIME_CALIB_REPORT_SB:
+        {
+            printf("Async event: Run time Calibration Report [0x%x]\n\n", ((rlRfRunTimeCalibReport_t *)payload)->calibErrorFlag);
+        }
+        break;
+        case RL_RF_AE_MON_TIMING_FAIL_REPORT_SB:
+        {
+            printf("Async event: Monitoring Timing Failed Report\n\n");
             break;
         }
+        case RL_RF_AE_GPADC_MEAS_DATA_SB:
+        {
+            mmwl_bGpadcDataRcv = 1U;
+            /* store the GPAdc Measurement data which AWR2243 will read from the analog test pins
+                where user has fed the input signal */
+            memcpy(&rcvGpAdcData, payload, sizeof(rlRecvdGpAdcData_t));
+            break;
+        }
+        case RL_RF_AE_CPUFAULT_SB:
+        {
+            printf("BSS CPU fault \n\n");
+            while (1)
+                ;
+            break;
+        }
+        case RL_RF_AE_ESMFAULT_SB:
+        {
+            printf("BSS ESM fault \n\n");
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    break;
+
+    /* Async Event from MSS */
+    case RL_DEV_ASYNC_EVENT_MSG:
+    {
+        switch (asyncSB)
+        {
+        case RL_DEV_AE_MSSPOWERUPDONE_SB:
+        {
+            mmwl_bInitComp = 1U;
+        }
+        break;
+        case RL_DEV_AE_MSS_BOOTERRSTATUS_SB:
+        {
+            mmwl_bMssBootErrStatus = 1U;
+        }
+        break;
+        case RL_DEV_AE_RFPOWERUPDONE_SB:
+        {
+            mmwl_bStartComp = 1U;
+        }
+        break;
+        case RL_DEV_AE_MSS_ESMFAULT_SB:
+        {
+            mmwl_bMssEsmFault = 1U;
+            printf("MSS ESM Error \n\n");
+        }
+        break;
+        case RL_DEV_AE_MSS_CPUFAULT_SB:
+        {
+            mmwl_bMssCpuFault = 1U;
+            printf("MSS CPU Fault\n\n");
+        }
+        break;
+        case RL_DEV_AE_MSS_RF_ERROR_STATUS_SB:
+        {
+            printf("MSS RF Error \n\n");
+        }
+        break;
         default:
         {
             printf("Unhandled Async Event msgId: 0x%x, asyncSB:0x%x  \n\n", msgId, asyncSB);
             break;
         }
+        }
+    }
+    break;
+
+    /* Async Event from MMWL */
+    case RL_MMWL_ASYNC_EVENT_MSG:
+    {
+    case RL_MMWL_AE_MISMATCH_REPORT:
+    {
+        int errTemp = *(int32_t *)payload;
+        /* CRC mismatched in the received Async-Event msg */
+        if (errTemp == RL_RET_CODE_CRC_FAILED)
+        {
+            printf("CRC mismatched in the received Async-Event msg \n\n");
+        }
+        /* Checksum mismatched in the received msg */
+        else if (errTemp == RL_RET_CODE_CHKSUM_FAILED)
+        {
+            printf("Checksum mismatched in the received msg \n\n");
+        }
+        /* Polling to HostIRQ is timed out,
+           i.e. Device didn't respond to CNYS from the Host */
+        else if (errTemp == RL_RET_CODE_HOSTIRQ_TIMEOUT)
+        {
+            printf("HostIRQ polling timed out \n\n");
+        }
+        /* If any of OSI call-back function returns non-zero value */
+        else if (errTemp == RL_RET_CODE_RADAR_OSIF_ERROR)
+        {
+            printf("mmWaveLink OS_IF error \n\n");
+        }
+        break;
+    }
+    break;
+    }
+    default:
+    {
+        printf("Unhandled Async Event msgId: 0x%x, asyncSB:0x%x  \n\n", msgId, asyncSB);
+        break;
+    }
     }
 }
 
 /** @fn int MMWL_enableDevice(unsigned char deviceIndex)
-*
-*   @brief Performs SOP and enables the device.
-*
-*   @param[in] deviceIndex
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Power on Slave device API.
-*/
+ *
+ *   @brief Performs SOP and enables the device.
+ *
+ *   @param[in] deviceIndex
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Power on Slave device API.
+ */
 int MMWL_enableDevice(unsigned char deviceIndex)
 {
     int retVal = RL_RET_CODE_OK;
@@ -499,15 +496,15 @@ int MMWL_enableDevice(unsigned char deviceIndex)
 }
 
 /** @fn int MMWL_disableDevice(unsigned char deviceIndex)
-*
-*   @brief disables the device.
-*
-*   @param[in] deviceIndex
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Power on Slave device API.
-*/
+ *
+ *   @brief disables the device.
+ *
+ *   @param[in] deviceIndex
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Power on Slave device API.
+ */
 int MMWL_disableDevice(unsigned char deviceIndex)
 {
     printf("rlDeviceDisable Callback is called by mmWaveLink for Device Index [%d]\n\n", deviceIndex);
@@ -528,8 +525,8 @@ int MMWL_disableDevice(unsigned char deviceIndex)
 *
 *   Compute the CRC of given data
 */
-int MMWL_computeCRC(unsigned char* data, unsigned int dataLen, unsigned char crcLen,
-                        unsigned char* outCrc)
+int MMWL_computeCRC(unsigned char *data, unsigned int dataLen, unsigned char crcLen,
+                    unsigned char *outCrc)
 {
     uint64_t crcResult = computeCRC(data, dataLen, (16 << crcLen));
     memcpy(outCrc, &crcResult, (2 << crcLen));
@@ -537,15 +534,15 @@ int MMWL_computeCRC(unsigned char* data, unsigned int dataLen, unsigned char crc
 }
 extern unsigned long i2cAddr[RLS_NUM_CONNECTED_DEVICES_MAX];
 /** @fn int MMWL_powerOnMaster(deviceMap)
-*
-*   @brief Power on Master API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Power on Master API.
-*/
+ *
+ *   @brief Power on Master API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Power on Master API.
+ */
 int MMWL_powerOnMaster(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK, timeOutCnt = 0;
@@ -558,7 +555,7 @@ int MMWL_powerOnMaster(unsigned char deviceMap)
 
      Refer to \ref rlClientCbs_t for more details
      */
-    rlClientCbs_t clientCtx = { 0 };
+    rlClientCbs_t clientCtx = {0};
 
     /*Read all the parameters from config file*/
     MMWL_readPowerOnMaster(&clientCtx);
@@ -579,21 +576,21 @@ int MMWL_powerOnMaster(unsigned char deviceMap)
 
     Refer to \ref rlComIfCbs_t for interface details
     */
-	if (rlDevGlobalCfgArgs.TransferMode == 0)
-	{
-		clientCtx.comIfCb.rlComIfOpen = rlsSpiOpen;//rlsCommOpen;
-		clientCtx.comIfCb.rlComIfClose = rlsSpiClose;//rlsCommClose;
-		clientCtx.comIfCb.rlComIfRead = rlsSpiRead;
-		clientCtx.comIfCb.rlComIfWrite = rlsSpiWrite;
-	}
-	else
-	{
-		clientCtx.comIfCb.rlComIfOpen = rlsSpiOpen;//rlsCommOpen;
-		clientCtx.comIfCb.rlComIfClose =rlsSpiClose; //rlsCommClose;
-		clientCtx.comIfCb.rlComIfRead = rlsI2cRead;
-		clientCtx.comIfCb.rlComIfWrite = rlsI2cWrite;
-		i2cAddr[0] = 0x28;
-	}
+    if (rlDevGlobalCfgArgs.TransferMode == 0)
+    {
+        clientCtx.comIfCb.rlComIfOpen = rlsSpiOpen;   // rlsCommOpen;
+        clientCtx.comIfCb.rlComIfClose = rlsSpiClose; // rlsCommClose;
+        clientCtx.comIfCb.rlComIfRead = rlsSpiRead;
+        clientCtx.comIfCb.rlComIfWrite = rlsSpiWrite;
+    }
+    else
+    {
+        clientCtx.comIfCb.rlComIfOpen = rlsSpiOpen;   // rlsCommOpen;
+        clientCtx.comIfCb.rlComIfClose = rlsSpiClose; // rlsCommClose;
+        clientCtx.comIfCb.rlComIfRead = rlsI2cRead;
+        clientCtx.comIfCb.rlComIfWrite = rlsI2cWrite;
+        i2cAddr[0] = 0x28;
+    }
 
     /*   \subsection     porting_step3   Step 3 - Implement Device Control Interface
     The mmWaveLink driver internally powers on/off the mmWave device. The exact implementation of
@@ -641,7 +638,7 @@ int MMWL_powerOnMaster(unsigned char deviceMap)
 
     /* Spawn Task */
     clientCtx.osiCb.queue.rlOsiSpawn = (RL_P_OS_SPAWN_FUNC_PTR)rlSpawn;
-    
+
     /* Sleep/Delay Callback*/
     clientCtx.timerCb.rlDelay = (RL_P_OS_DELAY_FUNC_PTR)rlAppSleep;
 
@@ -678,7 +675,7 @@ int MMWL_powerOnMaster(unsigned char deviceMap)
     Once configuration is complete and mmWave device is powered On, mmWaveLink driver receives
     asynchronous event from mmWave device and notifies application using
     asynchronous event callback.
-    Note: In case of AWR2243 ES1.0, Host needs to wait for MSS CPU Fault as well, with current 
+    Note: In case of AWR2243 ES1.0, Host needs to wait for MSS CPU Fault as well, with current
     ROM version this MSS CPU fault async-event sent by AWR device which Host needs to ignore.
 
     Refer to \ref MMWL_asyncEventHandler for event details
@@ -701,13 +698,13 @@ int MMWL_powerOnMaster(unsigned char deviceMap)
 }
 
 int MMWL_fileWrite(unsigned char deviceMap,
-                unsigned short remChunks,
-                unsigned short chunkLen,
-                unsigned char *chunk)
+                   unsigned short remChunks,
+                   unsigned short chunkLen,
+                   unsigned char *chunk)
 {
     int ret_val = -1;
 
-    rlFileData_t fileChunk = { 0 };
+    rlFileData_t fileChunk = {0};
     fileChunk.chunkLen = chunkLen;
     memcpy(fileChunk.fData, chunk, chunkLen);
 
@@ -730,7 +727,7 @@ int MMWL_fileWrite(unsigned char deviceMap,
 *   Firmware Download API.
 */
 int MMWL_fileDownload(unsigned char deviceMap,
-                  unsigned int fileLen)
+                      unsigned int fileLen)
 {
     unsigned int imgLen = fileLen;
     int ret_val = -1;
@@ -743,11 +740,11 @@ int MMWL_fileDownload(unsigned char deviceMap,
 
     /*First Chunk*/
     unsigned char firstChunk[MMWL_FW_CHUNK_SIZE];
-    unsigned char* pmmwl_imgBuffer = NULL;
+    unsigned char *pmmwl_imgBuffer = NULL;
 
-    pmmwl_imgBuffer = (unsigned char*)&metaImage[0];
+    pmmwl_imgBuffer = (unsigned char *)&metaImage[0];
 
-    if(pmmwl_imgBuffer == NULL)
+    if (pmmwl_imgBuffer == NULL)
     {
         printf("MMWL_fileDwld Fail : File Buffer is NULL \n\n\r");
         return -1;
@@ -762,20 +759,20 @@ int MMWL_fileDownload(unsigned char deviceMap,
     {
         usLastChunkLen = (imgLen + 8) % usChunkLen;
         usFirstChunkLen = MMWL_FW_CHUNK_SIZE;
-		mmwl_iRemChunks += 1;
+        mmwl_iRemChunks += 1;
     }
     else
     {
         usFirstChunkLen = imgLen + 8;
     }
 
-    *((unsigned int*)&firstChunk[0]) = (unsigned int)MMWL_FILETYPE_META_IMG;
-    *((unsigned int*)&firstChunk[4]) = (unsigned int)imgLen;
-    memcpy((char*)&firstChunk[8], (char*)pmmwl_imgBuffer,
-                usFirstChunkLen - 8);
+    *((unsigned int *)&firstChunk[0]) = (unsigned int)MMWL_FILETYPE_META_IMG;
+    *((unsigned int *)&firstChunk[4]) = (unsigned int)imgLen;
+    memcpy((char *)&firstChunk[8], (char *)pmmwl_imgBuffer,
+           usFirstChunkLen - 8);
 
-    ret_val = MMWL_fileWrite(deviceMap, (mmwl_iRemChunks-1), usFirstChunkLen,
-                              firstChunk);
+    ret_val = MMWL_fileWrite(deviceMap, (mmwl_iRemChunks - 1), usFirstChunkLen,
+                             firstChunk);
     if (ret_val < 0)
     {
         printf("MMWL_fileDwld Fail : Ftype: %d\n\n\r", MMWL_FILETYPE_META_IMG);
@@ -784,7 +781,7 @@ int MMWL_fileDownload(unsigned char deviceMap,
     pmmwl_imgBuffer += MMWL_FW_FIRST_CHUNK_SIZE;
     mmwl_iRemChunks--;
 
-    if(mmwl_iRemChunks > 0)
+    if (mmwl_iRemChunks > 0)
     {
         // printf("Download in Progress: %d..\n", usProgress);
         printf("metaimage size: %.2lf KByte\n", ((double)MMWL_META_IMG_FILE_SIZE / 1024));
@@ -794,38 +791,38 @@ int MMWL_fileDownload(unsigned char deviceMap,
     /*Remaining Chunk*/
     while (mmwl_iRemChunks > 0)
     {
-        if ((((iNumChunks - mmwl_iRemChunks) * 100)/iNumChunks - usProgress) > 1)
+        if ((((iNumChunks - mmwl_iRemChunks) * 100) / iNumChunks - usProgress) > 1)
         {
             usProgress += 1;
             printf("Download in Progress: %d%%\r", usProgress);
             fflush(stdout);
         }
 
-		/* Last chunk */
-		if ((mmwl_iRemChunks == 1) && (usLastChunkLen > 0))
-		{
-			ret_val = MMWL_fileWrite(deviceMap, 0, usLastChunkLen,
-				pmmwl_imgBuffer);
-			if (ret_val < 0)
-			{
-				printf("MMWL_fileDwld last chunk Fail : Ftype: %d\n\n\r",
-					MMWL_FILETYPE_META_IMG);
-				return ret_val;
-			}
-		}
-		else
-		{
-			ret_val = MMWL_fileWrite(deviceMap, (mmwl_iRemChunks - 1),
-				MMWL_FW_CHUNK_SIZE, pmmwl_imgBuffer);
+        /* Last chunk */
+        if ((mmwl_iRemChunks == 1) && (usLastChunkLen > 0))
+        {
+            ret_val = MMWL_fileWrite(deviceMap, 0, usLastChunkLen,
+                                     pmmwl_imgBuffer);
+            if (ret_val < 0)
+            {
+                printf("MMWL_fileDwld last chunk Fail : Ftype: %d\n\n\r",
+                       MMWL_FILETYPE_META_IMG);
+                return ret_val;
+            }
+        }
+        else
+        {
+            ret_val = MMWL_fileWrite(deviceMap, (mmwl_iRemChunks - 1),
+                                     MMWL_FW_CHUNK_SIZE, pmmwl_imgBuffer);
 
-			if (ret_val < 0)
-			{
-				printf("\n\n\r MMWL_fileDwld rem chunk Fail : Ftype: %d\n\n\r",
-					MMWL_FILETYPE_META_IMG);
-				return ret_val;
-			}
-			pmmwl_imgBuffer += MMWL_FW_CHUNK_SIZE;
-		}
+            if (ret_val < 0)
+            {
+                printf("\n\n\r MMWL_fileDwld rem chunk Fail : Ftype: %d\n\n\r",
+                       MMWL_FILETYPE_META_IMG);
+                return ret_val;
+            }
+            pmmwl_imgBuffer += MMWL_FW_CHUNK_SIZE;
+        }
 
         mmwl_iRemChunks--;
     }
@@ -834,22 +831,22 @@ int MMWL_fileDownload(unsigned char deviceMap,
 }
 
 /** @fn int MMWL_firmwareDownload(deviceMap)
-*
-*   @brief Firmware Download API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Firmware Download API.
-*/
+ *
+ *   @brief Firmware Download API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Firmware Download API.
+ */
 int MMWL_firmwareDownload(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK, timeOutCnt = 0;
 
     /* Meta Image download */
     printf("Meta Image download started for deviceMap %u\n\n",
-        deviceMap);
+           deviceMap);
     fflush(stdout);
     retVal = MMWL_fileDownload(deviceMap, MMWL_META_IMG_FILE_SIZE);
     printf("Meta Image download complete ret = %d\n\n", retVal);
@@ -858,23 +855,23 @@ int MMWL_firmwareDownload(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_rfEnable(deviceMap)
-*
-*   @brief RFenable API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   RFenable API.
-*/
+ *
+ *   @brief RFenable API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   RFenable API.
+ */
 int MMWL_rfEnable(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK, timeOutCnt = 0;
     retVal = rlDeviceRfStart(deviceMap);
     while (mmwl_bStartComp == 0U)
     {
-		rlNonOsMainLoopTask();
-		rlAppSleep(5);
+        rlNonOsMainLoopTask();
+        rlAppSleep(5);
         timeOutCnt++;
         if (timeOutCnt > MMWL_API_START_TIMEOUT)
         {
@@ -884,42 +881,42 @@ int MMWL_rfEnable(unsigned char deviceMap)
     }
     mmwl_bStartComp = 0;
 
-    if(retVal == RL_RET_CODE_OK)
+    if (retVal == RL_RET_CODE_OK)
     {
         rlVersion_t verArgs = {0};
-		rlRfDieIdCfg_t dieId = { 0 };
-        retVal = rlDeviceGetVersion(deviceMap,&verArgs);
+        rlRfDieIdCfg_t dieId = {0};
+        retVal = rlDeviceGetVersion(deviceMap, &verArgs);
 
         printf("RF Version [%2d.%2d.%2d.%2d] \nMSS version [%2d.%2d.%2d.%2d] \nmmWaveLink version [%2d.%2d.%2d.%2d]\n\n",
-            verArgs.rf.fwMajor, verArgs.rf.fwMinor, verArgs.rf.fwBuild, verArgs.rf.fwDebug,
-            verArgs.master.fwMajor, verArgs.master.fwMinor, verArgs.master.fwBuild, verArgs.master.fwDebug,
-            verArgs.mmWaveLink.major, verArgs.mmWaveLink.minor, verArgs.mmWaveLink.build, verArgs.mmWaveLink.debug);
+               verArgs.rf.fwMajor, verArgs.rf.fwMinor, verArgs.rf.fwBuild, verArgs.rf.fwDebug,
+               verArgs.master.fwMajor, verArgs.master.fwMinor, verArgs.master.fwBuild, verArgs.master.fwDebug,
+               verArgs.mmWaveLink.major, verArgs.mmWaveLink.minor, verArgs.mmWaveLink.build, verArgs.mmWaveLink.debug);
         printf("RF Patch Version [%2d.%2d.%2d.%2d] \nMSS Patch version [%2d.%2d.%2d.%2d]\n\n",
-            verArgs.rf.patchMajor, verArgs.rf.patchMinor, ((verArgs.rf.patchBuildDebug & 0xF0) >> 4), (verArgs.rf.patchBuildDebug & 0x0F),
-            verArgs.master.patchMajor, verArgs.master.patchMinor, ((verArgs.master.patchBuildDebug & 0xF0) >> 4), (verArgs.master.patchBuildDebug & 0x0F));
+               verArgs.rf.patchMajor, verArgs.rf.patchMinor, ((verArgs.rf.patchBuildDebug & 0xF0) >> 4), (verArgs.rf.patchBuildDebug & 0x0F),
+               verArgs.master.patchMajor, verArgs.master.patchMinor, ((verArgs.master.patchBuildDebug & 0xF0) >> 4), (verArgs.master.patchBuildDebug & 0x0F));
 
-		retVal = rlGetRfDieId(deviceMap, &dieId);
+        retVal = rlGetRfDieId(deviceMap, &dieId);
 
-		printf("Lot Number [%d] \nWafer Number [%d] \nDie Coordinates in Wafer ([%d], [%d]) \n\n", dieId.lotNo, dieId.waferNo, dieId.devX, dieId.devY);
+        printf("Lot Number [%d] \nWafer Number [%d] \nDie Coordinates in Wafer ([%d], [%d]) \n\n", dieId.lotNo, dieId.waferNo, dieId.devX, dieId.devY);
     }
     return retVal;
 }
 
 /** @fn int MMWL_dataFmtConfig(unsigned char deviceMap)
-*
-*   @brief Data Format Config API
-*
-*   @return Success - 0, Failure - Error Code
-*
-*   Data Format Config API
-*/
+ *
+ *   @brief Data Format Config API
+ *
+ *   @return Success - 0, Failure - Error Code
+ *
+ *   Data Format Config API
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
 int MMWL_dataFmtConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlDevDataFmtCfg_t dataFmtCfgArgs = { 0 };
+    rlDevDataFmtCfg_t dataFmtCfgArgs = {0};
 
     /*dataFmtCfgArgs from config file*/
     MMWL_readDataFmtConfig(&dataFmtCfgArgs);
@@ -929,36 +926,36 @@ int MMWL_dataFmtConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_ldoBypassConfig(unsigned char deviceMap)
-*
-*   @brief LDO Bypass Config API
-*
-*   @return Success - 0, Failure - Error Code
-*
-*   LDO Bypass Config API
-*/
+ *
+ *   @brief LDO Bypass Config API
+ *
+ *   @return Success - 0, Failure - Error Code
+ *
+ *   LDO Bypass Config API
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
 int MMWL_ldoBypassConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlRfLdoBypassCfg_t rfLdoBypassCfgArgs = { 0 };
+    rlRfLdoBypassCfg_t rfLdoBypassCfgArgs = {0};
 
     printf("Calling rlRfSetLdoBypassConfig With Bypass [%d] \n\n",
-        rfLdoBypassCfgArgs.ldoBypassEnable);
+           rfLdoBypassCfgArgs.ldoBypassEnable);
 
     retVal = rlRfSetLdoBypassConfig(deviceMap, &rfLdoBypassCfgArgs);
     return retVal;
 }
 
 /** @fn int MMWL_adcOutConfig(unsigned char deviceMap)
-*
-*   @brief ADC Configuration API
-*
-*   @return Success - 0, Failure - Error Code
-*
-*   ADC Configuration API
-*/
+ *
+ *   @brief ADC Configuration API
+ *
+ *   @return Success - 0, Failure - Error Code
+ *
+ *   ADC Configuration API
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
@@ -966,14 +963,13 @@ int MMWL_adcOutConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
 
-    rlAdcOutCfg_t adcOutCfgArgs = { 0 };
+    rlAdcOutCfg_t adcOutCfgArgs = {0};
 
     /*read adcOutCfgArgs from config file*/
     MMWL_readAdcOutConfig(&adcOutCfgArgs);
 
-
     printf("Calling rlSetAdcOutConfig With [%d]ADC Bits and [%d]ADC Format \n\n",
-        adcOutCfgArgs.fmt.b2AdcBits, adcOutCfgArgs.fmt.b2AdcOutFmt);
+           adcOutCfgArgs.fmt.b2AdcBits, adcOutCfgArgs.fmt.b2AdcOutFmt);
 
     retVal = rlSetAdcOutConfig(deviceMap, &adcOutCfgArgs);
     return retVal;
@@ -996,7 +992,7 @@ int MMWL_channelConfig(unsigned char deviceMap,
 {
     int retVal = RL_RET_CODE_OK;
     /* TBD - Read GUI Values */
-    rlChanCfg_t rfChanCfgArgs = { 0 };
+    rlChanCfg_t rfChanCfgArgs = {0};
 
     /*read arguments from config file*/
     MMWL_readChannelConfig(&rfChanCfgArgs, cascade);
@@ -1013,20 +1009,20 @@ int MMWL_channelConfig(unsigned char deviceMap,
 }
 
 /** @fn int MMWL_setAsyncEventDir(unsigned char deviceMap)
-*
-*   @brief Update async event message direction and CRC type of Async event
-*           from AWR2243 radarSS to Host
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Update async event message direction and CRC type of Async event
-*   from AWR2243 radarSS to Host
-*/
-int MMWL_setAsyncEventDir(unsigned char  deviceMap)
+ *
+ *   @brief Update async event message direction and CRC type of Async event
+ *           from AWR2243 radarSS to Host
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Update async event message direction and CRC type of Async event
+ *   from AWR2243 radarSS to Host
+ */
+int MMWL_setAsyncEventDir(unsigned char deviceMap)
 {
-    int32_t         retVal;
+    int32_t retVal;
     /* set global and monitoring async event direction to Host */
     rfDevCfg.aeDirection = 0x05;
     /* Set the CRC type of Async event received from radarSS */
@@ -1036,40 +1032,40 @@ int MMWL_setAsyncEventDir(unsigned char  deviceMap)
 }
 
 /** @fn int MMWL_setMiscConfig(unsigned char deviceMap)
-*
-*   @brief Sets misc feature such as per chirp phase shifter and Advance chirp
-*
-*   @param[in] deviceMap - Device Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Sets misc feature such as per chirp phase shifter and Advance chirp
-*/
+ *
+ *   @brief Sets misc feature such as per chirp phase shifter and Advance chirp
+ *
+ *   @param[in] deviceMap - Device Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Sets misc feature such as per chirp phase shifter and Advance chirp
+ */
 int MMWL_setMiscConfig(unsigned char deviceMap)
 {
-	int32_t         retVal;
-	rlRfMiscConf_t MiscCfg = { 0 };
-	/* Enable Adv chirp feature 
-		b0 PERCHIRP_PHASESHIFTER_EN
-		b1 ADVANCE_CHIRP_CONFIG_EN  */
-	MiscCfg.miscCtl = 0x3;
-	retVal = rlRfSetMiscConfig(deviceMap, &MiscCfg);
-	return retVal;
+    int32_t retVal;
+    rlRfMiscConf_t MiscCfg = {0};
+    /* Enable Adv chirp feature
+        b0 PERCHIRP_PHASESHIFTER_EN
+        b1 ADVANCE_CHIRP_CONFIG_EN  */
+    MiscCfg.miscCtl = 0x3;
+    retVal = rlRfSetMiscConfig(deviceMap, &MiscCfg);
+    return retVal;
 }
 
 /** @fn int MMWL_setDeviceCrcType(unsigned char deviceMap)
-*
-*   @brief Set CRC type of async event from AWR2243 MasterSS
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Set CRC type of async event from AWR2243 MasterSS
-*/
+ *
+ *   @brief Set CRC type of async event from AWR2243 MasterSS
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Set CRC type of async event from AWR2243 MasterSS
+ */
 int MMWL_setDeviceCrcType(unsigned char deviceMap)
 {
-    int32_t         retVal;
+    int32_t retVal;
     rlDevMiscCfg_t devMiscCfg = {0};
     /* Set the CRC Type for Async Event from MSS */
     devMiscCfg.aeCrcConfig = gAwr2243CrcType;
@@ -1078,16 +1074,16 @@ int MMWL_setDeviceCrcType(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
-*
-*   @brief Channel, ADC,Data format configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*    @param[in] unsigned int cascade
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Channel, ADC,Data format configuration API.
-*/
+ *
+ *   @brief Channel, ADC,Data format configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *    @param[in] unsigned int cascade
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Channel, ADC,Data format configuration API.
+ */
 int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
 {
     int retVal = RL_RET_CODE_OK;
@@ -1097,7 +1093,7 @@ int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Channel Config failed for deviceMap %u with error code %d\n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -1109,7 +1105,7 @@ int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("AdcOut Config failed for deviceMap %u with error code %d\n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -1122,7 +1118,7 @@ int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("LDO Bypass Config failed for deviceMap %u with error code %d\n\n",
-            deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -1135,7 +1131,7 @@ int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Data format Configuration failed for deviceMap %u with error code %d\n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -1148,7 +1144,7 @@ int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Low Power Configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -1161,7 +1157,7 @@ int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("AsyncEvent Configuration failed for deviceMap %u with error code %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -1169,118 +1165,118 @@ int MMWL_basicConfiguration(unsigned char deviceMap, unsigned int cascade)
         printf("AsyncEvent Configuration success for deviceMap %u \n\n", deviceMap);
     }
 
-	if (rlDevGlobalCfgArgs.LinkAdvChirpTest == TRUE)
-	{
-		/* Misc control configuration for RadarSS */
-		/* This API enables the Advanced chirp and per chirp phase shifter features */
-		retVal = MMWL_setMiscConfig(deviceMap);
-		if (retVal != RL_RET_CODE_OK)
-		{
-			printf("Misc control configuration failed for deviceMap %u with error code %d \n\n",
-				deviceMap, retVal);
-			return -1;
-		}
-		else
-		{
-			printf("Misc control configuration success for deviceMap %u \n\n", deviceMap);
-		}
-	}
-	
+    if (rlDevGlobalCfgArgs.LinkAdvChirpTest == TRUE)
+    {
+        /* Misc control configuration for RadarSS */
+        /* This API enables the Advanced chirp and per chirp phase shifter features */
+        retVal = MMWL_setMiscConfig(deviceMap);
+        if (retVal != RL_RET_CODE_OK)
+        {
+            printf("Misc control configuration failed for deviceMap %u with error code %d \n\n",
+                   deviceMap, retVal);
+            return -1;
+        }
+        else
+        {
+            printf("Misc control configuration success for deviceMap %u \n\n", deviceMap);
+        }
+    }
+
     return retVal;
 }
 
 /** @fn int MMWL_rfInit(unsigned char deviceMap)
-*
-*   @brief RFinit API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   RFinit API.
-*/
+ *
+ *   @brief RFinit API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   RFinit API.
+ */
 int MMWL_rfInit(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK, timeOutCnt = 0;
     mmwl_bRfInitComp = 0;
 
-	if (rlDevGlobalCfgArgs.CalibEnable == TRUE)
-	{
-		rlRfInitCalConf_t rfCalibCfgArgs = { 0 };
+    if (rlDevGlobalCfgArgs.CalibEnable == TRUE)
+    {
+        rlRfInitCalConf_t rfCalibCfgArgs = {0};
 
-		/* Calibration store */
-		if (rlDevGlobalCfgArgs.CalibStoreRestore == 1)
-		{
-			/* Enable only required boot-time calibrations, by default all are enabled in the device */
-			rfCalibCfgArgs.calibEnMask = 0x1FF0;
-		}
-		/* Calibration restore */
-		else
-		{
-			/* Disable all the boot-time calibrations, by default all are enabled in the device */
-			rfCalibCfgArgs.calibEnMask = 0x0;
-		}
-		/* RF Init Calibration Configuration */
-		retVal = rlRfInitCalibConfig(deviceMap, &rfCalibCfgArgs);
-		if (retVal != RL_RET_CODE_OK)
-		{
-			printf("RF Init Calibration Configuration failed for deviceMap %u with error %d \n\n",
-				deviceMap, retVal);
-			return -1;
-		}
-		else
-		{
-			printf("RF Init Calibration Configuration success for deviceMap %u \n\n", deviceMap);
-		}
+        /* Calibration store */
+        if (rlDevGlobalCfgArgs.CalibStoreRestore == 1)
+        {
+            /* Enable only required boot-time calibrations, by default all are enabled in the device */
+            rfCalibCfgArgs.calibEnMask = 0x1FF0;
+        }
+        /* Calibration restore */
+        else
+        {
+            /* Disable all the boot-time calibrations, by default all are enabled in the device */
+            rfCalibCfgArgs.calibEnMask = 0x0;
+        }
+        /* RF Init Calibration Configuration */
+        retVal = rlRfInitCalibConfig(deviceMap, &rfCalibCfgArgs);
+        if (retVal != RL_RET_CODE_OK)
+        {
+            printf("RF Init Calibration Configuration failed for deviceMap %u with error %d \n\n",
+                   deviceMap, retVal);
+            return -1;
+        }
+        else
+        {
+            printf("RF Init Calibration Configuration success for deviceMap %u \n\n", deviceMap);
+        }
 
-		/* Calibration restore */
-		if (rlDevGlobalCfgArgs.CalibStoreRestore == 0)
-		{
-			/* Load Calibration Data from a file */
-		    printf("Loading from file!");
-			retVal = MMWL_LoadCalibDataFromFile(deviceMap);
-			if (retVal != RL_RET_CODE_OK)
-			{
-				printf("Load Calibration Data from a file failed for deviceMap %u with error %d \n\n",
-					deviceMap, retVal);
-				return -1;
-			}
-			else
-			{
-				printf("Load Calibration Data from a file success for deviceMap %u \n\n", deviceMap);
-			}
+        /* Calibration restore */
+        if (rlDevGlobalCfgArgs.CalibStoreRestore == 0)
+        {
+            /* Load Calibration Data from a file */
+            printf("Loading from file!");
+            retVal = MMWL_LoadCalibDataFromFile(deviceMap);
+            if (retVal != RL_RET_CODE_OK)
+            {
+                printf("Load Calibration Data from a file failed for deviceMap %u with error %d \n\n",
+                       deviceMap, retVal);
+                return -1;
+            }
+            else
+            {
+                printf("Load Calibration Data from a file success for deviceMap %u \n\n", deviceMap);
+            }
 
-			/* Calibration Data Restore Configuration */
-			retVal = rlRfCalibDataRestore(deviceMap, &calibData);
-			if (retVal != RL_RET_CODE_OK)
-			{
-				printf("Calibration Data Restore Configuration failed for deviceMap %u with error %d \n\n",
-					deviceMap, retVal);
-				return -1;
-			}
-			else
-			{
-				printf("Calibration Data Restore Configuration success for deviceMap %u \n\n", deviceMap);
-				while (mmwl_bRfInitComp == 0U)
-				{
-					rlNonOsMainLoopTask();
-					rlAppSleep(15);
-					timeOutCnt++;
-					if (timeOutCnt > MMWL_API_RF_INIT_TIMEOUT)
-					{
-						retVal = RL_RET_CODE_RESP_TIMEOUT;
-						break;
-					}
-				}
-				mmwl_bRfInitComp = 0;
-			}
-		}
-	}
+            /* Calibration Data Restore Configuration */
+            retVal = rlRfCalibDataRestore(deviceMap, &calibData);
+            if (retVal != RL_RET_CODE_OK)
+            {
+                printf("Calibration Data Restore Configuration failed for deviceMap %u with error %d \n\n",
+                       deviceMap, retVal);
+                return -1;
+            }
+            else
+            {
+                printf("Calibration Data Restore Configuration success for deviceMap %u \n\n", deviceMap);
+                while (mmwl_bRfInitComp == 0U)
+                {
+                    rlNonOsMainLoopTask();
+                    rlAppSleep(15);
+                    timeOutCnt++;
+                    if (timeOutCnt > MMWL_API_RF_INIT_TIMEOUT)
+                    {
+                        retVal = RL_RET_CODE_RESP_TIMEOUT;
+                        break;
+                    }
+                }
+                mmwl_bRfInitComp = 0;
+            }
+        }
+    }
     retVal = rlRfInit(deviceMap);
     while (mmwl_bRfInitComp == 0U)
     {
-		rlNonOsMainLoopTask();
-		rlAppSleep(15);
+        rlNonOsMainLoopTask();
+        rlAppSleep(15);
         timeOutCnt++;
         if (timeOutCnt > MMWL_API_RF_INIT_TIMEOUT)
         {
@@ -1289,226 +1285,226 @@ int MMWL_rfInit(unsigned char deviceMap)
         }
     }
     mmwl_bRfInitComp = 0;
-	if (rlDevGlobalCfgArgs.CalibEnable == TRUE)
-	{
-		/* Calibration Store */
-		if (rlDevGlobalCfgArgs.CalibStoreRestore == 1)
-		{
-			/* If all the calibration is done successfully as per above Async-event status,
-			   now get the calibration data from the device */
-			   /* Calibration Data Store Configuration */
-			retVal = rlRfCalibDataStore(deviceMap, &calibData);
-			if (retVal != RL_RET_CODE_OK)
-			{
-				printf("Calibration Data Store Configuration failed for deviceMap %u with error %d \n\n",
-					deviceMap, retVal);
-				return -1;
-			}
-			else
-			{
-				printf("Calibration Data Store Configuration success for deviceMap %u \n\n", deviceMap);
-			}
+    if (rlDevGlobalCfgArgs.CalibEnable == TRUE)
+    {
+        /* Calibration Store */
+        if (rlDevGlobalCfgArgs.CalibStoreRestore == 1)
+        {
+            /* If all the calibration is done successfully as per above Async-event status,
+               now get the calibration data from the device */
+            /* Calibration Data Store Configuration */
+            retVal = rlRfCalibDataStore(deviceMap, &calibData);
+            if (retVal != RL_RET_CODE_OK)
+            {
+                printf("Calibration Data Store Configuration failed for deviceMap %u with error %d \n\n",
+                       deviceMap, retVal);
+                return -1;
+            }
+            else
+            {
+                printf("Calibration Data Store Configuration success for deviceMap %u \n\n", deviceMap);
+            }
 
-			/* Save Calibration Data to a file */
-			retVal = MMWL_saveCalibDataToFile(deviceMap);
-			if (retVal != RL_RET_CODE_OK)
-			{
-				printf("Save Calibration Data to a file failed for deviceMap %u with error %d \n\n",
-					deviceMap, retVal);
-				return -1;
-			}
-			else
-			{
-				printf("Save Calibration Data to a file success for deviceMap %u \n\n", deviceMap);
-			}
-		}
-	}
+            /* Save Calibration Data to a file */
+            retVal = MMWL_saveCalibDataToFile(deviceMap);
+            if (retVal != RL_RET_CODE_OK)
+            {
+                printf("Save Calibration Data to a file failed for deviceMap %u with error %d \n\n",
+                       deviceMap, retVal);
+                return -1;
+            }
+            else
+            {
+                printf("Save Calibration Data to a file success for deviceMap %u \n\n", deviceMap);
+            }
+        }
+    }
     return retVal;
 }
 
 /** @fn int MMWL_saveCalibDataToFile(unsigned char deviceMap)
-*
-*   @brief Save Calibration Data to a file.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Save Calibration Data to a file.
-*/
+ *
+ *   @brief Save Calibration Data to a file.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Save Calibration Data to a file.
+ */
 int MMWL_saveCalibDataToFile(unsigned char deviceMap)
 {
-	int retVal = RL_RET_CODE_OK;
-//	int i,j;
-//	int index = 0;
-//	char CalibdataBuff[2500] = { 0 };
-//	CalibrationDataPtr = _fsopen("CalibrationData.txt", "wt", _SH_DENYWR);
-//
-//	/* Copy data from all the 3 chunks */
-//	for (i = 0; i < 3; i++)
-//	{
-//		sprintf(CalibdataBuff + strlen(CalibdataBuff), "0x%04x\n", calibData.calibChunk[i].numOfChunk);
-//		sprintf(CalibdataBuff + strlen(CalibdataBuff), "0x%04x\n", calibData.calibChunk[i].chunkId);
-//		/* Store 224 bytes of data in each chunk in terms of 2 bytes per line */
-//		for (j = 0; j < 224; j+=2)
-//		{
-//			sprintf(CalibdataBuff + strlen(CalibdataBuff), "0x%02x%02x\n", calibData.calibChunk[i].calData[j+1], calibData.calibChunk[i].calData[j]);
-//		}
-//	}
-//
-//	fwrite(CalibdataBuff, sizeof(char), strlen(CalibdataBuff), CalibrationDataPtr);
-//	fflush(CalibrationDataPtr);
-//
-//	if (CalibrationDataPtr != NULL)
-//		fclose(CalibrationDataPtr); //TODO include this with linux filesystem
+    int retVal = RL_RET_CODE_OK;
+    //	int i,j;
+    //	int index = 0;
+    //	char CalibdataBuff[2500] = { 0 };
+    //	CalibrationDataPtr = _fsopen("CalibrationData.txt", "wt", _SH_DENYWR);
+    //
+    //	/* Copy data from all the 3 chunks */
+    //	for (i = 0; i < 3; i++)
+    //	{
+    //		sprintf(CalibdataBuff + strlen(CalibdataBuff), "0x%04x\n", calibData.calibChunk[i].numOfChunk);
+    //		sprintf(CalibdataBuff + strlen(CalibdataBuff), "0x%04x\n", calibData.calibChunk[i].chunkId);
+    //		/* Store 224 bytes of data in each chunk in terms of 2 bytes per line */
+    //		for (j = 0; j < 224; j+=2)
+    //		{
+    //			sprintf(CalibdataBuff + strlen(CalibdataBuff), "0x%02x%02x\n", calibData.calibChunk[i].calData[j+1], calibData.calibChunk[i].calData[j]);
+    //		}
+    //	}
+    //
+    //	fwrite(CalibdataBuff, sizeof(char), strlen(CalibdataBuff), CalibrationDataPtr);
+    //	fflush(CalibrationDataPtr);
+    //
+    //	if (CalibrationDataPtr != NULL)
+    //		fclose(CalibrationDataPtr); //TODO include this with linux filesystem
 
-	return retVal;
+    return retVal;
 }
 
 /** @fn int MMWL_LoadCalibDataFromFile(unsigned char deviceMap)
-*
-*   @brief Load Calibration Data from a file.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Load Calibration Data from a file.
-*/
+ *
+ *   @brief Load Calibration Data from a file.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Load Calibration Data from a file.
+ */
 int MMWL_LoadCalibDataFromFile(unsigned char deviceMap)
 {
-	int retVal = RLS_RET_CODE_NULL_PTR_ERROR;
-//	int index = 0;
-//	char CalibdataBuff[2500] = { 0 };
-//	char *s, buff[8], val[100];
-//	int i = 0;
-//	char readNumChunks = 0, readChunkId = 0;
-//
-//	CalibrationDataPtr = _fsopen("CalibrationData.txt", "rt", _SH_DENYRD);
-//
-//	if (CalibrationDataPtr == NULL)
-//	{
-//		printf("CalibrationData.txt does not exist or Error opening the file\n\n");
-//		return -1;
-//	}
-//
-//	/*seek the pointer to starting of the file */
-//	fseek(CalibrationDataPtr, 0, SEEK_SET);
-//
-//	/*parse the parameters by reading each line of the calib data file*/
-//	while ((readNumChunks != 3) && (readChunkId != 3))
-//	{
-//		unsigned char readDataChunks = 0;
-//		if ((s = fgets(buff, sizeof buff, CalibrationDataPtr)) != NULL)
-//		{
-//			/* Parse value from line */
-//			s = strtok(buff, "\n");
-//			if (s == NULL)
-//			{
-//				continue;
-//			}
-//			else
-//			{
-//				strncpy(val, s, STRINGLEN);
-//				calibData.calibChunk[i].numOfChunk = (rlUInt16_t)strtol(val, NULL, 0);
-//				readNumChunks++;
-//			}
-//		}
-//		if ((s = fgets(buff, sizeof buff, CalibrationDataPtr)) != NULL)
-//		{
-//			/* Parse value from line */
-//			s = strtok(buff, "\n");
-//			if (s == NULL)
-//			{
-//				continue;
-//			}
-//			else
-//			{
-//				strncpy(val, s, STRINGLEN);
-//				calibData.calibChunk[i].chunkId = (rlUInt16_t)strtol(val, NULL, 0);
-//				readChunkId++;
-//			}
-//		}
-//		while (((s = fgets(buff, sizeof buff, CalibrationDataPtr)) != NULL) && (readDataChunks != 222))
-//		{
-//			/* Parse value from line */
-//			const char* temp = &buff[0];
-//			char byte1[3];
-//			char byte2[3];
-//
-//			strncpy(byte1, temp +4, 2);
-//			byte1[2] = '\0';
-//			if (byte1 == NULL)
-//			{
-//				continue;
-//			}
-//			else
-//			{
-//				calibData.calibChunk[i].calData[readDataChunks] = (rlUInt8_t)strtol(byte1, NULL, 16);
-//				readDataChunks++;
-//			}
-//
-//			strncpy(byte2, temp + 2, 2);
-//			byte2[2] = '\0';
-//			if (byte2 == NULL)
-//			{
-//				continue;
-//			}
-//			else
-//			{
-//				calibData.calibChunk[i].calData[readDataChunks] = (rlUInt8_t)strtol(byte2, NULL, 16);
-//				readDataChunks++;
-//			}
-//		}
-//		i++;
-//	}
-//
-//	fflush(CalibrationDataPtr);
-//
-//	if (CalibrationDataPtr != NULL)
-//		fclose(CalibrationDataPtr); //Todo, uncomment this as well
+    int retVal = RLS_RET_CODE_NULL_PTR_ERROR;
+    //	int index = 0;
+    //	char CalibdataBuff[2500] = { 0 };
+    //	char *s, buff[8], val[100];
+    //	int i = 0;
+    //	char readNumChunks = 0, readChunkId = 0;
+    //
+    //	CalibrationDataPtr = _fsopen("CalibrationData.txt", "rt", _SH_DENYRD);
+    //
+    //	if (CalibrationDataPtr == NULL)
+    //	{
+    //		printf("CalibrationData.txt does not exist or Error opening the file\n\n");
+    //		return -1;
+    //	}
+    //
+    //	/*seek the pointer to starting of the file */
+    //	fseek(CalibrationDataPtr, 0, SEEK_SET);
+    //
+    //	/*parse the parameters by reading each line of the calib data file*/
+    //	while ((readNumChunks != 3) && (readChunkId != 3))
+    //	{
+    //		unsigned char readDataChunks = 0;
+    //		if ((s = fgets(buff, sizeof buff, CalibrationDataPtr)) != NULL)
+    //		{
+    //			/* Parse value from line */
+    //			s = strtok(buff, "\n");
+    //			if (s == NULL)
+    //			{
+    //				continue;
+    //			}
+    //			else
+    //			{
+    //				strncpy(val, s, STRINGLEN);
+    //				calibData.calibChunk[i].numOfChunk = (rlUInt16_t)strtol(val, NULL, 0);
+    //				readNumChunks++;
+    //			}
+    //		}
+    //		if ((s = fgets(buff, sizeof buff, CalibrationDataPtr)) != NULL)
+    //		{
+    //			/* Parse value from line */
+    //			s = strtok(buff, "\n");
+    //			if (s == NULL)
+    //			{
+    //				continue;
+    //			}
+    //			else
+    //			{
+    //				strncpy(val, s, STRINGLEN);
+    //				calibData.calibChunk[i].chunkId = (rlUInt16_t)strtol(val, NULL, 0);
+    //				readChunkId++;
+    //			}
+    //		}
+    //		while (((s = fgets(buff, sizeof buff, CalibrationDataPtr)) != NULL) && (readDataChunks != 222))
+    //		{
+    //			/* Parse value from line */
+    //			const char* temp = &buff[0];
+    //			char byte1[3];
+    //			char byte2[3];
+    //
+    //			strncpy(byte1, temp +4, 2);
+    //			byte1[2] = '\0';
+    //			if (byte1 == NULL)
+    //			{
+    //				continue;
+    //			}
+    //			else
+    //			{
+    //				calibData.calibChunk[i].calData[readDataChunks] = (rlUInt8_t)strtol(byte1, NULL, 16);
+    //				readDataChunks++;
+    //			}
+    //
+    //			strncpy(byte2, temp + 2, 2);
+    //			byte2[2] = '\0';
+    //			if (byte2 == NULL)
+    //			{
+    //				continue;
+    //			}
+    //			else
+    //			{
+    //				calibData.calibChunk[i].calData[readDataChunks] = (rlUInt8_t)strtol(byte2, NULL, 16);
+    //				readDataChunks++;
+    //			}
+    //		}
+    //		i++;
+    //	}
+    //
+    //	fflush(CalibrationDataPtr);
+    //
+    //	if (CalibrationDataPtr != NULL)
+    //		fclose(CalibrationDataPtr); //Todo, uncomment this as well
 
-	return retVal;
+    return retVal;
 }
 
 /** @fn int MMWL_progFiltConfig(unsigned char deviceMap)
-*
-*   @brief Programmable filter configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Programmable filter configuration API.
-*/
+ *
+ *   @brief Programmable filter configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Programmable filter configuration API.
+ */
 int MMWL_progFiltConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlRfProgFiltConf_t progFiltCnfgArgs = { 0 };
+    rlRfProgFiltConf_t progFiltCnfgArgs = {0};
 
     /*read profileCfgArgs from config file*/
     MMWL_readProgFiltConfig(&progFiltCnfgArgs);
 
     printf("Calling rlRfSetProgFiltConfig with \ncoeffStartIdx[%d]\nprogFiltLen[%d] GHz\nprogFiltFreqShift[%d] MHz/uS \n\n",
-        progFiltCnfgArgs.coeffStartIdx, progFiltCnfgArgs.progFiltLen, progFiltCnfgArgs.progFiltFreqShift);
+           progFiltCnfgArgs.coeffStartIdx, progFiltCnfgArgs.progFiltLen, progFiltCnfgArgs.progFiltFreqShift);
     retVal = rlRfSetProgFiltConfig(deviceMap, &progFiltCnfgArgs);
     return retVal;
 }
 
 /** @fn int MMWL_progFiltCoeffRam(unsigned char deviceMap)
-*
-*   @brief Programmable Filter coefficient RAM configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Programmable Filter coefficient RAM configuration API.
-*/
+ *
+ *   @brief Programmable Filter coefficient RAM configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Programmable Filter coefficient RAM configuration API.
+ */
 int MMWL_progFiltCoeffRam(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlRfProgFiltCoeff_t progFiltCoeffCnfgArgs = { 0 };
+    rlRfProgFiltCoeff_t progFiltCoeffCnfgArgs = {0};
     progFiltCoeffCnfgArgs.coeffArray[0] = -876,
     progFiltCoeffCnfgArgs.coeffArray[1] = -272,
     progFiltCoeffCnfgArgs.coeffArray[2] = 1826,
@@ -1525,105 +1521,101 @@ int MMWL_progFiltCoeffRam(unsigned char deviceMap)
     progFiltCoeffCnfgArgs.coeffArray[13] = -876,
 
     printf("Calling rlRfSetProgFiltCoeffRam with \ncoeffArray0[%d]\ncoeffArray1[%d] GHz\ncoeffArray2[%d] MHz/uS \n\n",
-    progFiltCoeffCnfgArgs.coeffArray[0], progFiltCoeffCnfgArgs.coeffArray[1], progFiltCoeffCnfgArgs.coeffArray[2]);
+           progFiltCoeffCnfgArgs.coeffArray[0], progFiltCoeffCnfgArgs.coeffArray[1], progFiltCoeffCnfgArgs.coeffArray[2]);
     retVal = rlRfSetProgFiltCoeffRam(deviceMap, &progFiltCoeffCnfgArgs);
     return retVal;
 }
 
 /** @fn int MMWL_profileConfig(unsigned char deviceMap)
-*
-*   @brief Profile configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Profile configuration API.
-*/
+ *
+ *   @brief Profile configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Profile configuration API.
+ */
 int MMWL_profileConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK, i;
-	
-	if (rlDevGlobalCfgArgs.LinkAdvChirpTest == FALSE)
-	{
-		/*read profileCfgArgs from config file*/
-		MMWL_readProfileConfig(&profileCfgArgs[0], 1U);
 
-		printf("Calling rlSetProfileConfig with \nProfileId[%d]\nStart Frequency[%f] GHz\nRamp Slope[%f] MHz/uS \nPulseLength: [%f] \n\n",
-			profileCfgArgs[0].profileId, (float)((profileCfgArgs[0].startFreqConst * 53.6441803) / (1000 * 1000 * 1000)),
-			(float)(profileCfgArgs[0].freqSlopeConst * 48.2797623) / 1000.0),(float)profileCfgArgs[0].rampEndTime*10e-9;
-		/* with this API we can configure 2 profiles (max 4 profiles) at a time */
-		retVal = rlSetProfileConfig(deviceMap, 1U, &profileCfgArgs[0U]);
+    if (rlDevGlobalCfgArgs.LinkAdvChirpTest == FALSE)
+    {
+        /*read profileCfgArgs from config file*/
+        MMWL_readProfileConfig(&profileCfgArgs[0], 1U);
+
+        printf("Calling rlSetProfileConfig with \nProfileId[%d]\nStart Frequency[%f] GHz\nRamp Slope[%f] MHz/uS \nPulseLength: [%f] \n\n",
+               profileCfgArgs[0].profileId, (float)((profileCfgArgs[0].startFreqConst * 53.6441803) / (1000 * 1000 * 1000)),
+               (float)(profileCfgArgs[0].freqSlopeConst * 48.2797623) / 1000.0),
+            (float)profileCfgArgs[0].rampEndTime * 10e-9;
+        /* with this API we can configure 2 profiles (max 4 profiles) at a time */
+        retVal = rlSetProfileConfig(deviceMap, 1U, &profileCfgArgs[0U]);
 
         rlProfileCfg_t getprofileCfgArgs = {0};
 
-        retVal = rlGetProfileConfig(deviceMap,0,&getprofileCfgArgs);
+        retVal = rlGetProfileConfig(deviceMap, 0, &getprofileCfgArgs);
 
         printf("Got rlSetProfileConfig with \nProfileId[%d]\nStart Frequency[%f] GHz\nRamp Slope[%f] MHz/uS \n\n",
                getprofileCfgArgs.profileId, (float)((getprofileCfgArgs.startFreqConst * 53.6441803) / (1000 * 1000 * 1000)),
                (float)(getprofileCfgArgs.freqSlopeConst * 48.2797623) / 1000.0);
+    }
+    else
+    {
+        rlProfileCfg_t ProfileCfgArgs[4] = {0};
 
-	}
-	else
-	{
-		rlProfileCfg_t ProfileCfgArgs[4] = { 0 };
+        /*read ProfileCfgArgs from config file*/
+        MMWL_readProfileConfig(&ProfileCfgArgs[0], 4U);
 
-		/*read ProfileCfgArgs from config file*/
-		MMWL_readProfileConfig(&ProfileCfgArgs[0], 4U);
+        for (i = 0; i < 4; i++)
+        {
+            printf("Calling rlSetProfileConfig with \nProfileId[%d]\nStart Frequency[%f] GHz\nRamp Slope[%f] MHz/uS \n\n",
+                   ProfileCfgArgs[i].profileId, (float)((ProfileCfgArgs[i].startFreqConst * 53.6441803) / (1000 * 1000 * 1000)),
+                   (float)(ProfileCfgArgs[i].freqSlopeConst * 48.2797623) / 1000.0);
+        }
 
-		for (i = 0; i < 4; i++)
-		{
-			printf("Calling rlSetProfileConfig with \nProfileId[%d]\nStart Frequency[%f] GHz\nRamp Slope[%f] MHz/uS \n\n",
-				ProfileCfgArgs[i].profileId, (float)((ProfileCfgArgs[i].startFreqConst * 53.6441803) / (1000 * 1000 * 1000)),
-				(float)(ProfileCfgArgs[i].freqSlopeConst * 48.2797623) / 1000.0);
-		}
-
-		/* configuring 4 profiles at a time */
-		retVal = rlSetProfileConfig(deviceMap, 4U, &ProfileCfgArgs[0U]);
-	}
+        /* configuring 4 profiles at a time */
+        retVal = rlSetProfileConfig(deviceMap, 4U, &ProfileCfgArgs[0U]);
+    }
     return retVal;
 }
 
 /** @fn int MMWL_chirpConfig(unsigned char deviceMap)
-*
-*   @brief Chirp configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Chirp configuration API.
-*/
+ *
+ *   @brief Chirp configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Chirp configuration API.
+ */
 int MMWL_chirpConfig(unsigned char deviceMap)
 {
     int i, retVal = RL_RET_CODE_OK;
     rlChirpCfg_t setChirpCfgArgs[2] = {0};
 
-    rlChirpCfg_t getChirpCfgArgs[MAX_GET_CHIRP_CONFIG_IDX+1] = {0};
-//    rlChirpCfg_t getChirpCfgArgs = {0};
+    rlChirpCfg_t getChirpCfgArgs[MAX_GET_CHIRP_CONFIG_IDX + 1] = {0};
+    //    rlChirpCfg_t getChirpCfgArgs = {0};
 
     /*read chirpCfgArgs from config file*/
-    int n_chirp_configs = MMWL_readChirpConfig(&setChirpCfgArgs[0],2);
+    int n_chirp_configs = MMWL_readChirpConfig(&setChirpCfgArgs[0], 2);
 
-//    printf("Calling rlSetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n\n",
-//                setChirpCfgArgs[0].profileId, setChirpCfgArgs[0].chirpStartIdx,
-//                setChirpCfgArgs[0].chirpEndIdx);
-//    printf("Calling rlSetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d]\n\n",
-//           setChirpCfgArgs[0].profileId, setChirpCfgArgs[0].chirpStartIdx,
-//           setChirpCfgArgs[0].chirpEndIdx,setChirpCfgArgs[0].txEnable, setChirpCfgArgs[0].startFreqVar, setChirpCfgArgs[0].idleTimeVar,setChirpCfgArgs[0].freqSlopeVar, setChirpCfgArgs[0].adcStartTimeVar);
-    printf("Got [%d] chirpConfigs to read\n",n_chirp_configs);
-    for (i=0; i < n_chirp_configs; i++)
+    //    printf("Calling rlSetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n\n",
+    //                setChirpCfgArgs[0].profileId, setChirpCfgArgs[0].chirpStartIdx,
+    //                setChirpCfgArgs[0].chirpEndIdx);
+    //    printf("Calling rlSetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d]\n\n",
+    //           setChirpCfgArgs[0].profileId, setChirpCfgArgs[0].chirpStartIdx,
+    //           setChirpCfgArgs[0].chirpEndIdx,setChirpCfgArgs[0].txEnable, setChirpCfgArgs[0].startFreqVar, setChirpCfgArgs[0].idleTimeVar,setChirpCfgArgs[0].freqSlopeVar, setChirpCfgArgs[0].adcStartTimeVar);
+    printf("Got [%d] chirpConfigs to read\n", n_chirp_configs);
+    for (i = 0; i < n_chirp_configs; i++)
     {
         /* @Note- This check assumes that all chirp configs are configured by single setChirpCfgArgs[0] */
         /* compare each chirpConfig parameters to lastly configured via rlDynChirpConfig API */
         printf("Calling rlSetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d]\n\n",
                setChirpCfgArgs[i].profileId, setChirpCfgArgs[i].chirpStartIdx,
-               setChirpCfgArgs[i].chirpEndIdx,setChirpCfgArgs[i].txEnable, setChirpCfgArgs[i].startFreqVar, setChirpCfgArgs[i].idleTimeVar,setChirpCfgArgs[i].freqSlopeVar, setChirpCfgArgs[i].adcStartTimeVar);
-
+               setChirpCfgArgs[i].chirpEndIdx, setChirpCfgArgs[i].txEnable, setChirpCfgArgs[i].startFreqVar, setChirpCfgArgs[i].idleTimeVar, setChirpCfgArgs[i].freqSlopeVar, setChirpCfgArgs[i].adcStartTimeVar);
     }
-
-
-
 
     /* With this API we can configure max 512 chirp in one call */
     retVal = rlSetChirpConfig(deviceMap, n_chirp_configs, &setChirpCfgArgs[0]);
@@ -1638,54 +1630,52 @@ int MMWL_chirpConfig(unsigned char deviceMap)
       @Note - This examples read back (10+1) num of chirp config for demonstration,
                which user can raise to match with their requirement */
 
-//    retVal = rlGetChirpConfig(deviceMap, setChirpCfgArgs[0].chirpStartIdx,
-//                              setChirpCfgArgs[0].chirpStartIdx + MAX_GET_CHIRP_CONFIG_IDX, &getChirpCfgArgs[0]);
-//
+    //    retVal = rlGetChirpConfig(deviceMap, setChirpCfgArgs[0].chirpStartIdx,
+    //                              setChirpCfgArgs[0].chirpStartIdx + MAX_GET_CHIRP_CONFIG_IDX, &getChirpCfgArgs[0]);
+    //
     retVal = rlGetChirpConfig(deviceMap, setChirpCfgArgs[0].chirpStartIdx,
                               setChirpCfgArgs[0].chirpEndIdx, &getChirpCfgArgs[0]);
 
     if (retVal != RL_RET_CODE_OK)
     {
         printf("GetChirp Configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
     }
-//            printf("Called rlgetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
-//                   getChirpCfgArgs[0].profileId, getChirpCfgArgs[0].chirpStartIdx,
-//                   getChirpCfgArgs[0].chirpEndIdx,getChirpCfgArgs[0].txEnable, getChirpCfgArgs[0].startFreqVar, getChirpCfgArgs[0].idleTimeVar,getChirpCfgArgs[0].freqSlopeVar, getChirpCfgArgs[0].adcStartTimeVar);
+    //            printf("Called rlgetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
+    //                   getChirpCfgArgs[0].profileId, getChirpCfgArgs[0].chirpStartIdx,
+    //                   getChirpCfgArgs[0].chirpEndIdx,getChirpCfgArgs[0].txEnable, getChirpCfgArgs[0].startFreqVar, getChirpCfgArgs[0].idleTimeVar,getChirpCfgArgs[0].freqSlopeVar, getChirpCfgArgs[0].adcStartTimeVar);
 
     else
     {
-        for (i=0; i < n_chirp_configs; i++)
+        for (i = 0; i < n_chirp_configs; i++)
         {
             /* @Note- This check assumes that all chirp configs are configured by single setChirpCfgArgs[0] */
             /* compare each chirpConfig parameters to lastly configured via rlDynChirpConfig API */
-//            printf("GetChirpConfig compare to rlSetChirpConfig *** [%d] \n",i);
-                printf("Got rlgetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
-                       getChirpCfgArgs[i].profileId, getChirpCfgArgs[i].chirpStartIdx,
-                       getChirpCfgArgs[i].chirpEndIdx,getChirpCfgArgs[i].txEnable, getChirpCfgArgs[i].startFreqVar, getChirpCfgArgs[i].idleTimeVar,getChirpCfgArgs[i].freqSlopeVar, getChirpCfgArgs[i].adcStartTimeVar);
+            //            printf("GetChirpConfig compare to rlSetChirpConfig *** [%d] \n",i);
+            printf("Got rlgetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
+                   getChirpCfgArgs[i].profileId, getChirpCfgArgs[i].chirpStartIdx,
+                   getChirpCfgArgs[i].chirpEndIdx, getChirpCfgArgs[i].txEnable, getChirpCfgArgs[i].startFreqVar, getChirpCfgArgs[i].idleTimeVar, getChirpCfgArgs[i].freqSlopeVar, getChirpCfgArgs[i].adcStartTimeVar);
 
-
-            if ((getChirpCfgArgs[i].profileId != setChirpCfgArgs[i].profileId) || \
-                (getChirpCfgArgs[i].freqSlopeVar != setChirpCfgArgs[i].freqSlopeVar) || \
-                (getChirpCfgArgs[i].txEnable != setChirpCfgArgs[i].txEnable) || \
-                (getChirpCfgArgs[i].startFreqVar != setChirpCfgArgs[i].startFreqVar) || \
-                (getChirpCfgArgs[i].idleTimeVar != setChirpCfgArgs[i].idleTimeVar) || \
+            if ((getChirpCfgArgs[i].profileId != setChirpCfgArgs[i].profileId) ||
+                (getChirpCfgArgs[i].freqSlopeVar != setChirpCfgArgs[i].freqSlopeVar) ||
+                (getChirpCfgArgs[i].txEnable != setChirpCfgArgs[i].txEnable) ||
+                (getChirpCfgArgs[i].startFreqVar != setChirpCfgArgs[i].startFreqVar) ||
+                (getChirpCfgArgs[i].idleTimeVar != setChirpCfgArgs[i].idleTimeVar) ||
                 (getChirpCfgArgs[i].adcStartTimeVar != setChirpCfgArgs[i].adcStartTimeVar))
             {
 
-//                            printf("Called rlsetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
-//                   setChirpCfgArgs[i].profileId, setChirpCfgArgs[i].chirpStartIdx,
-//                   setChirpCfgArgs[i].chirpEndIdx,setChirpCfgArgs[i].txEnable, setChirpCfgArgs[i].startFreqVar, setChirpCfgArgs[i].idleTimeVar,setChirpCfgArgs[i].freqSlopeVar, setChirpCfgArgs[i].adcStartTimeVar);
-//
-//                printf("Called rlgetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
-//                       getChirpCfgArgs[i].profileId, getChirpCfgArgs[i].chirpStartIdx,
-//                       getChirpCfgArgs[i].chirpEndIdx,getChirpCfgArgs[i].txEnable, getChirpCfgArgs[i].startFreqVar, getChirpCfgArgs[i].idleTimeVar,getChirpCfgArgs[i].freqSlopeVar, getChirpCfgArgs[i].adcStartTimeVar);
+                //                            printf("Called rlsetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
+                //                   setChirpCfgArgs[i].profileId, setChirpCfgArgs[i].chirpStartIdx,
+                //                   setChirpCfgArgs[i].chirpEndIdx,setChirpCfgArgs[i].txEnable, setChirpCfgArgs[i].startFreqVar, setChirpCfgArgs[i].idleTimeVar,setChirpCfgArgs[i].freqSlopeVar, setChirpCfgArgs[i].adcStartTimeVar);
+                //
+                //                printf("Called rlgetChirpConfig with \nProfileId[%d]\nStart Idx[%d]\nEnd Idx[%d] \n txEnable[%d]\nstartFreqVar [%d] \n idletimeVar[%d] \n freqSlopeVar [%d]  \n adcstarttime [%d] \n\n",
+                //                       getChirpCfgArgs[i].profileId, getChirpCfgArgs[i].chirpStartIdx,
+                //                       getChirpCfgArgs[i].chirpEndIdx,getChirpCfgArgs[i].txEnable, getChirpCfgArgs[i].startFreqVar, getChirpCfgArgs[i].idleTimeVar,getChirpCfgArgs[i].freqSlopeVar, getChirpCfgArgs[i].adcStartTimeVar);
 
-                printf("*** Failed - Parameters are mismatched GetChirpConfig compare to rlSetChirpConfig *** [%d] \n",i);
+                printf("*** Failed - Parameters are mismatched GetChirpConfig compare to rlSetChirpConfig *** [%d] \n", i);
 
                 break;
             }
-
         }
 
         if (i > MAX_GET_CHIRP_CONFIG_IDX)
@@ -1697,19 +1687,19 @@ int MMWL_chirpConfig(unsigned char deviceMap)
     return retVal;
 }
 
-int MMWL_chirpParamCompare(rlChirpCfg_t * chirpData)
+int MMWL_chirpParamCompare(rlChirpCfg_t *chirpData)
 {
-    int retVal = RL_RET_CODE_OK, i = 0,j = 0;
+    int retVal = RL_RET_CODE_OK, i = 0, j = 0;
     /* compare each chirpConfig parameters to lastly configured via rlDynChirpConfig API */
     while (i <= MAX_GET_CHIRP_CONFIG_IDX)
     {
         if (dynChirpCfgArgs[0].chirpRowSelect == 0x00)
         {
-            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 4, 0)) || \
-                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 6, 8)) || \
-                (chirpData->txEnable != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 3, 16)) || \
-                (chirpData->startFreqVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 23, 0)) || \
-                (chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 12, 0)) || \
+            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 4, 0)) ||
+                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 6, 8)) ||
+                (chirpData->txEnable != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 3, 16)) ||
+                (chirpData->startFreqVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 23, 0)) ||
+                (chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 12, 0)) ||
                 (chirpData->adcStartTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 12, 16)))
             {
                 break;
@@ -1719,24 +1709,24 @@ int MMWL_chirpParamCompare(rlChirpCfg_t * chirpData)
         }
         else if (dynChirpCfgArgs[0].chirpRowSelect == 0x10)
         {
-            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 4, 0)) || \
-                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 6, 8)) || \
+            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 4, 0)) ||
+                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 6, 8)) ||
                 (chirpData->txEnable != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 3, 16)))
             {
                 break;
             }
             i++;
             chirpData++;
-            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 4, 0)) || \
-                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 6, 8)) || \
+            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 4, 0)) ||
+                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 6, 8)) ||
                 (chirpData->txEnable != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 3, 16)))
             {
                 break;
             }
             i++;
             chirpData++;
-            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 4, 0)) || \
-                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 6, 8)) || \
+            if ((chirpData->profileId != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 4, 0)) ||
+                (chirpData->freqSlopeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 6, 8)) ||
                 (chirpData->txEnable != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 3, 16)))
             {
                 break;
@@ -1767,21 +1757,21 @@ int MMWL_chirpParamCompare(rlChirpCfg_t * chirpData)
         }
         else if (dynChirpCfgArgs[0].chirpRowSelect == 0x30)
         {
-            if ((chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 12, 0)) || \
+            if ((chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 12, 0)) ||
                 (chirpData->adcStartTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR1, 12, 16)))
             {
                 break;
             }
             i++;
             chirpData++;
-            if ((chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 12, 0)) || \
+            if ((chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 12, 0)) ||
                 (chirpData->adcStartTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR2, 12, 16)))
             {
                 break;
             }
             i++;
             chirpData++;
-            if ((chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 12, 0)) || \
+            if ((chirpData->idleTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 12, 0)) ||
                 (chirpData->adcStartTimeVar != GET_BIT_VALUE(dynChirpCfgArgs[0].chirpRow[j].chirpNR3, 12, 16)))
             {
                 break;
@@ -1799,9 +1789,9 @@ int MMWL_chirpParamCompare(rlChirpCfg_t * chirpData)
 }
 int MMWL_getDynChirpConfig(unsigned char deviceMap)
 {
-    int retVal = RL_RET_CODE_OK,i = 0, j= 0, chirpNotMatch = 0;
+    int retVal = RL_RET_CODE_OK, i = 0, j = 0, chirpNotMatch = 0;
     unsigned short chirpStartIdx;
-    rlChirpCfg_t chirpCfgArgs[MAX_GET_CHIRP_CONFIG_IDX+1] = {0};
+    rlChirpCfg_t chirpCfgArgs[MAX_GET_CHIRP_CONFIG_IDX + 1] = {0};
     if (dynChirpCfgArgs[0].chirpRowSelect == 0x00)
     {
         chirpStartIdx = (dynChirpCfgArgs[0].chirpSegSel * 16);
@@ -1817,7 +1807,7 @@ int MMWL_getDynChirpConfig(unsigned char deviceMap)
 
     if (retVal != RL_RET_CODE_OK)
     {
-        printf("*** Failed - rlGetChirpConfig failed with %d*** \n\n",retVal);
+        printf("*** Failed - rlGetChirpConfig failed with %d*** \n\n", retVal);
     }
 
     retVal = MMWL_chirpParamCompare(&chirpCfgArgs[0]);
@@ -1835,697 +1825,694 @@ int MMWL_getDynChirpConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_advChirpConfigAll(unsigned char deviceMap)
-*
-*   @brief Advanced chirp configuration API.
-*
-*   @param[in] deviceMap - Device Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Advanced chirp configuration API.
-*/
+ *
+ *   @brief Advanced chirp configuration API.
+ *
+ *   @param[in] deviceMap - Device Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Advanced chirp configuration API.
+ */
 int MMWL_advChirpConfigAll(unsigned char deviceMap)
 {
-	int retVal = RL_RET_CODE_OK;
-//
-//	rlAdvChirpCfg_t AdvChirpCfgArgs = { 0 };
-//	rlFillLUTParams_t rlFillLUTParamsArgs = { 0 };
-//	rlAdvChirpLUTProfileCfg_t AdvChirpLUTProfileCfgArgs = { 0 };
-//	/* profile ID LUT dither local buffer */
-//	rlUInt8_t ProfileCfgData[4] = { 0 };
-//	rlAdvChirpLUTStartFreqCfg_t AdvChirpLUTStartFreqCfgArgs = { 0 };
-//	/* Frequency start LUT dither local buffer */
-//	rlInt16_t StartFreqData[4] = { 0 }; /* Change this based on the chirp param size*/
-//	rlAdvChirpLUTFreqSlopeCfg_t AdvChirpLUTFreqSlopeCfgArgs = { 0 };
-//	/* Frequency slope LUT dither local buffer */
-//	rlInt8_t FreqSlopeData[4] = { 0 };
-//	rlAdvChirpLUTIdleTimeCfg_t AdvChirpLUTIdleTimeCfgArgs = { 0 };
-//	/* Idle Time LUT dither local buffer */
-//	rlInt16_t IdleTimeData[4] = { 0 }; /* Change this based on the chirp param size*/
-//	rlAdvChirpLUTADCTimeCfg_t AdvChirpLUTADCTimeCfgArgs = { 0 };
-//	/* ADC start Time LUT dither local buffer */
-//	rlInt16_t ADCStartTimeData[4] = { 0 }; /* Change this based on the chirp param size*/
-//	rlAdvChirpLUTTxEnCfg_t AdvChirpLUTTxEnCfgArgs = { 0 };
-//	/* Tx Enable LUT dither local buffer */
-//	rlUInt8_t TxEnCfgData[4] = { 0 };
-//	rlAdvChirpLUTBpmEnCfg_t AdvChirpLUTBpmEnCfgArgs = { 0 };
-//	/* BPM Enable LUT dither local buffer */
-//	rlUInt8_t BpmEnCfgData[4] = { 0 };
-//	rlAdvChirpLUTTx0PhShiftCfg_t AdvChirpLUTTx0PhShiftCfgArgs = { 0 };
-//	/* Tx0 Phase shifter LUT dither local buffer */
-//	rlInt8_t Tx0PhShiftData[4] = { 0 };
-//	rlAdvChirpLUTTx1PhShiftCfg_t AdvChirpLUTTx1PhShiftCfgArgs = { 0 };
-//	/* Tx1 Phase shifter LUT dither local buffer */
-//	rlInt8_t Tx1PhShiftData[4] = { 0 };
-//	rlAdvChirpLUTTx2PhShiftCfg_t AdvChirpLUTTx2PhShiftCfgArgs = { 0 };
-//	/* Tx2 Phase shifter LUT dither local buffer */
-//	rlInt8_t Tx2PhShiftData[4] = { 0 };
-//
-//	/* Configuring Profile (Param Index = 0) */
-//	/* Fixed delta dither is not supported for profile parameter */
-//	/* Configuring 4 unique profile index (0,1,2,3) in the generic SW LUT - LUT Reset period (4) */
-//	/* The new profile index is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    Profile
-//	       0         0
-//		   1         1
-//		   2         2
-//		   3         3
-//		   4         0     and so on */
-//	/* LUT start address offset for the profile chirp parameter is made 0 */
-//	/* AdvChirpLUTData[0] is the start address offset (Offset = 0), Each data parameter is 4 bits */
-//	/* Number of unique LUT dither parameters (4) */
-//	AdvChirpCfgArgs.chirpParamIdx = 0;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1; /* Make it zero if LUT index zero (PF0) to be applied for all the chirps */
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 0;
-//	AdvChirpCfgArgs.numOfPatterns = 4; /* Uses 4 different profiles. Make it one, if it requires only a single profile */
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpProfileConfig(&AdvChirpLUTProfileCfgArgs);
-//	printf("Saving advChirpLUTProfileConfig with \nLUTAddrOff[%d]\nProfileCfgData[0]=[%d]\nProfileCfgData[1]=[%d]\nProfileCfgData[2]=[%d]\nProfileCfgData[3]=[%d] \n\n",
-//		AdvChirpLUTProfileCfgArgs.LUTAddrOff, AdvChirpLUTProfileCfgArgs.ProfileCfgData[0], AdvChirpLUTProfileCfgArgs.ProfileCfgData[1],
-//		AdvChirpLUTProfileCfgArgs.ProfileCfgData[2], AdvChirpLUTProfileCfgArgs.ProfileCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	memcpy(&ProfileCfgData[0], &AdvChirpLUTProfileCfgArgs.ProfileCfgData[0], 4 * sizeof(rlUInt8_t));
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_PROFILE_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &ProfileCfgData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* Start Frequency (Param Index = 1) */
-//	/* Fixed start frequency delta dither (-20000) LSB's = (-20000 * 3.6 GHz) / 2^26 = -0.0010728 GHz, the delta dither
-//	   will accumulate every single chirp (update period = 1) and it will reset every 8 chirps */
-//	/* Configuring 4 unique start frequency LUT dither (-0.000001,0.000000,0.000001,-0.000001) GHz from mmwaveconfig.txt */
-//	/* The new start frequency LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    Start Freq (from Profile) + LUT dither + Fixed delta dither
-//		   0         77 GHz + -0.000001 GHz + 0
-//		   1         77 GHz + 0.000000 GHz + -0.0010728 GHz
-//		   2         77 GHz + 0.000001 GHz + -0.0010728*2 GHz
-//		   3         77 GHz + -0.000001 GHz + -0.0010728*3 GHz
-//		   4         77 GHz + -0.000001 GHz + -0.0010728*4 GHz  (LUT reset period = 4)
-//		   5         77 GHz + 0.000000 GHz + -0.0010728*5 GHz
-//		   6         77 GHz + 0.000001 GHz + -0.0010728*6 GHz
-//		   7         77 GHz + -0.000001 GHz + -0.0010728*7 GHz
-//		   8         77 GHz + -0.000001 GHz + 0                 (Delta dither reset period = 8) and so on */
-//	/* LUT start address offset for the start frequency chirp parameter is made 4 */
-//	/* AdvChirpLUTData[4] is the start address offset (Offset = 4), Each data parameter is 2 bytes (used lutChirpParamSize = 1 and lutChirpParamScale = 0) */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 1;
-//	AdvChirpCfgArgs.resetMode = 0; /* reset at the end of frame */
-//	AdvChirpCfgArgs.deltaResetPeriod = 8;
-//	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1; /* Update start frequency for each chirp */
-//	AdvChirpCfgArgs.sf0ChirpParamDelta = -20000; /* This value corresponds to (-20000 * 3.6 GHz) / 2^26 */
-//	AdvChirpCfgArgs.sf1ChirpParamDelta = 0; /* In legacy frame - SF1, SF2 and SF3 are not used */
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 4;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//	AdvChirpCfgArgs.lutChirpParamSize = 1;
-//	AdvChirpCfgArgs.lutChirpParamScale = 0;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpStartFreqConfig(&AdvChirpLUTStartFreqCfgArgs);
-//	printf("Saving advChirpLUTStartFreqConfig with \nLUTAddrOff[%d]\nParamSize[%d]\nParamScale[%d]\nStartFreqCfgData[0]=[%.6f] GHz\nStartFreqCfgData[1]=[%.6f] GHz\nStartFreqCfgData[2]=[%.6f] GHz\nStartFreqCfgData[3]=[%.6f] GHz \n\n",
-//		AdvChirpLUTStartFreqCfgArgs.LUTAddrOff, AdvChirpLUTStartFreqCfgArgs.ParamSize, AdvChirpLUTStartFreqCfgArgs.ParamScale, AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[0], AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[1],
-//		AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[2], AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	/* Dividing the input param data by 1 LSB . 1 LSB = ((3.6 * 10^9)/2^26) * 2^Scale Hz = (3.6 * 2^Scale)/2^26 GHz */
-//	StartFreqData[0] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[0] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
-//	StartFreqData[1] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[1] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
-//	StartFreqData[2] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[2] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
-//	StartFreqData[3] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[3] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_FREQ_START_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &(rlInt8_t)StartFreqData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* Frequency Slope (Param Index = 2) */
-//	/* Fixed slope delta dither (-10) LSB's = (-10 * 3.6 * 900 GHz) / 2^26 = -0.482797 MHz/us, the delta dither
-//	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
-//	/* Configuring 4 unique slope LUT dither (-0.050,0.000,-0.050,0.050) MHz/us from mmwaveconfig.txt */
-//	/* The new slope LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    Slope (from Profile) + LUT dither + Fixed delta dither
-//		   0         29.982 MHz/us + -0.050 MHz/us + 0
-//		   1         29.982 MHz/us + 0.000 MHz/us + -0.482797 MHz/us
-//		   2         29.982 MHz/us + -0.050 MHz/us + -0.482797*2 MHz/us
-//		   3         29.982 MHz/us + 0.050 MHz/us + -0.482797*3 MHz/us
-//		   4         29.982 MHz/us + -0.050 MHz/us + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
-//	/* LUT start address offset for the slope chirp parameter is made 12 */
-//	/* AdvChirpLUTData[12] is the start address offset (Offset = 12), Each data parameter is 1 byte */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 2;
-//	AdvChirpCfgArgs.deltaResetPeriod = 4;
-//	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.sf0ChirpParamDelta = -10;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 12;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpFreqSlopeConfig(&AdvChirpLUTFreqSlopeCfgArgs);
-//	printf("Saving advChirpLUTFreqSlopeConfig with \nLUTAddrOff[%d]\nFreqSlopeCfgData[0]=[%.3f] MHz/us\nFreqSlopeCfgData[1]=[%.3f] MHz/us\nFreqSlopeCfgData[2]=[%.3f] MHz/us\nFreqSlopeCfgData[3]=[%.3f] MHz/us \n\n",
-//		AdvChirpLUTFreqSlopeCfgArgs.LUTAddrOff, AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[0], AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[1],
-//		AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[2], AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//    /* Dividing the input param data by 1 LSB . 1 LSB = ((3.6 * 10^9)* 900 /2^26) Hz = 48.279 KHz = 0.048279 MHz*/
-//	FreqSlopeData[0] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[0] * (67108864.0 / 3240000.0));
-//	FreqSlopeData[1] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[1] * (67108864.0 / 3240000.0));
-//	FreqSlopeData[2] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[2] * (67108864.0 / 3240000.0));
-//	FreqSlopeData[3] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[3] * (67108864.0 / 3240000.0));
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_FREQ_SLOPE_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &FreqSlopeData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* Idle time (Param Index = 3) */
-//	/* Fixed idle time delta dither (2) LSB's = (2 * 10 ns) = 0.02 us, the delta dither
-//	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
-//	/* Configuring 4 unique idle time LUT dither (0.01,0.02,0.00,0.01) us from mmwaveconfig.txt */
-//	/* The new idle time LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    Idle time (from Profile) + LUT dither + Fixed delta dither
-//		   0         100 us + 0.01 us + 0
-//		   1         100 us + 0.02 us + 0.02 us
-//		   2         100 us + 0.00 us + 0.02*2 us
-//		   3         100 us + 0.01 us + 0.02*3 us
-//		   4         100 us + 0.01 us + 0    (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
-//	/* LUT start address offset for the idle time chirp parameter is made 16 */
-//	/* AdvChirpLUTData[16] is the start address offset (Offset = 16), Each data parameter is 2 bytes (used lutChirpParamSize = 0 and lutChirpParamScale = 0) */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 3;
-//	AdvChirpCfgArgs.deltaResetPeriod = 4;
-//	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.sf0ChirpParamDelta = 2;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 16;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//	AdvChirpCfgArgs.lutChirpParamScale = 0;
-//	AdvChirpCfgArgs.lutChirpParamSize = 0;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpIdleTimeConfig(&AdvChirpLUTIdleTimeCfgArgs);
-//	printf("Saving advChirpLUTIdleTimeConfig with \nLUTAddrOff[%d]\nParamSize[%d]\nParamScale[%d]\nIdleTimeCfgData[0]=[%.2f] us\nIdleTimeCfgData[1]=[%.2f] us\nIdleTimeCfgData[2]=[%.2f] us\nIdleTimeCfgData[3]=[%.2f] us \n\n",
-//		AdvChirpLUTIdleTimeCfgArgs.LUTAddrOff, AdvChirpLUTIdleTimeCfgArgs.ParamSize, AdvChirpLUTIdleTimeCfgArgs.ParamScale, AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[0], AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[1],
-//		AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[2], AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	/* Dividing the input param data by 1 LSB . 1 LSB = 10ns * 2^scale  = 0.01 us * 2^scale */
-//	IdleTimeData[0] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[0] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
-//	IdleTimeData[1] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[1] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
-//	IdleTimeData[2] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[2] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
-//	IdleTimeData[3] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[3] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_IDLE_TIME_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &(rlInt8_t)IdleTimeData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* ADC start time (Param Index = 4) */
-//	/* Fixed ADC start time delta dither (3) LSB's = (3 * 10 ns) = 0.03 us, the delta dither
-//	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
-//	/* Configuring 4 unique idle time LUT dither (0.02,0.01,0.00,0.01) us from mmwaveconfig.txt */
-//	/* The new idle time LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    ADC start time (from Profile) + LUT dither + Fixed delta dither
-//		   0         6 us + 0.02 us + 0
-//		   1         6 us + 0.01 us + 0.03 us
-//		   2         6 us + 0.00 us + 0.03*2 us
-//		   3         6 us + 0.01 us + 0.03*3 us
-//		   4         6 us + 0.02 us + 0    (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
-//	/* LUT start address offset for the idle time chirp parameter is made 24 */
-//	/* AdvChirpLUTData[24] is the start address offset (Offset = 24), Each data parameter is 2 bytes (used lutChirpParamSize = 0 and lutChirpParamScale = 0) */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 4;
-//	AdvChirpCfgArgs.deltaResetPeriod = 4;
-//	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.sf0ChirpParamDelta = 3;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 24;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//	AdvChirpCfgArgs.lutChirpParamScale = 0;
-//	AdvChirpCfgArgs.lutChirpParamSize = 0;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpADCTimeConfig(&AdvChirpLUTADCTimeCfgArgs);
-//	printf("Saving advChirpLUTADCTimeConfig with \nLUTAddrOff[%d]\nParamSize[%d]\nParamScale[%d]\nADCTimeCfgData[0]=[%.2f] us\nADCTimeCfgData[1]=[%.2f] us\nADCTimeCfgData[2]=[%.2f] us\nADCTimeCfgData[3]=[%.2f] us \n\n",
-//		AdvChirpLUTADCTimeCfgArgs.LUTAddrOff, AdvChirpLUTADCTimeCfgArgs.ParamSize, AdvChirpLUTADCTimeCfgArgs.ParamScale, AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[0], AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[1],
-//		AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[2], AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	/* Dividing the input param data by 1 LSB . 1 LSB = 10ns * 2^scale  = 0.01 us * 2^scale */
-//	ADCStartTimeData[0] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[0] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
-//	ADCStartTimeData[1] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[1] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
-//	ADCStartTimeData[2] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[2] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
-//	ADCStartTimeData[3] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[3] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_ADC_START_TIME_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &(rlInt8_t)ADCStartTimeData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* Tx Enable (Param Index = 5) */
-//	/* Fixed delta dither is not supported for Tx Enable parameter */
-//	/* Configuring 4 unique Tx enable mask (7,3,1,2) in the generic SW LUT - LUT Reset period (4) */
-//	/* The new Tx enable mask is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    Tx enable mask
-//		   0         7
-//		   1         3
-//		   2         1
-//		   3         2
-//		   4         7     and so on */
-//    /* LUT start address offset for the Tx enable chirp parameter is made 32 */
-//    /* AdvChirpLUTData[32] is the start address offset (Offset = 32), Each data parameter is 4 bits */
-//    /* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 5;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 32;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpTxEnConfig(&AdvChirpLUTTxEnCfgArgs);
-//	printf("Saving advChirpLUTTxEnConfig with \nLUTAddrOff[%d]\nTxEnCfgData[0]=[%d]\nTxEnCfgData[1]=[%d]\nTxEnCfgData[2]=[%d]\nTxEnCfgData[3]=[%d] \n\n",
-//		AdvChirpLUTTxEnCfgArgs.LUTAddrOff, AdvChirpLUTTxEnCfgArgs.TxEnCfgData[0], AdvChirpLUTTxEnCfgArgs.TxEnCfgData[1],
-//		AdvChirpLUTTxEnCfgArgs.TxEnCfgData[2], AdvChirpLUTTxEnCfgArgs.TxEnCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	memcpy(&TxEnCfgData[0], &AdvChirpLUTTxEnCfgArgs.TxEnCfgData[0], 4 * sizeof(rlUInt8_t));
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_TX_EN_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &TxEnCfgData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* BPM Enable (Param Index = 6) */
-//	/* Fixed delta dither is not supported for BPM Enable parameter */
-//	/* Configuring 4 unique BPM enable mask (7,3,1,2) in the generic SW LUT - LUT Reset period (4) */
-//	/* The new BPM enable mask is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    BPM enable mask
-//		   0         7
-//		   1         3
-//		   2         1
-//		   3         2
-//		   4         7     and so on */
-//	/* LUT start address offset for the BPM enable chirp parameter is made 36 */
-//	/* AdvChirpLUTData[36] is the start address offset (Offset = 36), Each data parameter is 4 bits */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 6;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 36;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpBpmEnConfig(&AdvChirpLUTBpmEnCfgArgs);
-//	printf("Saving advChirpLUTBpmEnConfig with \nLUTAddrOff[%d]\nBpmEnCfgData[0]=[%d]\nBpmEnCfgData[1]=[%d]\nBpmEnCfgData[2]=[%d]\nBpmEnCfgData[3]=[%d] \n\n",
-//		AdvChirpLUTBpmEnCfgArgs.LUTAddrOff, AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[0], AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[1],
-//		AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[2], AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	memcpy(&BpmEnCfgData[0], &AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[0], 4 * sizeof(rlUInt8_t));
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_BPM_VAL_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &BpmEnCfgData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* TX0 Phase shifter (Param Index = 7) */
-//	/* Fixed TX0 phase shifter delta dither (512) LSB's = (512 * 360) degrees / 2^16 = 2.8125 degrees, the delta dither
-//	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
-//	/* Configuring 4 unique TX0 phase shifter LUT dither (5.625,11.250,16.875,16.875) degrees from mmwaveconfig.txt */
-//	/* The new TX0 phase shifter LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    TX0 PS (from Profile) + LUT dither + Fixed delta dither
-//			0         0 deg + 5.625 deg + 0
-//			1         0 deg + 11.250 deg + 2.8125 deg
-//			2         0 deg + 16.875 deg + 2.8125*2 deg
-//			3         0 deg + 16.875 deg + 2.8125*3 deg
-//			4         0 deg + 5.625 deg + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
-//	/* LUT start address offset for the TX0 PS chirp parameter is made 40 */
-//	/* AdvChirpLUTData[40] is the start address offset (Offset = 40), Each data parameter is 1 byte */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 7;
-//	AdvChirpCfgArgs.deltaResetPeriod = 4;
-//	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.sf0ChirpParamDelta = 512;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 40;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//	AdvChirpCfgArgs.maxTxPhShiftIntDither = 0;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpTx0PhShiftConfig(&AdvChirpLUTTx0PhShiftCfgArgs);
-//	printf("Saving advChirpLUTTx0PhShiftConfig with \nLUTAddrOff[%d]\nTx0PhShiftCfgData[0]=[%.3f] deg\nTx0PhShiftCfgData[1]=[%.3f] deg\nTx0PhShiftCfgData[2]=[%.3f] deg\nTx0PhShiftCfgData[3]=[%.3f] deg \n\n",
-//		AdvChirpLUTTx0PhShiftCfgArgs.LUTAddrOff, AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[0], AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[1],
-//		AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[2], AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	/* Dividing the input param data by 1 LSB . 1 LSB = 360 / 2^6 degrees */
-//	Tx0PhShiftData[0] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[0] * 64) / 360);
-//	Tx0PhShiftData[1] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[1] * 64) / 360);
-//	Tx0PhShiftData[2] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[2] * 64) / 360);
-//	Tx0PhShiftData[3] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[3] * 64) / 360);
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_TX0_PHASE_SHIFT_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &Tx0PhShiftData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* TX1 Phase shifter (Param Index = 8) */
-//	/* Fixed TX1 phase shifter delta dither (1024) LSB's = (1024 * 360) degrees / 2^16 = 5.625 degrees, the delta dither
-//	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
-//	/* Configuring 4 unique TX1 phase shifter LUT dither (0.000, 5.625,0.000, 5.625) degrees from mmwaveconfig.txt */
-//	/* The new TX1 phase shifter LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    TX1 PS (from Profile) + LUT dither + Fixed delta dither
-//		   0         0 deg + 0.000 deg + 0
-//		   1         0 deg + 5.625 deg + 5.625 deg
-//		   2         0 deg + 0.000 deg + 5.625*2 deg
-//		   3         0 deg + 5.625 deg + 5.625*3 deg
-//		   4         0 deg + 0.000 deg + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
-//	/* LUT start address offset for the TX1 PS chirp parameter is made 44 */
-//	/* AdvChirpLUTData[44] is the start address offset (Offset = 44), Each data parameter is 1 byte */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 8;
-//	AdvChirpCfgArgs.deltaResetPeriod = 4;
-//	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.sf0ChirpParamDelta = 1024;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 44;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//	AdvChirpCfgArgs.maxTxPhShiftIntDither = 0;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpTx1PhShiftConfig(&AdvChirpLUTTx1PhShiftCfgArgs);
-//	printf("Saving advChirpLUTTx1PhShiftConfig with \nLUTAddrOff[%d]\nTx1PhShiftCfgData[0]=[%.3f] deg\nTx1PhShiftCfgData[1]=[%.3f] deg\nTx1PhShiftCfgData[2]=[%.3f] deg\nTx1PhShiftCfgData[3]=[%.3f] deg \n\n",
-//		AdvChirpLUTTx1PhShiftCfgArgs.LUTAddrOff, AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[0], AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[1],
-//		AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[2], AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	/* Dividing the input param data by 1 LSB . 1 LSB = 360 / 2^6 degrees */
-//	Tx1PhShiftData[0] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[0] * 64) / 360);
-//	Tx1PhShiftData[1] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[1] * 64) / 360);
-//	Tx1PhShiftData[2] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[2] * 64) / 360);
-//	Tx1PhShiftData[3] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[3] * 64) / 360);
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_TX1_PHASE_SHIFT_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &Tx1PhShiftData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* TX2 Phase shifter (Param Index = 9) */
-//	/* Fixed TX2 phase shifter delta dither (2048) LSB's = (2048 * 360) degrees / 2^16 = 11.25 degrees, the delta dither
-//	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
-//	/* Configuring 4 unique TX2 phase shifter LUT dither (5.625,0.000, 5.625, 0.000) degrees from mmwaveconfig.txt */
-//	/* The new TX2 phase shifter LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
-//	/*   Chirp    TX2 PS (from Profile) + LUT dither + Fixed delta dither
-//		   0         0 deg + 5.625 deg + 0
-//		   1         0 deg + 0.000 deg + 11.25 deg
-//		   2         0 deg + 5.625 deg + 11.25*2 deg
-//		   3         0 deg + 0.000 deg + 11.25*3 deg
-//		   4         0 deg + 5.625 deg + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
-//	/* LUT start address offset for the TX2 PS chirp parameter is made 48 */
-//	/* AdvChirpLUTData[48] is the start address offset (Offset = 48), Each data parameter is 1 byte */
-//	/* Number of unique LUT dither parameters (4) */
-//	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
-//	AdvChirpCfgArgs.chirpParamIdx = 9;
-//	AdvChirpCfgArgs.deltaResetPeriod = 4;
-//	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.sf0ChirpParamDelta = 2048;
-//	AdvChirpCfgArgs.lutResetPeriod = 4;
-//	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
-//	AdvChirpCfgArgs.lutPatternAddressOffset = 48;
-//	AdvChirpCfgArgs.numOfPatterns = 4;
-//	AdvChirpCfgArgs.maxTxPhShiftIntDither = 0;
-//
-//	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//
-//	/* read the input param data */
-//	MMWL_readAdvChirpTx2PhShiftConfig(&AdvChirpLUTTx2PhShiftCfgArgs);
-//	printf("Saving advChirpLUTTx2PhShiftConfig with \nLUTAddrOff[%d]\nTx2PhShiftCfgData[0]=[%.3f] deg\nTx2PhShiftCfgData[1]=[%.3f] deg\nTx2PhShiftCfgData[2]=[%.3f] deg\nTx2PhShiftCfgData[3]=[%.3f] deg \n\n",
-//		AdvChirpLUTTx2PhShiftCfgArgs.LUTAddrOff, AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[0], AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[1],
-//		AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[2], AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[3]);
-//	/* copy the input param data from mmwaveconfig.txt to a local buffer */
-//	/* Dividing the input param data by 1 LSB . 1 LSB = 360 / 2^6 degrees */
-//	Tx2PhShiftData[0] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[0] * 64) / 360);
-//	Tx2PhShiftData[1] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[1] * 64) / 360);
-//	Tx2PhShiftData[2] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[2] * 64) / 360);
-//	Tx2PhShiftData[3] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[3] * 64) / 360);
-//
-//	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
-//	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_TX2_PHASE_SHIFT_VAR;
-//	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
-//	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
-//	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
-//	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &Tx2PhShiftData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
-//
-//	/* Save the entire locally programmed LUT data to a file for debug purposes
-//	   This locally programmed LUT data will be the same as RadarSS LUT at the device end */
-//	retVal = MMWL_saveAdvChirpLUTDataToFile(deviceMap);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - MMWL_saveAdvChirpLUTDataToFile failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//	else
-//	{
-//		printf("MMWL_saveAdvChirpLUTDataToFile success for deviceMap %u \n\n", deviceMap);
-//	}
-//
-//	/* Send the locally programmed LUT data to the device */
-//	rlAdvChirpLUTCfg_t rlAdvChirpLUTCfgArgs = { 0 };
-//	rlAdvChirpLUTCfgArgs.lutAddressOffset = 0;
-//	rlAdvChirpLUTCfgArgs.numBytes = lutOffsetInNBytes;
-//
-//	retVal = rlSetMultiAdvChirpLUTConfig(deviceMap, &rlAdvChirpLUTCfgArgs, &AdvChirpLUTData[0]);
-//	if (retVal != RL_RET_CODE_OK)
-//	{
-//		printf("*** Failed - rlSetMultiAdvChirpLUTConfig failed with error code %d*** \n\n", retVal);
-//		return retVal;
-//	}
-//	else
-//	{
-//		printf("rlSetMultiAdvChirpLUTConfig success for deviceMap %u \n\n", deviceMap);
-//	} //TODO uncomment this also, problems in line
+    int retVal = RL_RET_CODE_OK;
+    //
+    //	rlAdvChirpCfg_t AdvChirpCfgArgs = { 0 };
+    //	rlFillLUTParams_t rlFillLUTParamsArgs = { 0 };
+    //	rlAdvChirpLUTProfileCfg_t AdvChirpLUTProfileCfgArgs = { 0 };
+    //	/* profile ID LUT dither local buffer */
+    //	rlUInt8_t ProfileCfgData[4] = { 0 };
+    //	rlAdvChirpLUTStartFreqCfg_t AdvChirpLUTStartFreqCfgArgs = { 0 };
+    //	/* Frequency start LUT dither local buffer */
+    //	rlInt16_t StartFreqData[4] = { 0 }; /* Change this based on the chirp param size*/
+    //	rlAdvChirpLUTFreqSlopeCfg_t AdvChirpLUTFreqSlopeCfgArgs = { 0 };
+    //	/* Frequency slope LUT dither local buffer */
+    //	rlInt8_t FreqSlopeData[4] = { 0 };
+    //	rlAdvChirpLUTIdleTimeCfg_t AdvChirpLUTIdleTimeCfgArgs = { 0 };
+    //	/* Idle Time LUT dither local buffer */
+    //	rlInt16_t IdleTimeData[4] = { 0 }; /* Change this based on the chirp param size*/
+    //	rlAdvChirpLUTADCTimeCfg_t AdvChirpLUTADCTimeCfgArgs = { 0 };
+    //	/* ADC start Time LUT dither local buffer */
+    //	rlInt16_t ADCStartTimeData[4] = { 0 }; /* Change this based on the chirp param size*/
+    //	rlAdvChirpLUTTxEnCfg_t AdvChirpLUTTxEnCfgArgs = { 0 };
+    //	/* Tx Enable LUT dither local buffer */
+    //	rlUInt8_t TxEnCfgData[4] = { 0 };
+    //	rlAdvChirpLUTBpmEnCfg_t AdvChirpLUTBpmEnCfgArgs = { 0 };
+    //	/* BPM Enable LUT dither local buffer */
+    //	rlUInt8_t BpmEnCfgData[4] = { 0 };
+    //	rlAdvChirpLUTTx0PhShiftCfg_t AdvChirpLUTTx0PhShiftCfgArgs = { 0 };
+    //	/* Tx0 Phase shifter LUT dither local buffer */
+    //	rlInt8_t Tx0PhShiftData[4] = { 0 };
+    //	rlAdvChirpLUTTx1PhShiftCfg_t AdvChirpLUTTx1PhShiftCfgArgs = { 0 };
+    //	/* Tx1 Phase shifter LUT dither local buffer */
+    //	rlInt8_t Tx1PhShiftData[4] = { 0 };
+    //	rlAdvChirpLUTTx2PhShiftCfg_t AdvChirpLUTTx2PhShiftCfgArgs = { 0 };
+    //	/* Tx2 Phase shifter LUT dither local buffer */
+    //	rlInt8_t Tx2PhShiftData[4] = { 0 };
+    //
+    //	/* Configuring Profile (Param Index = 0) */
+    //	/* Fixed delta dither is not supported for profile parameter */
+    //	/* Configuring 4 unique profile index (0,1,2,3) in the generic SW LUT - LUT Reset period (4) */
+    //	/* The new profile index is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    Profile
+    //	       0         0
+    //		   1         1
+    //		   2         2
+    //		   3         3
+    //		   4         0     and so on */
+    //	/* LUT start address offset for the profile chirp parameter is made 0 */
+    //	/* AdvChirpLUTData[0] is the start address offset (Offset = 0), Each data parameter is 4 bits */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	AdvChirpCfgArgs.chirpParamIdx = 0;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1; /* Make it zero if LUT index zero (PF0) to be applied for all the chirps */
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 0;
+    //	AdvChirpCfgArgs.numOfPatterns = 4; /* Uses 4 different profiles. Make it one, if it requires only a single profile */
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpProfileConfig(&AdvChirpLUTProfileCfgArgs);
+    //	printf("Saving advChirpLUTProfileConfig with \nLUTAddrOff[%d]\nProfileCfgData[0]=[%d]\nProfileCfgData[1]=[%d]\nProfileCfgData[2]=[%d]\nProfileCfgData[3]=[%d] \n\n",
+    //		AdvChirpLUTProfileCfgArgs.LUTAddrOff, AdvChirpLUTProfileCfgArgs.ProfileCfgData[0], AdvChirpLUTProfileCfgArgs.ProfileCfgData[1],
+    //		AdvChirpLUTProfileCfgArgs.ProfileCfgData[2], AdvChirpLUTProfileCfgArgs.ProfileCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	memcpy(&ProfileCfgData[0], &AdvChirpLUTProfileCfgArgs.ProfileCfgData[0], 4 * sizeof(rlUInt8_t));
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_PROFILE_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &ProfileCfgData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* Start Frequency (Param Index = 1) */
+    //	/* Fixed start frequency delta dither (-20000) LSB's = (-20000 * 3.6 GHz) / 2^26 = -0.0010728 GHz, the delta dither
+    //	   will accumulate every single chirp (update period = 1) and it will reset every 8 chirps */
+    //	/* Configuring 4 unique start frequency LUT dither (-0.000001,0.000000,0.000001,-0.000001) GHz from mmwaveconfig.txt */
+    //	/* The new start frequency LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    Start Freq (from Profile) + LUT dither + Fixed delta dither
+    //		   0         77 GHz + -0.000001 GHz + 0
+    //		   1         77 GHz + 0.000000 GHz + -0.0010728 GHz
+    //		   2         77 GHz + 0.000001 GHz + -0.0010728*2 GHz
+    //		   3         77 GHz + -0.000001 GHz + -0.0010728*3 GHz
+    //		   4         77 GHz + -0.000001 GHz + -0.0010728*4 GHz  (LUT reset period = 4)
+    //		   5         77 GHz + 0.000000 GHz + -0.0010728*5 GHz
+    //		   6         77 GHz + 0.000001 GHz + -0.0010728*6 GHz
+    //		   7         77 GHz + -0.000001 GHz + -0.0010728*7 GHz
+    //		   8         77 GHz + -0.000001 GHz + 0                 (Delta dither reset period = 8) and so on */
+    //	/* LUT start address offset for the start frequency chirp parameter is made 4 */
+    //	/* AdvChirpLUTData[4] is the start address offset (Offset = 4), Each data parameter is 2 bytes (used lutChirpParamSize = 1 and lutChirpParamScale = 0) */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 1;
+    //	AdvChirpCfgArgs.resetMode = 0; /* reset at the end of frame */
+    //	AdvChirpCfgArgs.deltaResetPeriod = 8;
+    //	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1; /* Update start frequency for each chirp */
+    //	AdvChirpCfgArgs.sf0ChirpParamDelta = -20000; /* This value corresponds to (-20000 * 3.6 GHz) / 2^26 */
+    //	AdvChirpCfgArgs.sf1ChirpParamDelta = 0; /* In legacy frame - SF1, SF2 and SF3 are not used */
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 4;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //	AdvChirpCfgArgs.lutChirpParamSize = 1;
+    //	AdvChirpCfgArgs.lutChirpParamScale = 0;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpStartFreqConfig(&AdvChirpLUTStartFreqCfgArgs);
+    //	printf("Saving advChirpLUTStartFreqConfig with \nLUTAddrOff[%d]\nParamSize[%d]\nParamScale[%d]\nStartFreqCfgData[0]=[%.6f] GHz\nStartFreqCfgData[1]=[%.6f] GHz\nStartFreqCfgData[2]=[%.6f] GHz\nStartFreqCfgData[3]=[%.6f] GHz \n\n",
+    //		AdvChirpLUTStartFreqCfgArgs.LUTAddrOff, AdvChirpLUTStartFreqCfgArgs.ParamSize, AdvChirpLUTStartFreqCfgArgs.ParamScale, AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[0], AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[1],
+    //		AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[2], AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	/* Dividing the input param data by 1 LSB . 1 LSB = ((3.6 * 10^9)/2^26) * 2^Scale Hz = (3.6 * 2^Scale)/2^26 GHz */
+    //	StartFreqData[0] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[0] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
+    //	StartFreqData[1] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[1] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
+    //	StartFreqData[2] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[2] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
+    //	StartFreqData[3] = (rlInt16_t)round(((double)AdvChirpLUTStartFreqCfgArgs.StartFreqCfgData[3] * 67108864.0) / (3.6 * pow(2, AdvChirpLUTStartFreqCfgArgs.ParamScale)));
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_FREQ_START_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &(rlInt8_t)StartFreqData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* Frequency Slope (Param Index = 2) */
+    //	/* Fixed slope delta dither (-10) LSB's = (-10 * 3.6 * 900 GHz) / 2^26 = -0.482797 MHz/us, the delta dither
+    //	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
+    //	/* Configuring 4 unique slope LUT dither (-0.050,0.000,-0.050,0.050) MHz/us from mmwaveconfig.txt */
+    //	/* The new slope LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    Slope (from Profile) + LUT dither + Fixed delta dither
+    //		   0         29.982 MHz/us + -0.050 MHz/us + 0
+    //		   1         29.982 MHz/us + 0.000 MHz/us + -0.482797 MHz/us
+    //		   2         29.982 MHz/us + -0.050 MHz/us + -0.482797*2 MHz/us
+    //		   3         29.982 MHz/us + 0.050 MHz/us + -0.482797*3 MHz/us
+    //		   4         29.982 MHz/us + -0.050 MHz/us + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
+    //	/* LUT start address offset for the slope chirp parameter is made 12 */
+    //	/* AdvChirpLUTData[12] is the start address offset (Offset = 12), Each data parameter is 1 byte */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 2;
+    //	AdvChirpCfgArgs.deltaResetPeriod = 4;
+    //	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.sf0ChirpParamDelta = -10;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 12;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpFreqSlopeConfig(&AdvChirpLUTFreqSlopeCfgArgs);
+    //	printf("Saving advChirpLUTFreqSlopeConfig with \nLUTAddrOff[%d]\nFreqSlopeCfgData[0]=[%.3f] MHz/us\nFreqSlopeCfgData[1]=[%.3f] MHz/us\nFreqSlopeCfgData[2]=[%.3f] MHz/us\nFreqSlopeCfgData[3]=[%.3f] MHz/us \n\n",
+    //		AdvChirpLUTFreqSlopeCfgArgs.LUTAddrOff, AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[0], AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[1],
+    //		AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[2], AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //    /* Dividing the input param data by 1 LSB . 1 LSB = ((3.6 * 10^9)* 900 /2^26) Hz = 48.279 KHz = 0.048279 MHz*/
+    //	FreqSlopeData[0] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[0] * (67108864.0 / 3240000.0));
+    //	FreqSlopeData[1] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[1] * (67108864.0 / 3240000.0));
+    //	FreqSlopeData[2] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[2] * (67108864.0 / 3240000.0));
+    //	FreqSlopeData[3] = (rlInt8_t)round((double)AdvChirpLUTFreqSlopeCfgArgs.FreqSlopeCfgData[3] * (67108864.0 / 3240000.0));
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_FREQ_SLOPE_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &FreqSlopeData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* Idle time (Param Index = 3) */
+    //	/* Fixed idle time delta dither (2) LSB's = (2 * 10 ns) = 0.02 us, the delta dither
+    //	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
+    //	/* Configuring 4 unique idle time LUT dither (0.01,0.02,0.00,0.01) us from mmwaveconfig.txt */
+    //	/* The new idle time LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    Idle time (from Profile) + LUT dither + Fixed delta dither
+    //		   0         100 us + 0.01 us + 0
+    //		   1         100 us + 0.02 us + 0.02 us
+    //		   2         100 us + 0.00 us + 0.02*2 us
+    //		   3         100 us + 0.01 us + 0.02*3 us
+    //		   4         100 us + 0.01 us + 0    (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
+    //	/* LUT start address offset for the idle time chirp parameter is made 16 */
+    //	/* AdvChirpLUTData[16] is the start address offset (Offset = 16), Each data parameter is 2 bytes (used lutChirpParamSize = 0 and lutChirpParamScale = 0) */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 3;
+    //	AdvChirpCfgArgs.deltaResetPeriod = 4;
+    //	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.sf0ChirpParamDelta = 2;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 16;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //	AdvChirpCfgArgs.lutChirpParamScale = 0;
+    //	AdvChirpCfgArgs.lutChirpParamSize = 0;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpIdleTimeConfig(&AdvChirpLUTIdleTimeCfgArgs);
+    //	printf("Saving advChirpLUTIdleTimeConfig with \nLUTAddrOff[%d]\nParamSize[%d]\nParamScale[%d]\nIdleTimeCfgData[0]=[%.2f] us\nIdleTimeCfgData[1]=[%.2f] us\nIdleTimeCfgData[2]=[%.2f] us\nIdleTimeCfgData[3]=[%.2f] us \n\n",
+    //		AdvChirpLUTIdleTimeCfgArgs.LUTAddrOff, AdvChirpLUTIdleTimeCfgArgs.ParamSize, AdvChirpLUTIdleTimeCfgArgs.ParamScale, AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[0], AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[1],
+    //		AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[2], AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	/* Dividing the input param data by 1 LSB . 1 LSB = 10ns * 2^scale  = 0.01 us * 2^scale */
+    //	IdleTimeData[0] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[0] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
+    //	IdleTimeData[1] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[1] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
+    //	IdleTimeData[2] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[2] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
+    //	IdleTimeData[3] = (rlInt16_t)round(((double)AdvChirpLUTIdleTimeCfgArgs.IdleTimeCfgData[3] * 100) / pow(2, AdvChirpLUTIdleTimeCfgArgs.ParamScale));
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_IDLE_TIME_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &(rlInt8_t)IdleTimeData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* ADC start time (Param Index = 4) */
+    //	/* Fixed ADC start time delta dither (3) LSB's = (3 * 10 ns) = 0.03 us, the delta dither
+    //	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
+    //	/* Configuring 4 unique idle time LUT dither (0.02,0.01,0.00,0.01) us from mmwaveconfig.txt */
+    //	/* The new idle time LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    ADC start time (from Profile) + LUT dither + Fixed delta dither
+    //		   0         6 us + 0.02 us + 0
+    //		   1         6 us + 0.01 us + 0.03 us
+    //		   2         6 us + 0.00 us + 0.03*2 us
+    //		   3         6 us + 0.01 us + 0.03*3 us
+    //		   4         6 us + 0.02 us + 0    (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
+    //	/* LUT start address offset for the idle time chirp parameter is made 24 */
+    //	/* AdvChirpLUTData[24] is the start address offset (Offset = 24), Each data parameter is 2 bytes (used lutChirpParamSize = 0 and lutChirpParamScale = 0) */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 4;
+    //	AdvChirpCfgArgs.deltaResetPeriod = 4;
+    //	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.sf0ChirpParamDelta = 3;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 24;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //	AdvChirpCfgArgs.lutChirpParamScale = 0;
+    //	AdvChirpCfgArgs.lutChirpParamSize = 0;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpADCTimeConfig(&AdvChirpLUTADCTimeCfgArgs);
+    //	printf("Saving advChirpLUTADCTimeConfig with \nLUTAddrOff[%d]\nParamSize[%d]\nParamScale[%d]\nADCTimeCfgData[0]=[%.2f] us\nADCTimeCfgData[1]=[%.2f] us\nADCTimeCfgData[2]=[%.2f] us\nADCTimeCfgData[3]=[%.2f] us \n\n",
+    //		AdvChirpLUTADCTimeCfgArgs.LUTAddrOff, AdvChirpLUTADCTimeCfgArgs.ParamSize, AdvChirpLUTADCTimeCfgArgs.ParamScale, AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[0], AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[1],
+    //		AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[2], AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	/* Dividing the input param data by 1 LSB . 1 LSB = 10ns * 2^scale  = 0.01 us * 2^scale */
+    //	ADCStartTimeData[0] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[0] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
+    //	ADCStartTimeData[1] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[1] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
+    //	ADCStartTimeData[2] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[2] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
+    //	ADCStartTimeData[3] = (rlInt16_t)round(((double)AdvChirpLUTADCTimeCfgArgs.ADCTimeCfgData[3] * 100) / pow(2, AdvChirpLUTADCTimeCfgArgs.ParamScale));
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_ADC_START_TIME_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &(rlInt8_t)ADCStartTimeData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* Tx Enable (Param Index = 5) */
+    //	/* Fixed delta dither is not supported for Tx Enable parameter */
+    //	/* Configuring 4 unique Tx enable mask (7,3,1,2) in the generic SW LUT - LUT Reset period (4) */
+    //	/* The new Tx enable mask is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    Tx enable mask
+    //		   0         7
+    //		   1         3
+    //		   2         1
+    //		   3         2
+    //		   4         7     and so on */
+    //    /* LUT start address offset for the Tx enable chirp parameter is made 32 */
+    //    /* AdvChirpLUTData[32] is the start address offset (Offset = 32), Each data parameter is 4 bits */
+    //    /* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 5;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 32;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpTxEnConfig(&AdvChirpLUTTxEnCfgArgs);
+    //	printf("Saving advChirpLUTTxEnConfig with \nLUTAddrOff[%d]\nTxEnCfgData[0]=[%d]\nTxEnCfgData[1]=[%d]\nTxEnCfgData[2]=[%d]\nTxEnCfgData[3]=[%d] \n\n",
+    //		AdvChirpLUTTxEnCfgArgs.LUTAddrOff, AdvChirpLUTTxEnCfgArgs.TxEnCfgData[0], AdvChirpLUTTxEnCfgArgs.TxEnCfgData[1],
+    //		AdvChirpLUTTxEnCfgArgs.TxEnCfgData[2], AdvChirpLUTTxEnCfgArgs.TxEnCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	memcpy(&TxEnCfgData[0], &AdvChirpLUTTxEnCfgArgs.TxEnCfgData[0], 4 * sizeof(rlUInt8_t));
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_TX_EN_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &TxEnCfgData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* BPM Enable (Param Index = 6) */
+    //	/* Fixed delta dither is not supported for BPM Enable parameter */
+    //	/* Configuring 4 unique BPM enable mask (7,3,1,2) in the generic SW LUT - LUT Reset period (4) */
+    //	/* The new BPM enable mask is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    BPM enable mask
+    //		   0         7
+    //		   1         3
+    //		   2         1
+    //		   3         2
+    //		   4         7     and so on */
+    //	/* LUT start address offset for the BPM enable chirp parameter is made 36 */
+    //	/* AdvChirpLUTData[36] is the start address offset (Offset = 36), Each data parameter is 4 bits */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 6;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 36;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpBpmEnConfig(&AdvChirpLUTBpmEnCfgArgs);
+    //	printf("Saving advChirpLUTBpmEnConfig with \nLUTAddrOff[%d]\nBpmEnCfgData[0]=[%d]\nBpmEnCfgData[1]=[%d]\nBpmEnCfgData[2]=[%d]\nBpmEnCfgData[3]=[%d] \n\n",
+    //		AdvChirpLUTBpmEnCfgArgs.LUTAddrOff, AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[0], AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[1],
+    //		AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[2], AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	memcpy(&BpmEnCfgData[0], &AdvChirpLUTBpmEnCfgArgs.BpmEnCfgData[0], 4 * sizeof(rlUInt8_t));
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_CHIRP_BPM_VAL_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &BpmEnCfgData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* TX0 Phase shifter (Param Index = 7) */
+    //	/* Fixed TX0 phase shifter delta dither (512) LSB's = (512 * 360) degrees / 2^16 = 2.8125 degrees, the delta dither
+    //	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
+    //	/* Configuring 4 unique TX0 phase shifter LUT dither (5.625,11.250,16.875,16.875) degrees from mmwaveconfig.txt */
+    //	/* The new TX0 phase shifter LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    TX0 PS (from Profile) + LUT dither + Fixed delta dither
+    //			0         0 deg + 5.625 deg + 0
+    //			1         0 deg + 11.250 deg + 2.8125 deg
+    //			2         0 deg + 16.875 deg + 2.8125*2 deg
+    //			3         0 deg + 16.875 deg + 2.8125*3 deg
+    //			4         0 deg + 5.625 deg + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
+    //	/* LUT start address offset for the TX0 PS chirp parameter is made 40 */
+    //	/* AdvChirpLUTData[40] is the start address offset (Offset = 40), Each data parameter is 1 byte */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 7;
+    //	AdvChirpCfgArgs.deltaResetPeriod = 4;
+    //	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.sf0ChirpParamDelta = 512;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 40;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //	AdvChirpCfgArgs.maxTxPhShiftIntDither = 0;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpTx0PhShiftConfig(&AdvChirpLUTTx0PhShiftCfgArgs);
+    //	printf("Saving advChirpLUTTx0PhShiftConfig with \nLUTAddrOff[%d]\nTx0PhShiftCfgData[0]=[%.3f] deg\nTx0PhShiftCfgData[1]=[%.3f] deg\nTx0PhShiftCfgData[2]=[%.3f] deg\nTx0PhShiftCfgData[3]=[%.3f] deg \n\n",
+    //		AdvChirpLUTTx0PhShiftCfgArgs.LUTAddrOff, AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[0], AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[1],
+    //		AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[2], AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	/* Dividing the input param data by 1 LSB . 1 LSB = 360 / 2^6 degrees */
+    //	Tx0PhShiftData[0] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[0] * 64) / 360);
+    //	Tx0PhShiftData[1] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[1] * 64) / 360);
+    //	Tx0PhShiftData[2] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[2] * 64) / 360);
+    //	Tx0PhShiftData[3] = (rlInt8_t)(round(AdvChirpLUTTx0PhShiftCfgArgs.Tx0PhShiftCfgData[3] * 64) / 360);
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_TX0_PHASE_SHIFT_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &Tx0PhShiftData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* TX1 Phase shifter (Param Index = 8) */
+    //	/* Fixed TX1 phase shifter delta dither (1024) LSB's = (1024 * 360) degrees / 2^16 = 5.625 degrees, the delta dither
+    //	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
+    //	/* Configuring 4 unique TX1 phase shifter LUT dither (0.000, 5.625,0.000, 5.625) degrees from mmwaveconfig.txt */
+    //	/* The new TX1 phase shifter LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    TX1 PS (from Profile) + LUT dither + Fixed delta dither
+    //		   0         0 deg + 0.000 deg + 0
+    //		   1         0 deg + 5.625 deg + 5.625 deg
+    //		   2         0 deg + 0.000 deg + 5.625*2 deg
+    //		   3         0 deg + 5.625 deg + 5.625*3 deg
+    //		   4         0 deg + 0.000 deg + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
+    //	/* LUT start address offset for the TX1 PS chirp parameter is made 44 */
+    //	/* AdvChirpLUTData[44] is the start address offset (Offset = 44), Each data parameter is 1 byte */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 8;
+    //	AdvChirpCfgArgs.deltaResetPeriod = 4;
+    //	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.sf0ChirpParamDelta = 1024;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 44;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //	AdvChirpCfgArgs.maxTxPhShiftIntDither = 0;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpTx1PhShiftConfig(&AdvChirpLUTTx1PhShiftCfgArgs);
+    //	printf("Saving advChirpLUTTx1PhShiftConfig with \nLUTAddrOff[%d]\nTx1PhShiftCfgData[0]=[%.3f] deg\nTx1PhShiftCfgData[1]=[%.3f] deg\nTx1PhShiftCfgData[2]=[%.3f] deg\nTx1PhShiftCfgData[3]=[%.3f] deg \n\n",
+    //		AdvChirpLUTTx1PhShiftCfgArgs.LUTAddrOff, AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[0], AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[1],
+    //		AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[2], AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	/* Dividing the input param data by 1 LSB . 1 LSB = 360 / 2^6 degrees */
+    //	Tx1PhShiftData[0] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[0] * 64) / 360);
+    //	Tx1PhShiftData[1] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[1] * 64) / 360);
+    //	Tx1PhShiftData[2] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[2] * 64) / 360);
+    //	Tx1PhShiftData[3] = (rlInt8_t)(round(AdvChirpLUTTx1PhShiftCfgArgs.Tx1PhShiftCfgData[3] * 64) / 360);
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_TX1_PHASE_SHIFT_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &Tx1PhShiftData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* TX2 Phase shifter (Param Index = 9) */
+    //	/* Fixed TX2 phase shifter delta dither (2048) LSB's = (2048 * 360) degrees / 2^16 = 11.25 degrees, the delta dither
+    //	   will accumulate every single chirp (update period = 1) and it will reset every 4 chirps */
+    //	/* Configuring 4 unique TX2 phase shifter LUT dither (5.625,0.000, 5.625, 0.000) degrees from mmwaveconfig.txt */
+    //	/* The new TX2 phase shifter LUT dither is picked every chirp (update period = 1) and it will reset every 4 chirps */
+    //	/*   Chirp    TX2 PS (from Profile) + LUT dither + Fixed delta dither
+    //		   0         0 deg + 5.625 deg + 0
+    //		   1         0 deg + 0.000 deg + 11.25 deg
+    //		   2         0 deg + 5.625 deg + 11.25*2 deg
+    //		   3         0 deg + 0.000 deg + 11.25*3 deg
+    //		   4         0 deg + 5.625 deg + 0     (Delta dither reset period = 4 and LUT dither reset period = 4) and so on */
+    //	/* LUT start address offset for the TX2 PS chirp parameter is made 48 */
+    //	/* AdvChirpLUTData[48] is the start address offset (Offset = 48), Each data parameter is 1 byte */
+    //	/* Number of unique LUT dither parameters (4) */
+    //	memset((void *)&AdvChirpCfgArgs, 0, sizeof(rlAdvChirpCfg_t));
+    //	AdvChirpCfgArgs.chirpParamIdx = 9;
+    //	AdvChirpCfgArgs.deltaResetPeriod = 4;
+    //	AdvChirpCfgArgs.deltaParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.sf0ChirpParamDelta = 2048;
+    //	AdvChirpCfgArgs.lutResetPeriod = 4;
+    //	AdvChirpCfgArgs.lutParamUpdatePeriod = 1;
+    //	AdvChirpCfgArgs.lutPatternAddressOffset = 48;
+    //	AdvChirpCfgArgs.numOfPatterns = 4;
+    //	AdvChirpCfgArgs.maxTxPhShiftIntDither = 0;
+    //
+    //	retVal = MMWL_advChirpConfig(deviceMap, &AdvChirpCfgArgs);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_advChirpConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //
+    //	/* read the input param data */
+    //	MMWL_readAdvChirpTx2PhShiftConfig(&AdvChirpLUTTx2PhShiftCfgArgs);
+    //	printf("Saving advChirpLUTTx2PhShiftConfig with \nLUTAddrOff[%d]\nTx2PhShiftCfgData[0]=[%.3f] deg\nTx2PhShiftCfgData[1]=[%.3f] deg\nTx2PhShiftCfgData[2]=[%.3f] deg\nTx2PhShiftCfgData[3]=[%.3f] deg \n\n",
+    //		AdvChirpLUTTx2PhShiftCfgArgs.LUTAddrOff, AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[0], AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[1],
+    //		AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[2], AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[3]);
+    //	/* copy the input param data from mmwaveconfig.txt to a local buffer */
+    //	/* Dividing the input param data by 1 LSB . 1 LSB = 360 / 2^6 degrees */
+    //	Tx2PhShiftData[0] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[0] * 64) / 360);
+    //	Tx2PhShiftData[1] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[1] * 64) / 360);
+    //	Tx2PhShiftData[2] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[2] * 64) / 360);
+    //	Tx2PhShiftData[3] = (rlInt8_t)(round(AdvChirpLUTTx2PhShiftCfgArgs.Tx2PhShiftCfgData[3] * 64) / 360);
+    //
+    //	/* fill up the Chirp LUT buffer which is used later for rlSetAdvChirpLUTConfig API */
+    //	rlFillLUTParamsArgs.chirpParamIndex = RL_LUT_TX2_PHASE_SHIFT_VAR;
+    //	rlFillLUTParamsArgs.chirpParamSize = AdvChirpCfgArgs.lutChirpParamSize;
+    //	rlFillLUTParamsArgs.inputSize = AdvChirpCfgArgs.numOfPatterns;
+    //	rlFillLUTParamsArgs.lutGlobalOffset = lutOffsetInNBytes;
+    //	retVal = rlDevSetFillLUTBuff(&rlFillLUTParamsArgs, &Tx2PhShiftData[0], &AdvChirpLUTData[lutOffsetInNBytes], &lutOffsetInNBytes);
+    //
+    //	/* Save the entire locally programmed LUT data to a file for debug purposes
+    //	   This locally programmed LUT data will be the same as RadarSS LUT at the device end */
+    //	retVal = MMWL_saveAdvChirpLUTDataToFile(deviceMap);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - MMWL_saveAdvChirpLUTDataToFile failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //	else
+    //	{
+    //		printf("MMWL_saveAdvChirpLUTDataToFile success for deviceMap %u \n\n", deviceMap);
+    //	}
+    //
+    //	/* Send the locally programmed LUT data to the device */
+    //	rlAdvChirpLUTCfg_t rlAdvChirpLUTCfgArgs = { 0 };
+    //	rlAdvChirpLUTCfgArgs.lutAddressOffset = 0;
+    //	rlAdvChirpLUTCfgArgs.numBytes = lutOffsetInNBytes;
+    //
+    //	retVal = rlSetMultiAdvChirpLUTConfig(deviceMap, &rlAdvChirpLUTCfgArgs, &AdvChirpLUTData[0]);
+    //	if (retVal != RL_RET_CODE_OK)
+    //	{
+    //		printf("*** Failed - rlSetMultiAdvChirpLUTConfig failed with error code %d*** \n\n", retVal);
+    //		return retVal;
+    //	}
+    //	else
+    //	{
+    //		printf("rlSetMultiAdvChirpLUTConfig success for deviceMap %u \n\n", deviceMap);
+    //	} //TODO uncomment this also, problems in line
 
-	return retVal;
+    return retVal;
 }
 
 /** @fn int MMWL_advChirpConfig(unsigned char deviceMap)
-*
-*   @brief Advanced chirp configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Advanced chirp configuration API.
-*/
-int MMWL_advChirpConfig(unsigned char deviceMap, rlAdvChirpCfg_t* AdvChirpCfgArgs)
+ *
+ *   @brief Advanced chirp configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Advanced chirp configuration API.
+ */
+int MMWL_advChirpConfig(unsigned char deviceMap, rlAdvChirpCfg_t *AdvChirpCfgArgs)
 {
-	int retVal = RL_RET_CODE_OK;
+    int retVal = RL_RET_CODE_OK;
 
-	printf("Calling rlSetAdvChirpConfig with \nchirpParamIdx[%d]\nresetMode[%d]\ndeltaResetPeriod[%d]\ndeltaParamUpdatePeriod[%d]\nsf0ChirpParamDelta[%d]\nsf1ChirpParamDelta[%d]\nsf2ChirpParamDelta[%d]\nsf3ChirpParamDelta[%d]\n",
-		AdvChirpCfgArgs->chirpParamIdx, AdvChirpCfgArgs->resetMode, AdvChirpCfgArgs->deltaResetPeriod,
-		AdvChirpCfgArgs->deltaParamUpdatePeriod, AdvChirpCfgArgs->sf0ChirpParamDelta, AdvChirpCfgArgs->sf1ChirpParamDelta,
-		AdvChirpCfgArgs->sf2ChirpParamDelta, AdvChirpCfgArgs->sf3ChirpParamDelta);
+    printf("Calling rlSetAdvChirpConfig with \nchirpParamIdx[%d]\nresetMode[%d]\ndeltaResetPeriod[%d]\ndeltaParamUpdatePeriod[%d]\nsf0ChirpParamDelta[%d]\nsf1ChirpParamDelta[%d]\nsf2ChirpParamDelta[%d]\nsf3ChirpParamDelta[%d]\n",
+           AdvChirpCfgArgs->chirpParamIdx, AdvChirpCfgArgs->resetMode, AdvChirpCfgArgs->deltaResetPeriod,
+           AdvChirpCfgArgs->deltaParamUpdatePeriod, AdvChirpCfgArgs->sf0ChirpParamDelta, AdvChirpCfgArgs->sf1ChirpParamDelta,
+           AdvChirpCfgArgs->sf2ChirpParamDelta, AdvChirpCfgArgs->sf3ChirpParamDelta);
 
-	printf("lutResetPeriod[%d]\nlutParamUpdatePeriod[%d]\nlutPatternAddressOffset[%d]\nnumOfPatterns[%d]\nlutBurstIndexOffset[%d]\nlutSfIndexOffset[%d]\nlutChirpParamSize[%d]\nlutChirpParamScale[%d]\nmaxTxPhShiftIntDither[%d] \n\n",
-		AdvChirpCfgArgs->lutResetPeriod, AdvChirpCfgArgs->lutParamUpdatePeriod, AdvChirpCfgArgs->lutPatternAddressOffset,
-		AdvChirpCfgArgs->numOfPatterns, AdvChirpCfgArgs->lutBurstIndexOffset, AdvChirpCfgArgs->lutSfIndexOffset,
-		AdvChirpCfgArgs->lutChirpParamSize, AdvChirpCfgArgs->lutChirpParamScale, AdvChirpCfgArgs->maxTxPhShiftIntDither);
+    printf("lutResetPeriod[%d]\nlutParamUpdatePeriod[%d]\nlutPatternAddressOffset[%d]\nnumOfPatterns[%d]\nlutBurstIndexOffset[%d]\nlutSfIndexOffset[%d]\nlutChirpParamSize[%d]\nlutChirpParamScale[%d]\nmaxTxPhShiftIntDither[%d] \n\n",
+           AdvChirpCfgArgs->lutResetPeriod, AdvChirpCfgArgs->lutParamUpdatePeriod, AdvChirpCfgArgs->lutPatternAddressOffset,
+           AdvChirpCfgArgs->numOfPatterns, AdvChirpCfgArgs->lutBurstIndexOffset, AdvChirpCfgArgs->lutSfIndexOffset,
+           AdvChirpCfgArgs->lutChirpParamSize, AdvChirpCfgArgs->lutChirpParamScale, AdvChirpCfgArgs->maxTxPhShiftIntDither);
 
-	retVal = rlSetAdvChirpConfig(deviceMap, AdvChirpCfgArgs);
-	return retVal;
+    retVal = rlSetAdvChirpConfig(deviceMap, AdvChirpCfgArgs);
+    return retVal;
 }
 
 /** @fn int MMWL_saveAdvChirpLUTDataToFile(unsigned char deviceMap)
-*
-*   @brief Save Advanced Chirp LUT Data to a file.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Save Advanced Chirp LUT Data to a file.
-*/
+ *
+ *   @brief Save Advanced Chirp LUT Data to a file.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Save Advanced Chirp LUT Data to a file.
+ */
 int MMWL_saveAdvChirpLUTDataToFile(unsigned char deviceMap)
 {
-	int retVal = RL_RET_CODE_OK;
-//	int index = 0, j;
-//	char AdvChirpLUTDataBuff[LUT_ADVCHIRP_TABLE_SIZE*8] = { 0 };
-//	AdvChirpLUTDataPtr = _fsopen("AdvChirpLUTData.txt", "wt", _SH_DENYWR);
-//
-//	/* Store the entire LUT data in terms of 1 byte per line */
-//	for (j = 0; j < LUT_ADVCHIRP_TABLE_SIZE; j++)
-//	{
-//		sprintf(AdvChirpLUTDataBuff + strlen(AdvChirpLUTDataBuff), "%d\n", AdvChirpLUTData[j]);
-//	}
-//
-//	fwrite(AdvChirpLUTDataBuff, sizeof(char), strlen(AdvChirpLUTDataBuff), AdvChirpLUTDataPtr);
-//	fflush(AdvChirpLUTDataPtr);
-//
-//	if (AdvChirpLUTDataPtr != NULL)
-//		fclose(AdvChirpLUTDataPtr); //TODO - uncomment this as well
+    int retVal = RL_RET_CODE_OK;
+    //	int index = 0, j;
+    //	char AdvChirpLUTDataBuff[LUT_ADVCHIRP_TABLE_SIZE*8] = { 0 };
+    //	AdvChirpLUTDataPtr = _fsopen("AdvChirpLUTData.txt", "wt", _SH_DENYWR);
+    //
+    //	/* Store the entire LUT data in terms of 1 byte per line */
+    //	for (j = 0; j < LUT_ADVCHIRP_TABLE_SIZE; j++)
+    //	{
+    //		sprintf(AdvChirpLUTDataBuff + strlen(AdvChirpLUTDataBuff), "%d\n", AdvChirpLUTData[j]);
+    //	}
+    //
+    //	fwrite(AdvChirpLUTDataBuff, sizeof(char), strlen(AdvChirpLUTDataBuff), AdvChirpLUTDataPtr);
+    //	fflush(AdvChirpLUTDataPtr);
+    //
+    //	if (AdvChirpLUTDataPtr != NULL)
+    //		fclose(AdvChirpLUTDataPtr); //TODO - uncomment this as well
 
-	return retVal;
+    return retVal;
 }
 
 /** @fn int MMWL_frameConfig(unsigned char deviceMap)
-*
-*   @brief Frame configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Frame configuration API.
-*/
+ *
+ *   @brief Frame configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Frame configuration API.
+ */
 int MMWL_frameConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlFrameCfg_t frameCfgArgs = { 0 };
+    rlFrameCfg_t frameCfgArgs = {0};
 
     /*read frameCfgArgs from config file*/
     MMWL_readFrameConfig(&frameCfgArgs);
 
-    framePeriodicity = (frameCfgArgs.framePeriodicity * 5)/(1000*1000);
+    framePeriodicity = (frameCfgArgs.framePeriodicity * 5) / (1000 * 1000);
     frameCount = frameCfgArgs.numFrames;
 
     printf("Calling rlSetFrameConfig with \nStart Idx[%d]\nEnd Idx[%d]\nLoops[%d]\nPeriodicity[%d]ms \n\n",
-        frameCfgArgs.chirpStartIdx, frameCfgArgs.chirpEndIdx,
-        frameCfgArgs.numLoops, (frameCfgArgs.framePeriodicity * 5)/(1000*1000));
+           frameCfgArgs.chirpStartIdx, frameCfgArgs.chirpEndIdx,
+           frameCfgArgs.numLoops, (frameCfgArgs.framePeriodicity * 5) / (1000 * 1000));
 
     retVal = rlSetFrameConfig(deviceMap, &frameCfgArgs);
 
-
-    rlFrameCfg_t getFrameCfgArgs = { 0 };
-    retVal = rlGetFrameConfig(deviceMap,&getFrameCfgArgs);
+    rlFrameCfg_t getFrameCfgArgs = {0};
+    retVal = rlGetFrameConfig(deviceMap, &getFrameCfgArgs);
     printf("GotFrameConfig with \nStart Idx[%d]\nEnd Idx[%d]\nLoops[%d]\nPeriodicity[%d]ms \n\n",
            getFrameCfgArgs.chirpStartIdx, getFrameCfgArgs.chirpEndIdx,
-           getFrameCfgArgs.numLoops, (getFrameCfgArgs.framePeriodicity * 5)/(1000*1000));
+           getFrameCfgArgs.numLoops, (getFrameCfgArgs.framePeriodicity * 5) / (1000 * 1000));
 
-    if(frameCfgArgs.chirpStartIdx != getFrameCfgArgs.chirpStartIdx||
-    frameCfgArgs.chirpEndIdx != getFrameCfgArgs.chirpEndIdx||
-    frameCfgArgs.numLoops != getFrameCfgArgs.numLoops)
+    if (frameCfgArgs.chirpStartIdx != getFrameCfgArgs.chirpStartIdx ||
+        frameCfgArgs.chirpEndIdx != getFrameCfgArgs.chirpEndIdx ||
+        frameCfgArgs.numLoops != getFrameCfgArgs.numLoops)
     {
         printf("GotFrameConfig with \nStart Idx[%d]\nEnd Idx[%d]\nLoops[%d]\nPeriodicity[%d]ms \n\n",
                getFrameCfgArgs.chirpStartIdx, getFrameCfgArgs.chirpEndIdx,
-               getFrameCfgArgs.numLoops, (getFrameCfgArgs.framePeriodicity * 5)/(1000*1000));
-
+               getFrameCfgArgs.numLoops, (getFrameCfgArgs.framePeriodicity * 5) / (1000 * 1000));
     }
-
 
     return retVal;
 }
 
 /** @fn int MMWL_advFrameConfig(unsigned char deviceMap)
-*
-*   @brief Advance Frame configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Frame configuration API.
-*/
+ *
+ *   @brief Advance Frame configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Frame configuration API.
+ */
 int MMWL_advFrameConfig(unsigned char deviceMap)
 {
     int i, retVal = RL_RET_CODE_OK;
-    rlAdvFrameCfg_t AdvframeCfgArgs = { 0 };
-    rlAdvFrameCfg_t GetAdvFrameCfgArgs = { 0 };
+    rlAdvFrameCfg_t AdvframeCfgArgs = {0};
+    rlAdvFrameCfg_t GetAdvFrameCfgArgs = {0};
     /* reset frame periodicity to zero */
     framePeriodicity = 0;
 
@@ -2533,25 +2520,25 @@ int MMWL_advFrameConfig(unsigned char deviceMap)
     MMWL_readAdvFrameConfig(&AdvframeCfgArgs);
 
     /* Add all subframes periodicity to get whole frame periodicity */
-    for (i=0; i < AdvframeCfgArgs.frameSeq.numOfSubFrames; i++)
+    for (i = 0; i < AdvframeCfgArgs.frameSeq.numOfSubFrames; i++)
         framePeriodicity += AdvframeCfgArgs.frameSeq.subFrameCfg[i].subFramePeriodicity;
 
-    framePeriodicity = (framePeriodicity * 5)/(1000*1000);
+    framePeriodicity = (framePeriodicity * 5) / (1000 * 1000);
     /* store total number of frames configured */
     frameCount = AdvframeCfgArgs.frameSeq.numFrames;
 
     printf("Calling rlSetAdvFrameConfig with \nnumOfSubFrames[%d]\nforceProfile[%d]\nnumFrames[%d]\ntriggerSelect[%d]ms \n\n",
-        AdvframeCfgArgs.frameSeq.numOfSubFrames, AdvframeCfgArgs.frameSeq.forceProfile,
-        AdvframeCfgArgs.frameSeq.numFrames, AdvframeCfgArgs.frameSeq.triggerSelect);
+           AdvframeCfgArgs.frameSeq.numOfSubFrames, AdvframeCfgArgs.frameSeq.forceProfile,
+           AdvframeCfgArgs.frameSeq.numFrames, AdvframeCfgArgs.frameSeq.triggerSelect);
 
     retVal = rlSetAdvFrameConfig(deviceMap, &AdvframeCfgArgs);
     if (retVal == 0)
     {
         retVal = rlGetAdvFrameConfig(deviceMap, &GetAdvFrameCfgArgs);
-        if ((AdvframeCfgArgs.frameSeq.forceProfile != GetAdvFrameCfgArgs.frameSeq.forceProfile) || \
-            (AdvframeCfgArgs.frameSeq.frameTrigDelay != GetAdvFrameCfgArgs.frameSeq.frameTrigDelay) || \
-            (AdvframeCfgArgs.frameSeq.numFrames != GetAdvFrameCfgArgs.frameSeq.numFrames) || \
-            (AdvframeCfgArgs.frameSeq.numOfSubFrames != GetAdvFrameCfgArgs.frameSeq.numOfSubFrames) || \
+        if ((AdvframeCfgArgs.frameSeq.forceProfile != GetAdvFrameCfgArgs.frameSeq.forceProfile) ||
+            (AdvframeCfgArgs.frameSeq.frameTrigDelay != GetAdvFrameCfgArgs.frameSeq.frameTrigDelay) ||
+            (AdvframeCfgArgs.frameSeq.numFrames != GetAdvFrameCfgArgs.frameSeq.numFrames) ||
+            (AdvframeCfgArgs.frameSeq.numOfSubFrames != GetAdvFrameCfgArgs.frameSeq.numOfSubFrames) ||
             (AdvframeCfgArgs.frameSeq.triggerSelect != GetAdvFrameCfgArgs.frameSeq.triggerSelect))
         {
             printf("MMWL_readAdvFrameConfig failed...\n\n");
@@ -2570,8 +2557,8 @@ int MMWL_advFrameConfig(unsigned char deviceMap)
  * /return  retVal   BSP_SOK if the test source is set correctly.
  *
  *******************************************************************************
-*/
-#if defined (ENABLE_TEST_SOURCE)
+ */
+#if defined(ENABLE_TEST_SOURCE)
 int MMWL_testSourceConfig(unsigned char deviceMap)
 {
     rlTestSource_t tsArgs = {0};
@@ -2632,7 +2619,7 @@ int MMWL_testSourceConfig(unsigned char deviceMap)
     tsArgs.txAntPos[2].antPosZ = 0;
 
     printf("Calling rlSetTestSourceConfig with Simulated Object at X[%d]cm, Y[%d]cm, Z[%d]cm \n\n",
-            tsArgs.testObj[0].posX, tsArgs.testObj[0].posY, tsArgs.testObj[0].posZ);
+           tsArgs.testObj[0].posX, tsArgs.testObj[0].posY, tsArgs.testObj[0].posZ);
 
     retVal = rlSetTestSourceConfig(deviceMap, &tsArgs);
 
@@ -2645,27 +2632,27 @@ int MMWL_testSourceConfig(unsigned char deviceMap)
 #endif
 
 /** @fn int MMWL_dataPathConfig(unsigned char deviceMap)
-*
-*   @brief Data path configuration API. Configures CQ data size on the
-*           lanes and number of samples of CQ[0-2] to br transferred.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Data path configuration API. Configures CQ data size on the
-*   lanes and number of samples of CQ[0-2] to br transferred.
-*/
+ *
+ *   @brief Data path configuration API. Configures CQ data size on the
+ *           lanes and number of samples of CQ[0-2] to br transferred.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Data path configuration API. Configures CQ data size on the
+ *   lanes and number of samples of CQ[0-2] to br transferred.
+ */
 int MMWL_dataPathConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlDevDataPathCfg_t dataPathCfgArgs = { 0 };
+    rlDevDataPathCfg_t dataPathCfgArgs = {0};
 
     /* read dataPathCfgArgs from config file */
     MMWL_readDataPathConfig(&dataPathCfgArgs);
 
     printf("Calling rlDeviceSetDataPathConfig with HSI Interface[%d] Selected \n\n",
-            dataPathCfgArgs.intfSel);
+           dataPathCfgArgs.intfSel);
 
     /* same API is used to configure CQ data size on the
      * lanes and number of samples of CQ[0-2] to br transferred.
@@ -2675,20 +2662,20 @@ int MMWL_dataPathConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_lvdsLaneConfig(unsigned char deviceMap)
-*
-*   @brief Lane Config API
-*
-*   @return Success - 0, Failure - Error Code
-*
-*   Lane Config API
-*/
+ *
+ *   @brief Lane Config API
+ *
+ *   @return Success - 0, Failure - Error Code
+ *
+ *   Lane Config API
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
 int MMWL_lvdsLaneConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlDevLvdsLaneCfg_t lvdsLaneCfgArgs = { 0 };
+    rlDevLvdsLaneCfg_t lvdsLaneCfgArgs = {0};
 
     /*read lvdsLaneCfgArgs from config file*/
     MMWL_readLvdsLaneConfig(&lvdsLaneCfgArgs);
@@ -2698,20 +2685,20 @@ int MMWL_lvdsLaneConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_laneConfig(unsigned char deviceMap)
-*
-*   @brief Lane Enable API
-*
-*   @return Success - 0, Failure - Error Code
-*
-*   Lane Enable API
-*/
+ *
+ *   @brief Lane Enable API
+ *
+ *   @return Success - 0, Failure - Error Code
+ *
+ *   Lane Enable API
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
 int MMWL_laneConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlDevLaneEnable_t laneEnCfgArgs = { 0 };
+    rlDevLaneEnable_t laneEnCfgArgs = {0};
 
     /*read laneEnCfgArgs from config file*/
     MMWL_readLaneConfig(&laneEnCfgArgs);
@@ -2721,15 +2708,15 @@ int MMWL_laneConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_hsiLaneConfig(unsigned char deviceMap)
-*
-*   @brief LVDS lane configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   LVDS lane configuration API.
-*/
+ *
+ *   @brief LVDS lane configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   LVDS lane configuration API.
+ */
 int MMWL_hsiLaneConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
@@ -2738,7 +2725,7 @@ int MMWL_hsiLaneConfig(unsigned char deviceMap)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("LaneConfig failed for deviceMap %u with error code %d\n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -2750,7 +2737,7 @@ int MMWL_hsiLaneConfig(unsigned char deviceMap)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("LvdsLaneConfig failed for deviceMap %u with error code %d\n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -2761,67 +2748,67 @@ int MMWL_hsiLaneConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_setHsiClock(unsigned char deviceMap)
-*
-*   @brief High Speed Interface Clock Config API
-*
-*   @return Success - 0, Failure - Error Code
-*
-*   HSI Clock Config API
-*/
+ *
+ *   @brief High Speed Interface Clock Config API
+ *
+ *   @return Success - 0, Failure - Error Code
+ *
+ *   HSI Clock Config API
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
 int MMWL_setHsiClock(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlDevHsiClk_t hsiClkgs = { 0 };
+    rlDevHsiClk_t hsiClkgs = {0};
 
     /*read hsiClkgs from config file*/
     MMWL_readSetHsiClock(&hsiClkgs);
 
     printf("Calling rlDeviceSetHsiClk with HSI Clock[%d] \n\n",
-            hsiClkgs.hsiClk);
+           hsiClkgs.hsiClk);
 
     retVal = rlDeviceSetHsiClk(deviceMap, &hsiClkgs);
     return retVal;
 }
 
 /** @fn int MMWL_hsiDataRateConfig(unsigned char deviceMap)
-*
-*   @brief LVDS/CSI2 Clock Config API
-*
-*   @return Success - 0, Failure - Error Code
-*
-*   LVDS/CSI2 Clock Config API
-*/
+ *
+ *   @brief LVDS/CSI2 Clock Config API
+ *
+ *   @return Success - 0, Failure - Error Code
+ *
+ *   LVDS/CSI2 Clock Config API
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
 int MMWL_hsiDataRateConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlDevDataPathClkCfg_t dataPathClkCfgArgs = { 0 };
+    rlDevDataPathClkCfg_t dataPathClkCfgArgs = {0};
 
     /*read lvdsClkCfgArgs from config file*/
     MMWL_readLvdsClkConfig(&dataPathClkCfgArgs);
 
     printf("Calling rlDeviceSetDataPathClkConfig with HSI Data Rate[%d] Selected \n\n",
-            dataPathClkCfgArgs.dataRate);
+           dataPathClkCfgArgs.dataRate);
 
     retVal = rlDeviceSetDataPathClkConfig(deviceMap, &dataPathClkCfgArgs);
     return retVal;
 }
 
 /** @fn int MMWL_hsiClockConfig(unsigned char deviceMap)
-*
-*   @brief Clock configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Clock configuration API.
-*/
+ *
+ *   @brief Clock configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Clock configuration API.
+ */
 int MMWL_hsiClockConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK, readAllParams = 0;
@@ -2831,7 +2818,7 @@ int MMWL_hsiClockConfig(unsigned char deviceMap)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("LvdsClkConfig failed for deviceMap %u with error code %d\n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -2844,7 +2831,7 @@ int MMWL_hsiClockConfig(unsigned char deviceMap)
     if (retVal != RL_RET_CODE_OK)
     {
         printf("MMWL_setHsiClock failed for deviceMap %u with error code %d\n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -2856,18 +2843,18 @@ int MMWL_hsiClockConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_gpadcMeasConfig(unsigned char deviceMap)
-*
-*   @brief API to set GPADC configuration.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code.
-*
-*   API to set GPADC Configuration. And device will    send GPADC
-*    measurement data in form of Asynchronous event over SPI to
-*    Host. User needs to feed input signal on the device pins where
-*    they want to read the measurement data inside the device.
-*/
+ *
+ *   @brief API to set GPADC configuration.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code.
+ *
+ *   API to set GPADC Configuration. And device will    send GPADC
+ *    measurement data in form of Asynchronous event over SPI to
+ *    Host. User needs to feed input signal on the device pins where
+ *    they want to read the measurement data inside the device.
+ */
 int MMWL_gpadcMeasConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
@@ -2887,7 +2874,7 @@ int MMWL_gpadcMeasConfig(unsigned char deviceMap)
 
     retVal = rlSetGpAdcConfig(deviceMap, &gpadcCfg);
 
-    if(retVal == RL_RET_CODE_OK)
+    if (retVal == RL_RET_CODE_OK)
     {
         while (mmwl_bGpadcDataRcv == 0U)
         {
@@ -2906,15 +2893,15 @@ int MMWL_gpadcMeasConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_sensorStart(unsigned char deviceMap)
-*
-*   @brief API to Start sensor.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   API to Start sensor.
-*/
+ *
+ *   @brief API to Start sensor.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   API to Start sensor.
+ */
 int MMWL_sensorStart(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
@@ -2941,18 +2928,18 @@ int MMWL_sensorStart(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_sensorStop(unsigned char deviceMap)
-*
-*   @brief API to Stop sensor.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   API to Stop Sensor.
-*/
+ *
+ *   @brief API to Stop sensor.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   API to Stop Sensor.
+ */
 int MMWL_sensorStop(unsigned char deviceMap)
 {
-    int retVal = RL_RET_CODE_OK, timeOutCnt =0;
+    int retVal = RL_RET_CODE_OK, timeOutCnt = 0;
     retVal = rlSensorStop(deviceMap);
 #ifndef ENABLE_TEST_SOURCE
     if (retVal == RL_RET_CODE_OK)
@@ -2977,19 +2964,19 @@ int MMWL_sensorStop(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_setContMode(unsigned char deviceMap)
-*
-*   @brief API to set continuous mode.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   API to set continuous mode.
-*/
+ *
+ *   @brief API to set continuous mode.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   API to set continuous mode.
+ */
 int MMWL_setContMode(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlContModeCfg_t contModeCfgArgs = { 0 };
+    rlContModeCfg_t contModeCfgArgs = {0};
     contModeCfgArgs.digOutSampleRate = profileCfgArgs[0].digOutSampleRate;
     contModeCfgArgs.hpfCornerFreq1 = profileCfgArgs[0].hpfCornerFreq1;
     contModeCfgArgs.hpfCornerFreq2 = profileCfgArgs[0].hpfCornerFreq2;
@@ -3000,47 +2987,47 @@ int MMWL_setContMode(unsigned char deviceMap)
     /*read contModeCfgArgs from config file*/
     MMWL_readContModeConfig(&contModeCfgArgs);
 
-    printf("Calling setContMode with\n digOutSampleRate[%d]\nstartFreqConst[%d]\ntxOutPowerBackoffCode[%d]\nRXGain[%d]\n\n", \
-        contModeCfgArgs.digOutSampleRate, contModeCfgArgs.startFreqConst, contModeCfgArgs.txOutPowerBackoffCode, \
-        contModeCfgArgs.rxGain);
+    printf("Calling setContMode with\n digOutSampleRate[%d]\nstartFreqConst[%d]\ntxOutPowerBackoffCode[%d]\nRXGain[%d]\n\n",
+           contModeCfgArgs.digOutSampleRate, contModeCfgArgs.startFreqConst, contModeCfgArgs.txOutPowerBackoffCode,
+           contModeCfgArgs.rxGain);
     retVal = rlSetContModeConfig(deviceMap, &contModeCfgArgs);
     return retVal;
 }
 
 /** @fn int MMWL_dynChirpEnable(unsigned char deviceMap)
-*
-*   @brief API to enable Dynamic chirp feature.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   API to enable Dynamic chirp feature.
-*/
+ *
+ *   @brief API to enable Dynamic chirp feature.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   API to enable Dynamic chirp feature.
+ */
 int MMWL_dynChirpEnable(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
-    rlDynChirpEnCfg_t dynChirpEnCfgArgs = { 0 };
+    rlDynChirpEnCfg_t dynChirpEnCfgArgs = {0};
 
     retVal = rlSetDynChirpEn(deviceMap, &dynChirpEnCfgArgs);
     return retVal;
 }
 
 /** @fn int MMWL_dynChirpConfig(unsigned char deviceMap)
-*
-*   @brief API to config chirp dynamically.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   API to config chirp dynamically.
-*/
-int  MMWL_setDynChirpConfig(unsigned char deviceMap)
+ *
+ *   @brief API to config chirp dynamically.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   API to config chirp dynamically.
+ */
+int MMWL_setDynChirpConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
     unsigned int cnt;
-    rlDynChirpCfg_t * dataDynChirp[3U] = { &dynChirpCfgArgs[0], &dynChirpCfgArgs[1], &dynChirpCfgArgs[2]};
+    rlDynChirpCfg_t *dataDynChirp[3U] = {&dynChirpCfgArgs[0], &dynChirpCfgArgs[1], &dynChirpCfgArgs[2]};
 
     dynChirpCfgArgs[0].programMode = 0;
 
@@ -3060,35 +3047,35 @@ int  MMWL_setDynChirpConfig(unsigned char deviceMap)
     for (cnt = 0; cnt < 16; cnt++)
     {
         /* Reconfiguring frequency slope for 48 chirps */
-        dynChirpCfgArgs[0].chirpRow[cnt].chirpNR1 |= (((3*cnt) & 0x3FU) << 8);
-        dynChirpCfgArgs[0].chirpRow[cnt].chirpNR2 |= (((3*cnt + 1) & 0x3FU) << 8);
-        dynChirpCfgArgs[0].chirpRow[cnt].chirpNR3 |= (((3*cnt + 2) & 0x3FU) << 8);
+        dynChirpCfgArgs[0].chirpRow[cnt].chirpNR1 |= (((3 * cnt) & 0x3FU) << 8);
+        dynChirpCfgArgs[0].chirpRow[cnt].chirpNR2 |= (((3 * cnt + 1) & 0x3FU) << 8);
+        dynChirpCfgArgs[0].chirpRow[cnt].chirpNR3 |= (((3 * cnt + 2) & 0x3FU) << 8);
         /* Reconfiguring start frequency for 48 chirps */
-        dynChirpCfgArgs[1].chirpRow[cnt].chirpNR1 |= 3*cnt;
-        dynChirpCfgArgs[1].chirpRow[cnt].chirpNR2 |= 3*cnt + 1;
-        dynChirpCfgArgs[1].chirpRow[cnt].chirpNR3 |= 3*cnt + 2;
+        dynChirpCfgArgs[1].chirpRow[cnt].chirpNR1 |= 3 * cnt;
+        dynChirpCfgArgs[1].chirpRow[cnt].chirpNR2 |= 3 * cnt + 1;
+        dynChirpCfgArgs[1].chirpRow[cnt].chirpNR3 |= 3 * cnt + 2;
         /* Reconfiguring ideal time for 48 chirps */
         dynChirpCfgArgs[2].chirpRow[cnt].chirpNR1 |= 3 * cnt;
         dynChirpCfgArgs[2].chirpRow[cnt].chirpNR2 |= 3 * cnt + 1;
         dynChirpCfgArgs[2].chirpRow[cnt].chirpNR3 |= 3 * cnt + 2;
     }
 
-    printf("Calling DynChirpCfg with chirpSegSel[%d]\nchirpNR1[%d]\n\n", \
-        dynChirpCfgArgs[0].chirpSegSel, dynChirpCfgArgs[0].chirpRow[0].chirpNR1);
+    printf("Calling DynChirpCfg with chirpSegSel[%d]\nchirpNR1[%d]\n\n",
+           dynChirpCfgArgs[0].chirpSegSel, dynChirpCfgArgs[0].chirpRow[0].chirpNR1);
     retVal = rlSetDynChirpCfg(deviceMap, 2U, &dataDynChirp[0]);
     return retVal;
 }
 
 /** @fn int MMWL_powerOff(unsigned char deviceMap)
-*
-*   @brief API to poweroff device.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   API to poweroff device.
-*/
+ *
+ *   @brief API to poweroff device.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   API to poweroff device.
+ */
 int MMWL_powerOff(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
@@ -3102,20 +3089,20 @@ int MMWL_powerOff(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_lowPowerConfig(deviceMap)
-*
-*   @brief LowPower configuration API.
-*
-*   @param[in] deviceMap - Devic Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   LowPower configuration API.
-*/
+ *
+ *   @brief LowPower configuration API.
+ *
+ *   @param[in] deviceMap - Devic Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   LowPower configuration API.
+ */
 int MMWL_lowPowerConfig(unsigned char deviceMap)
 {
     int retVal = RL_RET_CODE_OK;
     /* TBD - Read GUI Values */
-    rlLowPowerModeCfg_t rfLpModeCfgArgs = { 0 };
+    rlLowPowerModeCfg_t rfLpModeCfgArgs = {0};
 
     /*read rfLpModeCfgArgs from config file*/
     MMWL_readLowPowerConfig(&rfLpModeCfgArgs);
@@ -3125,83 +3112,86 @@ int MMWL_lowPowerConfig(unsigned char deviceMap)
 }
 
 /** @fn int MMWL_SOPControl(unsigned char deviceMap, int SOPmode)
-*
-*   @brief SOP mode configuration API.
-*
-*   @param[in] deviceMap - Device Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   SOP mode configuration API.
-*/
+ *
+ *   @brief SOP mode configuration API.
+ *
+ *   @param[in] deviceMap - Device Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   SOP mode configuration API.
+ */
 int MMWL_SOPControl(unsigned char deviceMap, int SOPmode)
 {
-	int retVal = RL_RET_CODE_OK;
-	rlsDevHandle_t rlImpl_devHdl = NULL;
+    int retVal = RL_RET_CODE_OK;
+    rlsDevHandle_t rlImpl_devHdl = NULL;
 
-	rlImpl_devHdl = rlsGetDeviceCtx(0);
-	if (rlImpl_devHdl != NULL)
-	{
-		retVal = rlsOpenGenericGpioIf(rlImpl_devHdl);
-        if (retVal != 0) printf("Error: rlsOpenGenericGpioIf returned %d\n", retVal);
-		retVal = rlsSOPControl(rlImpl_devHdl, SOPmode);
-        if (retVal != 0) printf("Error: rlsSOPControl returned %d\n", retVal);
-		retVal = rlsOpenBoardControlIf(rlImpl_devHdl);
-        if (retVal != 0) printf("Error: rlsOpenBoardControlIf returned %d\n", retVal);
-	}
-	else
-	{
+    rlImpl_devHdl = rlsGetDeviceCtx(0);
+    if (rlImpl_devHdl != NULL)
+    {
+        retVal = rlsOpenGenericGpioIf(rlImpl_devHdl);
+        if (retVal != 0)
+            printf("Error: rlsOpenGenericGpioIf returned %d\n", retVal);
+        retVal = rlsSOPControl(rlImpl_devHdl, SOPmode);
+        if (retVal != 0)
+            printf("Error: rlsSOPControl returned %d\n", retVal);
+        retVal = rlsOpenBoardControlIf(rlImpl_devHdl);
+        if (retVal != 0)
+            printf("Error: rlsOpenBoardControlIf returned %d\n", retVal);
+    }
+    else
+    {
         printf("Error: rlsGetDeviceCtx returned NULL\n");
-		retVal = RL_RET_CODE_INVALID_STATE_ERROR;
-	}
-	return retVal;
+        retVal = RL_RET_CODE_INVALID_STATE_ERROR;
+    }
+    return retVal;
 }
 
 /** @fn int MMWL_ResetDevice(unsigned char deviceMap)
-*
-*   @brief Device Reset configuration API.
-*
-*   @param[in] deviceMap - Device Index
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   Device Reset configuration API.
-*/
+ *
+ *   @brief Device Reset configuration API.
+ *
+ *   @param[in] deviceMap - Device Index
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   Device Reset configuration API.
+ */
 int MMWL_ResetDevice(unsigned char deviceMap)
 {
-	int retVal = RL_RET_CODE_OK;
-	/* Reset the devices */
-	rlsDevHandle_t rlImpl_devHdl = NULL;
+    int retVal = RL_RET_CODE_OK;
+    /* Reset the devices */
+    rlsDevHandle_t rlImpl_devHdl = NULL;
 
-	rlImpl_devHdl = rlsGetDeviceCtx(0);
-	if (rlImpl_devHdl != NULL)
-	{
-		retVal = rlsFullReset(rlImpl_devHdl, 0);
+    rlImpl_devHdl = rlsGetDeviceCtx(0);
+    if (rlImpl_devHdl != NULL)
+    {
+        retVal = rlsFullReset(rlImpl_devHdl, 0);
         rlAppSleep(150);
-		retVal = rlsFullReset(rlImpl_devHdl, 1);
-		retVal = rlsCloseBoardControlIf(rlImpl_devHdl);
-		retVal = rlsCloseGenericGpioIf(rlImpl_devHdl);
-	}
-	else
-	{
-		retVal = RL_RET_CODE_INVALID_STATE_ERROR;
-	}
-	return retVal;
+        retVal = rlsFullReset(rlImpl_devHdl, 1);
+        retVal = rlsCloseBoardControlIf(rlImpl_devHdl);
+        retVal = rlsCloseGenericGpioIf(rlImpl_devHdl);
+    }
+    else
+    {
+        retVal = RL_RET_CODE_INVALID_STATE_ERROR;
+    }
+    return retVal;
 }
 
 /** @fn int MMWL_App()
-*
-*   @brief mmWaveLink Example Application.
-*
-*   @return int Success - 0, Failure - Error Code
-*
-*   mmWaveLink Example Application.
-*/
+ *
+ *   @brief mmWaveLink Example Application.
+ *
+ *   @return int Success - 0, Failure - Error Code
+ *
+ *   mmWaveLink Example Application.
+ */
 int MMWL_App()
 {
     int retVal = RL_RET_CODE_OK;
     unsigned char deviceMap = RL_DEVICE_MAP_CASCADED_1;
-	int SOPmode = 0;
+    int SOPmode = 0;
     retVal = MMWL_openConfigFile();
     if (retVal != RL_RET_CODE_OK)
     {
@@ -3209,47 +3199,47 @@ int MMWL_App()
         return -1;
     }
 
-	/* Read all global variable configurations from config file */
-	MMWL_getGlobalConfigStatus(&rlDevGlobalCfgArgs);
+    /* Read all global variable configurations from config file */
+    MMWL_getGlobalConfigStatus(&rlDevGlobalCfgArgs);
 
-	if (rlDevGlobalCfgArgs.TransferMode == 0)
-	{
-		printf("====================== SPI Mode of Operation ======================\n\n");
-		SOPmode = 4; /* Set SOP 4 mode for SPI */
-	}
-	else if (rlDevGlobalCfgArgs.TransferMode == 1)
-	{
-		printf("====================== I2C Mode of Operation ======================\n\n");
-		SOPmode = 7; /* Set SOP 7 mode for I2C */
-	}
-	else
-	{
-		printf("Invalid Transport Mode detected with transportMode %d\n\n", rlDevGlobalCfgArgs.TransferMode);
-		return -1;
-	}
+    if (rlDevGlobalCfgArgs.TransferMode == 0)
+    {
+        printf("====================== SPI Mode of Operation ======================\n\n");
+        SOPmode = 4; /* Set SOP 4 mode for SPI */
+    }
+    else if (rlDevGlobalCfgArgs.TransferMode == 1)
+    {
+        printf("====================== I2C Mode of Operation ======================\n\n");
+        SOPmode = 7; /* Set SOP 7 mode for I2C */
+    }
+    else
+    {
+        printf("Invalid Transport Mode detected with transportMode %d\n\n", rlDevGlobalCfgArgs.TransferMode);
+        return -1;
+    }
 
-	retVal = MMWL_SOPControl(deviceMap, SOPmode);
-	if (retVal != RL_RET_CODE_OK)
-	{
-		printf("Device map %u : SOP %d mode failed with error %d\n\n", deviceMap, SOPmode, retVal);
-		return -1;
-	}
-	else
-	{
-		printf("Device map %u : SOP %d mode successful\n\n", deviceMap, SOPmode);
-	}
+    retVal = MMWL_SOPControl(deviceMap, SOPmode);
+    if (retVal != RL_RET_CODE_OK)
+    {
+        printf("Device map %u : SOP %d mode failed with error %d\n\n", deviceMap, SOPmode, retVal);
+        return -1;
+    }
+    else
+    {
+        printf("Device map %u : SOP %d mode successful\n\n", deviceMap, SOPmode);
+    }
 
-	retVal = MMWL_ResetDevice(deviceMap);
-	if (retVal != RL_RET_CODE_OK)
-	{
-		printf("Device map %u : Device reset failed with error %d \n\n", deviceMap,
-			retVal);
-		return -1;
-	}
-	else
-	{
-		printf("Device map %u : Device reset successful\n\n", deviceMap);
-	}
+    retVal = MMWL_ResetDevice(deviceMap);
+    if (retVal != RL_RET_CODE_OK)
+    {
+        printf("Device map %u : Device reset failed with error %d \n\n", deviceMap,
+               retVal);
+        return -1;
+    }
+    else
+    {
+        printf("Device map %u : Device reset successful\n\n", deviceMap);
+    }
 
     /*  \subsection     api_sequence1     Seq 1 - Call Power ON API
     The mmWaveLink driver initializes the internal components, creates Mutex/Semaphore,
@@ -3259,13 +3249,13 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("mmWave Device Power on failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
     {
         printf("mmWave Device Power on success for deviceMap %u \n\n",
-                deviceMap);
+               deviceMap);
     }
 
     /*  \subsection     api_sequence2     Seq 2 - Download Firmware/patch (Optional)
@@ -3273,37 +3263,37 @@ int MMWL_App()
     step is necessary if firmware needs to be patched and patch is not stored in serial
     Flash
     */
-	if (rlDevGlobalCfgArgs.EnableFwDownload)
-	{
-		printf("========================== Firmware Download ==========================\n\n");
-		retVal = MMWL_firmwareDownload(deviceMap);
-		if (retVal != RL_RET_CODE_OK)
-		{
-			printf("Firmware update failed for deviceMap %u with error %d \n\n",
-				deviceMap, retVal);
-			return -1;
-		}
-		else
-		{
-			printf("Firmware update successful for deviceMap %u \n\n",
-				deviceMap);
-		}
-		printf("=====================================================================\n\n");
-	}
-	/* Swap reset and power on the device */
-	retVal = MMWL_SwapResetAndPowerOn(deviceMap);
-	if (retVal != RL_RET_CODE_OK)
-	{
-		printf("Could not restart the device\n\n");
-		return -1;
-	}
+    if (rlDevGlobalCfgArgs.EnableFwDownload)
+    {
+        printf("========================== Firmware Download ==========================\n\n");
+        retVal = MMWL_firmwareDownload(deviceMap);
+        if (retVal != RL_RET_CODE_OK)
+        {
+            printf("Firmware update failed for deviceMap %u with error %d \n\n",
+                   deviceMap, retVal);
+            return -1;
+        }
+        else
+        {
+            printf("Firmware update successful for deviceMap %u \n\n",
+                   deviceMap);
+        }
+        printf("=====================================================================\n\n");
+    }
+    /* Swap reset and power on the device */
+    retVal = MMWL_SwapResetAndPowerOn(deviceMap);
+    if (retVal != RL_RET_CODE_OK)
+    {
+        printf("Could not restart the device\n\n");
+        return -1;
+    }
 
     /* Change CRC Type of Async Event generated by MSS to what is being requested by user in mmwaveconfig.txt */
     retVal = MMWL_setDeviceCrcType(deviceMap);
     if (retVal != RL_RET_CODE_OK)
     {
         printf("CRC Type set for MasterSS failed for deviceMap %u with error code %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3319,7 +3309,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Radar/RF subsystem Power up failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3336,13 +3326,13 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Basic/Static configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
     {
         printf("Basic/Static configuration success for deviceMap %u \n\n",
-                deviceMap);
+               deviceMap);
     }
 
     /*  \subsection     api_sequence5     Seq 5 - Initializes the mmWave Front end
@@ -3354,7 +3344,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("RF Initialization/Calibration failed for deviceMap %u with error code %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3368,7 +3358,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Programmable Filter Configuration failed for deviceMap %u with error code %d \n\n",
-            deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3381,7 +3371,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Programmable Filter coefficient RAM Configuration failed for deviceMap %u with error code %d \n\n",
-            deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3403,7 +3393,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Profile Configuration failed for deviceMap %u with error code %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3411,43 +3401,43 @@ int MMWL_App()
         printf("Profile Configuration success for deviceMap %u \n\n", deviceMap);
     }
 
-	if (rlDevGlobalCfgArgs.LinkAdvChirpTest == FALSE)
-	{
-		/*  \subsection     api_sequence9     Seq 9 - FMCW chirp configuration
-		A chirp is always associated with FMCW profile from which it inherits coarse information
-		about FMCW signal. Using chirp configuration user can further define fine
-		variations to coarse parameters such as Start Frequency variation(0 - ~400 MHz), Ramp
-		Slope variation (0 - ~3 MHz/uS), Idle Time variation etc. It also configures which transmit channels to be used
-		for transmitting FMCW signal.
+    if (rlDevGlobalCfgArgs.LinkAdvChirpTest == FALSE)
+    {
+        /*  \subsection     api_sequence9     Seq 9 - FMCW chirp configuration
+        A chirp is always associated with FMCW profile from which it inherits coarse information
+        about FMCW signal. Using chirp configuration user can further define fine
+        variations to coarse parameters such as Start Frequency variation(0 - ~400 MHz), Ramp
+        Slope variation (0 - ~3 MHz/uS), Idle Time variation etc. It also configures which transmit channels to be used
+        for transmitting FMCW signal.
 
-		\ Note - User can define upto 512 unique chirps
-		*/
-		retVal = MMWL_chirpConfig(deviceMap);
-		if (retVal != RL_RET_CODE_OK)
-		{
-			printf("Chirp Configuration failed for deviceMap %u with error %d \n\n",
-				deviceMap, retVal);
-			return -1;
-		}
-		else
-		{
-			printf("Chirp Configuration success for deviceMap %u \n\n", deviceMap);
-		}
-	}
-	else
-	{
-		retVal = MMWL_advChirpConfigAll(deviceMap);
-		if (retVal != RL_RET_CODE_OK)
-		{
-			printf("Advanced Chirp Configuration failed for deviceMap %u with error %d \n\n",
-				deviceMap, retVal);
-			return -1;
-		}
-		else
-		{
-			printf("Advanced Chirp Configuration success for deviceMap %u \n\n", deviceMap);
-		}
-	}
+        \ Note - User can define upto 512 unique chirps
+        */
+        retVal = MMWL_chirpConfig(deviceMap);
+        if (retVal != RL_RET_CODE_OK)
+        {
+            printf("Chirp Configuration failed for deviceMap %u with error %d \n\n",
+                   deviceMap, retVal);
+            return -1;
+        }
+        else
+        {
+            printf("Chirp Configuration success for deviceMap %u \n\n", deviceMap);
+        }
+    }
+    else
+    {
+        retVal = MMWL_advChirpConfigAll(deviceMap);
+        if (retVal != RL_RET_CODE_OK)
+        {
+            printf("Advanced Chirp Configuration failed for deviceMap %u with error %d \n\n",
+                   deviceMap, retVal);
+            return -1;
+        }
+        else
+        {
+            printf("Advanced Chirp Configuration success for deviceMap %u \n\n", deviceMap);
+        }
+    }
 
     /*  \subsection     api_sequence10     Seq 10 - Data Path (CSI2/LVDS) Configuration
     TI mmWave device supports CSI2 or LVDS interface for sending RAW ADC data. mmWave device
@@ -3461,7 +3451,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Data Path Configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3478,7 +3468,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("CSI2/LVDS Clock Configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3494,13 +3484,13 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("CSI2/LVDS Lane Config failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
     {
         printf("CSI2/LVDS Lane Configuration success for deviceMap %u \n\n",
-                deviceMap);
+               deviceMap);
     }
     printf("======================================================================\n\n");
 
@@ -3509,7 +3499,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Test Source Configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3519,7 +3509,7 @@ int MMWL_App()
 #endif
 
     /* Check for If Advance Frame Test is enabled */
-    if(rlDevGlobalCfgArgs.LinkAdvanceFrameTest == FALSE)
+    if (rlDevGlobalCfgArgs.LinkAdvanceFrameTest == FALSE)
     {
         /*  \subsection     api_sequence13     Seq 13 - FMCW frame configuration
         A frame defines sequence of chirps and how this sequence needs to be repeated over time.
@@ -3528,7 +3518,7 @@ int MMWL_App()
         if (retVal != RL_RET_CODE_OK)
         {
             printf("Frame Configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+                   deviceMap, retVal);
             return -1;
         }
         else
@@ -3546,7 +3536,7 @@ int MMWL_App()
         if (retVal != RL_RET_CODE_OK)
         {
             printf("Adv Frame Configuration failed for deviceMap %u with error %d \n\n",
-                deviceMap, retVal);
+                   deviceMap, retVal);
             return -1;
         }
         else
@@ -3562,7 +3552,7 @@ int MMWL_App()
         if (retVal != RL_RET_CODE_OK)
         {
             printf("Continuous mode Config failed for deviceMap %u with error code %d \n\n",
-                deviceMap, retVal);
+                   deviceMap, retVal);
             return -1;
         }
         else
@@ -3580,7 +3570,7 @@ int MMWL_App()
     if (retVal != RL_RET_CODE_OK)
     {
         printf("Sensor Start failed for deviceMap %u with error code %d \n\n",
-                deviceMap, retVal);
+               deviceMap, retVal);
         return -1;
     }
     else
@@ -3589,180 +3579,180 @@ int MMWL_App()
     }
     printf("======================================================================\n\n");
 
-//    if (rlDevGlobalCfgArgs.LinkDynProfileTest == TRUE)
-//    {
-//        /* Host can update profile configurations dynamically while frame is ongoing.
-//           This test has been added in this example to demostrate dynamic profile update feature
-//           of mmWave sensor device, developer must check the validity of parameters at the system
-//           level before implementing the application. */
+    //    if (rlDevGlobalCfgArgs.LinkDynProfileTest == TRUE)
+    //    {
+    //        /* Host can update profile configurations dynamically while frame is ongoing.
+    //           This test has been added in this example to demostrate dynamic profile update feature
+    //           of mmWave sensor device, developer must check the validity of parameters at the system
+    //           level before implementing the application. */
 
-//        /* wait for few frames worth of time before updating profile config */
-// 		rlNonOsMainLoopTask();
-// 		rlAppSleep(30 * framePeriodicity);
+    //        /* wait for few frames worth of time before updating profile config */
+    // 		rlNonOsMainLoopTask();
+    // 		rlAppSleep(30 * framePeriodicity);
 
-//        /* update few of existing profile parameters */
-//        profileCfgArgs[0].rxGain = 222;
-//        profileCfgArgs[0].pfCalLutUpdate = 0x1; /* bit0: 1, bit1: 0 */
-//        profileCfgArgs[0].hpfCornerFreq1 = 1;
-//        profileCfgArgs[0].hpfCornerFreq2 = 1;
-//        profileCfgArgs[0].txStartTime = 2;
-//        profileCfgArgs[0].rampEndTime = 7000;
+    //        /* update few of existing profile parameters */
+    //        profileCfgArgs[0].rxGain = 222;
+    //        profileCfgArgs[0].pfCalLutUpdate = 0x1; /* bit0: 1, bit1: 0 */
+    //        profileCfgArgs[0].hpfCornerFreq1 = 1;
+    //        profileCfgArgs[0].hpfCornerFreq2 = 1;
+    //        profileCfgArgs[0].txStartTime = 2;
+    //        profileCfgArgs[0].rampEndTime = 7000;
 
-//        /* Dynamically configure 1 profile (max 4 profiles) while frame is ongoing */
-//        retVal = rlSetProfileConfig(deviceMap, 1U, &profileCfgArgs[0U]);
-//        if (retVal != RL_RET_CODE_OK)
-//        {
-//            printf("Dynamic Profile Configuration failed for deviceMap %u with error code %d \n\n",
-//                    deviceMap, retVal);
-//            return -1;
-//        }
-//        else
-//        {
-//            printf("Dynamic Profile Configuration success for deviceMap %u \n\n", deviceMap);
-//        }
+    //        /* Dynamically configure 1 profile (max 4 profiles) while frame is ongoing */
+    //        retVal = rlSetProfileConfig(deviceMap, 1U, &profileCfgArgs[0U]);
+    //        if (retVal != RL_RET_CODE_OK)
+    //        {
+    //            printf("Dynamic Profile Configuration failed for deviceMap %u with error code %d \n\n",
+    //                    deviceMap, retVal);
+    //            return -1;
+    //        }
+    //        else
+    //        {
+    //            printf("Dynamic Profile Configuration success for deviceMap %u \n\n", deviceMap);
+    //        }
 
-//        /* wait for few frames worth of time before reading profile config.
-//           Dynamic profile configuration will come in effect during next frame, so wait for that time
-//           before reading back profile config */
-// 		rlNonOsMainLoopTask();
-// 		rlAppSleep(20 * framePeriodicity);
+    //        /* wait for few frames worth of time before reading profile config.
+    //           Dynamic profile configuration will come in effect during next frame, so wait for that time
+    //           before reading back profile config */
+    // 		rlNonOsMainLoopTask();
+    // 		rlAppSleep(20 * framePeriodicity);
 
-//        /* To verify that profile configuration parameters are applied to device while frame is ongoing,
-//           read back profile configurationn from device */
-//        retVal = rlGetProfileConfig(deviceMap, 0, &profileCfgArgs[1]);
-//        if (retVal != RL_RET_CODE_OK)
-//        {
-//            printf("Dynamic Get Profile Configuration failed for deviceMap %u with error code %d \n\n",
-//                    deviceMap, retVal);
-//            return -1;
-//        }
-//        else
-//        {
-//            printf("Dynamic Get Profile Configuration success for deviceMap %u \n\n", deviceMap);
-//            /* compare the read back profile configuration parameters to lastly configured parameters */
-//            if ((profileCfgArgs[0].rxGain != profileCfgArgs[1].rxGain) || \
+    //        /* To verify that profile configuration parameters are applied to device while frame is ongoing,
+    //           read back profile configurationn from device */
+    //        retVal = rlGetProfileConfig(deviceMap, 0, &profileCfgArgs[1]);
+    //        if (retVal != RL_RET_CODE_OK)
+    //        {
+    //            printf("Dynamic Get Profile Configuration failed for deviceMap %u with error code %d \n\n",
+    //                    deviceMap, retVal);
+    //            return -1;
+    //        }
+    //        else
+    //        {
+    //            printf("Dynamic Get Profile Configuration success for deviceMap %u \n\n", deviceMap);
+    //            /* compare the read back profile configuration parameters to lastly configured parameters */
+    //            if ((profileCfgArgs[0].rxGain != profileCfgArgs[1].rxGain) || \
 //                (profileCfgArgs[0].hpfCornerFreq1 != profileCfgArgs[1].hpfCornerFreq1) || \
 //                (profileCfgArgs[0].hpfCornerFreq2 != profileCfgArgs[1].hpfCornerFreq2) || \
 //                (profileCfgArgs[0].txStartTime != profileCfgArgs[1].txStartTime) || \
 //                (profileCfgArgs[0].rampEndTime != profileCfgArgs[1].rampEndTime))
-//                printf("Dynamic Profile Config mismatched !!! \n\n");
-//            else
-//                printf("Dynamic profile cfg matched \n\n");
-//        }
-//    }
+    //                printf("Dynamic Profile Config mismatched !!! \n\n");
+    //            else
+    //                printf("Dynamic profile cfg matched \n\n");
+    //        }
+    //    }
 
-//    if (rlDevGlobalCfgArgs.LinkDynChirpTest == TRUE)
-//    {
-//        /* wait for few frames to elapse before invoking Dynamic chirp config API to update
-//           new chirp config to come in effect for next frames */
+    //    if (rlDevGlobalCfgArgs.LinkDynChirpTest == TRUE)
+    //    {
+    //        /* wait for few frames to elapse before invoking Dynamic chirp config API to update
+    //           new chirp config to come in effect for next frames */
 
-//        /* wait for few frames worth of time */
-// 		rlNonOsMainLoopTask();
-// 		rlAppSleep(30 * framePeriodicity);
+    //        /* wait for few frames worth of time */
+    // 		rlNonOsMainLoopTask();
+    // 		rlAppSleep(30 * framePeriodicity);
 
-//        retVal = MMWL_setDynChirpConfig(deviceMap);
-//        if (retVal != RL_RET_CODE_OK)
-//        {
-//            printf("Dynamic Chirp config failed for deviceMap %u with error code %d \n\n",
-//                deviceMap, retVal);
-//            return -1;
-//        }
-//        else
-//        {
-//            printf("Dynamic Chirp config successful for deviceMap %u \n\n", deviceMap);
-//        }
+    //        retVal = MMWL_setDynChirpConfig(deviceMap);
+    //        if (retVal != RL_RET_CODE_OK)
+    //        {
+    //            printf("Dynamic Chirp config failed for deviceMap %u with error code %d \n\n",
+    //                deviceMap, retVal);
+    //            return -1;
+    //        }
+    //        else
+    //        {
+    //            printf("Dynamic Chirp config successful for deviceMap %u \n\n", deviceMap);
+    //        }
 
-//        retVal = MMWL_dynChirpEnable(deviceMap);
-//        if (retVal != RL_RET_CODE_OK)
-//        {
-//            printf("Dynamic Chirp Enable failed for deviceMap %u with error code %d \n\n",
-//                deviceMap, retVal);
-//            return -1;
-//        }
-//        else
-//        {
-//            printf("Dynamic Chirp Enable successful for deviceMap %u \n\n", deviceMap);
-//        }
-//        printf("======================================================================\n\n");
+    //        retVal = MMWL_dynChirpEnable(deviceMap);
+    //        if (retVal != RL_RET_CODE_OK)
+    //        {
+    //            printf("Dynamic Chirp Enable failed for deviceMap %u with error code %d \n\n",
+    //                deviceMap, retVal);
+    //            return -1;
+    //        }
+    //        else
+    //        {
+    //            printf("Dynamic Chirp Enable successful for deviceMap %u \n\n", deviceMap);
+    //        }
+    //        printf("======================================================================\n\n");
 
-//        /* wait for another few mSec so that dynamic chirp come in effect,
-//         If above API reached to BSS at the end of frame then new chirp config will come in effect
-//         during next frame only */
-// 		rlNonOsMainLoopTask();
-// 		rlAppSleep(50 * framePeriodicity);
+    //        /* wait for another few mSec so that dynamic chirp come in effect,
+    //         If above API reached to BSS at the end of frame then new chirp config will come in effect
+    //         during next frame only */
+    // 		rlNonOsMainLoopTask();
+    // 		rlAppSleep(50 * framePeriodicity);
 
-//        /* read back Chirp config, which should be same as configured in dynChirpConfig for same segment */
-//        retVal = MMWL_getDynChirpConfig(deviceMap);
-//        if (retVal != RL_RET_CODE_OK)
-//        {
-//            printf("GetChirp Configuration failed for deviceMap %u with error %d \n\n",
-//                    deviceMap, retVal);
-//            return -1;
-//        }
-//        else
-//        {
-//            printf("GetChirp Configuration success for deviceMap %u \n\n", deviceMap);
-//        }
-//    }
+    //        /* read back Chirp config, which should be same as configured in dynChirpConfig for same segment */
+    //        retVal = MMWL_getDynChirpConfig(deviceMap);
+    //        if (retVal != RL_RET_CODE_OK)
+    //        {
+    //            printf("GetChirp Configuration failed for deviceMap %u with error %d \n\n",
+    //                    deviceMap, retVal);
+    //            return -1;
+    //        }
+    //        else
+    //        {
+    //            printf("GetChirp Configuration success for deviceMap %u \n\n", deviceMap);
+    //        }
+    //    }
 
-   /* @Note - all these SLeep is added in this demo application to demonstrate mmWave sensor features,
-               user can change these sleep time values as per their requirement */
+    /* @Note - all these SLeep is added in this demo application to demonstrate mmWave sensor features,
+                user can change these sleep time values as per their requirement */
 
-   /* wait for 10 frames worth of time */
-   rlNonOsMainLoopTask();
-   /* Sleep Count is based on PC where this application runs, so user needs to re-calculate
-      this number to equate with 10-frame worth of time */
-//    printf("sleeping for %d sec", 2);
-//    fflush(stdout);
-   rlAppSleep(2000);
+    /* wait for 10 frames worth of time */
+    rlNonOsMainLoopTask();
+    /* Sleep Count is based on PC where this application runs, so user needs to re-calculate
+       this number to equate with 10-frame worth of time */
+    //    printf("sleeping for %d sec", 2);
+    //    fflush(stdout);
+    rlAppSleep(2000);
 
-   /* Stop the frame */
-   retVal = MMWL_sensorStop(deviceMap);
-   if (retVal != RL_RET_CODE_OK)
-   {
-       if (retVal == RL_RET_CODE_FRAME_ALREADY_ENDED)
-       {
-           printf("Frame is already stopped when sensorStop CMD was issued\n\n");
-       }
-       else
-       {
-           printf("Sensor Stop failed for deviceMap %u with error code %d \n\n",
+    /* Stop the frame */
+    retVal = MMWL_sensorStop(deviceMap);
+    if (retVal != RL_RET_CODE_OK)
+    {
+        if (retVal == RL_RET_CODE_FRAME_ALREADY_ENDED)
+        {
+            printf("Frame is already stopped when sensorStop CMD was issued\n\n");
+        }
+        else
+        {
+            printf("Sensor Stop failed for deviceMap %u with error code %d \n\n",
+                   deviceMap, retVal);
+            return -1;
+        }
+    }
+    else
+    {
+        printf("Sensor Stop successful for deviceMap %u \n\n", deviceMap);
+    }
+
+    //    /* Note- Before Calling this API user must feed in input signal to device's pins,
+    //    else device will return garbage data in GPAdc measurement over Async event.
+    //    Measurement data is stored in 'rcvGpAdcData' structure after this API call. */
+    //    retVal = MMWL_gpadcMeasConfig(deviceMap);
+    //    if (retVal != RL_RET_CODE_OK)
+    //    {
+    //        printf("GPAdc measurement API failed for deviceMap %u with error code %d \n\n",
+    //                deviceMap, retVal);
+    //        return -1;
+    //    }
+    //    else
+    //    {
+    //        printf("GPAdc measurement API success for deviceMap %u \n\n", deviceMap);
+    //    }
+
+    /* Switch off the device */
+    retVal = MMWL_powerOff(deviceMap);
+    if (retVal != RL_RET_CODE_OK)
+    {
+        printf("Device power off failed for deviceMap %u with error code %d \n\n",
                deviceMap, retVal);
-           return -1;
-       }
-   }
-   else
-   {
-       printf("Sensor Stop successful for deviceMap %u \n\n", deviceMap);
-   }
-
-//    /* Note- Before Calling this API user must feed in input signal to device's pins,
-//    else device will return garbage data in GPAdc measurement over Async event.
-//    Measurement data is stored in 'rcvGpAdcData' structure after this API call. */
-//    retVal = MMWL_gpadcMeasConfig(deviceMap);
-//    if (retVal != RL_RET_CODE_OK)
-//    {
-//        printf("GPAdc measurement API failed for deviceMap %u with error code %d \n\n",
-//                deviceMap, retVal);
-//        return -1;
-//    }
-//    else
-//    {
-//        printf("GPAdc measurement API success for deviceMap %u \n\n", deviceMap);
-//    }
-
-   /* Switch off the device */
-   retVal = MMWL_powerOff(deviceMap);
-   if (retVal != RL_RET_CODE_OK)
-   {
-       printf("Device power off failed for deviceMap %u with error code %d \n\n",
-               deviceMap, retVal);
-       return -1;
-   }
-   else
-   {
-       printf("Device power off success for deviceMap %u \n\n", deviceMap);
-   }
+        return -1;
+    }
+    else
+    {
+        printf("Device power off success for deviceMap %u \n\n", deviceMap);
+    }
 
     /* Close Configuraiton file */
     MMWL_closeConfigFile();
@@ -3771,20 +3761,20 @@ int MMWL_App()
 }
 
 /** @fn int main()
-*
-*   @brief Main function.
-*
-*   @return none
-*
-*   Main function.
-*/
+ *
+ *   @brief Main function.
+ *
+ *   @return none
+ *
+ *   Main function.
+ */
 void main(void)
 {
     int retVal;
 
     printf("================= mmWaveLink Example Application ====================\n\n");
     retVal = MMWL_App();
-    if(retVal == RL_RET_CODE_OK)
+    if (retVal == RL_RET_CODE_OK)
     {
         printf("=========== mmWaveLink Example Application execution Successful =========== \n\n");
     }
