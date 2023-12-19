@@ -2,6 +2,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm,clion,python,c++,cmake
 # Edit at https://www.toptal.com/developers/gitignore?templates=pycharm,clion,python,c++,cmake
 
+.vscode/
+
 ### C++ ###
 # Prerequisites
 *.d
