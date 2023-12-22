@@ -1994,14 +1994,6 @@ rlReturnVal_t rlDriverInit(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
         /* intialize and stitch all OS interfaces */
         retVal = rlDriverOsiInit();
 
-#if !(RL_DISABLE_LOGGING)
-        if (RL_RET_CODE_OK == retVal)
-        {
-            /*All callback copied in global strcuture, Init log parameter */
-            retVal += rlLogInit();
-            RL_LOGV_ARG0("Logging is enabled \n");
-        }
-#endif
         index = 0U;
 
         do
