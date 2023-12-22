@@ -1027,7 +1027,7 @@ rlReturnVal_t rlDriverMsgReadCmdCtx(rlUInt8_t devIndex)
                     /* setCmd Response Wait Tag to False when timer expires */
                     rlDrvData->isCmdRespWaited[devIndex] = RL_FALSE;
 
-                    RL_LOGE_ARG0("CmdSem should be signaled by IRQ but respTimeout\n");
+                    RL_LOGE_ARG0("CommandSemaphore should be signaled by IRQ but respTimeout\n");
                     retVal += RL_RET_CODE_RESP_TIMEOUT;
                     break;
                 }
