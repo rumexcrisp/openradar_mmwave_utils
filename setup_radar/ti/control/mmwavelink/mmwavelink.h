@@ -860,7 +860,7 @@ extern "C" {
  * To enable logging set this MACRO to '0' and set proper function pointer
  * dbgCb.rlPrint and debug level dbgCb.dbgLevel out of RL_DBG_LEVEL_* during rlDevicePowerOn
  */
-#define RL_DISABLE_LOGGING                    1
+#define RL_DISABLE_LOGGING                    0
 
 /* mmwavelink MACROs for Error Checks */
 #define RL_OSI_RET_CODE_OK                  (0)
