@@ -71,14 +71,8 @@ extern "C" {
 #define RL_LOGE_ARG2(x,y,z)
 #else
 #define RL_LOGV_ARG0(x)             {\
-            /* get the logging function pointer as per requested Level */\
-            rlPrintFptr fPtr = rlGetLogFptr(RL_DBG_LEVEL_VERBOSE);\
-            /* check for NULL Pointer */\
-            if(fPtr != NULL)\
-            {\
-                /* log the data with function name, line no and passed arg */\
-                fPtr("[VER ] %s:%d::" x, __FUNCTION__, __LINE__);\
-            }\
+            printf("[VERSION] %s:%d::" x,\
+                __FUNCTION__, __LINE__);\
                                 }
 
 #define RL_LOGV_ARG1(x,y)      {\
@@ -118,14 +112,8 @@ extern "C" {
         }
 
 #define RL_LOGD_ARG0(x)         {\
-            /* get the logging function pointer as per requested Level */\
-            rlPrintFptr fPtr = rlGetLogFptr(RL_DBG_LEVEL_DEBUG);\
-            /* check for NULL Pointer */\
-            if(fPtr != NULL)\
-            {\
-                /* log the data with function name, line no and passed arg */\
-                (void)fPtr("[DBG ] %s:%d::" x, __FUNCTION__, __LINE__);\
-            }\
+            printf("[DEBUG] %s:%d::" x,\
+                __FUNCTION__, __LINE__);\
         }
 
 #define RL_LOGD_ARG1(x,y)      {\
@@ -141,15 +129,8 @@ extern "C" {
         }
 
 #define RL_LOGI_ARG0(x)        {\
-            /* get the logging function pointer as per requested Level */\
-            rlPrintFptr fPtr = rlGetLogFptr(RL_DBG_LEVEL_INFO);\
-            /* check for NULL Pointer */\
-            if(fPtr != NULL)\
-            {\
-                /* log the data with function name, line no and passed arg */\
-                (void)fPtr("[INFO] %s:%d::" x,\
-                       __FUNCTION__, __LINE__);\
-            }\
+            printf("[INFO] %s:%d::" x,\
+                __FUNCTION__, __LINE__);\
         }
 
 #define RL_LOGI_ARG1(x,y)       {\
@@ -165,14 +146,8 @@ extern "C" {
         }
 
 #define RL_LOGW_ARG0(x)         {\
-            /* get the logging function pointer as per requested Level */\
-            rlPrintFptr fPtr = rlGetLogFptr(RL_DBG_LEVEL_WARNING);\
-            /* check for NULL Pointer */\
-            if(fPtr != NULL)\
-            {\
-                /* log the data with function name, line no and passed arg */\
-                (void)fPtr("[WARN] %s:%d::", x, __FUNCTION__, __LINE__);\
-            }\
+            printf("[WARN] %s:%d::" x,\
+                __FUNCTION__, __LINE__);\
         }
 
 #define RL_LOGW_ARG1(x,y)      {\
@@ -187,20 +162,8 @@ extern "C" {
             }\
         }
 
-// #define RL_LOGE_ARG0(x)        {\
-//             /* get the logging function pointer as per requested Level */\
-//             rlPrintFptr fPtr = rlGetLogFptr(RL_DBG_LEVEL_ERROR);\
-//             /* check for NULL Pointer */\
-//             if(fPtr != NULL)\
-//             {\
-//                 /* log the data with function name, line no and passed arg */\
-//                 (void)fPtr("[ERR ] %s:%d::" x,\
-//                 __FUNCTION__, __LINE__);\
-//             }\
-//         }
-
 #define RL_LOGE_ARG0(x)        {\
-            printf("[ERR ] %s:%d::" x,\
+            printf("[ERR] %s:%d::" x,\
                 __FUNCTION__, __LINE__);\
         }
 
