@@ -40,7 +40,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 ///*****************************************************************************
 /// HISTORY :
 /// VERSION        DATE              AUTHOR      CHANGE DESCRIPTION
@@ -73,52 +72,52 @@
 ///****************
 
 /** Socket IDs for config and data ports                */
-strRFDCCard_SockInfo	sRFDCCard_SockInfo;
+strRFDCCard_SockInfo sRFDCCard_SockInfo;
 
 /** Record process - Inline stats                       */
 strRFDCCard_InlineProcStats sRFDCCard_InlineStats;
 
 /** Start record config structure                       */
-strStartRecConfigMode   sRFDCCard_StartRecConfig;
+strStartRecConfigMode sRFDCCard_StartRecConfig;
 
 /** Callback function - To handle Config port async status */
-EVENT_HANDLER           RFDCARD_Callback;
+EVENT_HANDLER RFDCARD_Callback;
 
 /** Callback function - To handle recording inline stats */
-INLINE_PROC_HANDLER     RecordInlineProc_Callback;
+INLINE_PROC_HANDLER RecordInlineProc_Callback;
 
 /** Commands protocol -  class object                   */
-cCommandsProtocol       objCmdsProto;
+cCommandsProtocol objCmdsProto;
 
 /** ADC data record process -  class object             */
-cUdpDataReceiver        objUdpDataRecv(RAW_DATA_INDEX);
+cUdpDataReceiver objUdpDataRecv(RAW_DATA_INDEX);
 
 /** CP data record process -  class object              */
-cUdpDataReceiver		objUdpCpDataRecv(CP_DATA_1_INDEX);
+cUdpDataReceiver objUdpCpDataRecv(CP_DATA_1_INDEX);
 
 /** CQ data record process -  class object              */
-cUdpDataReceiver		objUdpCqDataRecv(CQ_DATA_2_INDEX);
+cUdpDataReceiver objUdpCqDataRecv(CQ_DATA_2_INDEX);
 
 /** R4F data record process -  class object             */
-cUdpDataReceiver		objUdpR4fDataRecv(R4F_DATA_3_INDEX);
+cUdpDataReceiver objUdpR4fDataRecv(R4F_DATA_3_INDEX);
 
 /** DSP data record process -  class object             */
-cUdpDataReceiver		objUdpDspDataRecv(DSP_DATA_4_INDEX);
+cUdpDataReceiver objUdpDspDataRecv(DSP_DATA_4_INDEX);
 
 /** Command response data handling -  class object      */
-cUdpReceiver            objUdpConfigRecv;
+cUdpReceiver objUdpConfigRecv;
 
 /** Osal class object                                   */
 osal osalObj_api;
 
 /** Config port - socket address to send config commands    */
-struct sockaddr_in      ethConf_PortAddress;
+struct sockaddr_in ethConf_PortAddress;
 
 /** Config port - socket address to send config commands    */
-struct sockaddr_in      ethConf_ServAddr;
+struct sockaddr_in ethConf_ServAddr;
 
 /** Config port - socket address to send stop async command */
-struct sockaddr_in      ethConf_PortAsyncAddress;
+struct sockaddr_in ethConf_PortAsyncAddress;
 
 /** Record - Maximum file size config                       */
 UINT32 u32MaxFileSizeToCapture = 0;
@@ -190,17 +189,14 @@ OSAL_SIGNAL_HANDLE_TYPE sgnCaptureTimeoutWaitEvent;
  * --> Structure filled with Ethernet config data
  * @return SINT32 value
  */
-STATUS ConnectRFDCCard_ConfigMode
-(
-strEthConfigMode sEthConfigMode
-)
+STATUS ConnectRFDCCard_ConfigMode(strEthConfigMode sEthConfigMode)
 {
 #ifdef ENABLE_DEBUG
     pDebugFile = fopen(s8DebugFileName, "wb");
     if (NULL == pDebugFile)
     {
         RFDCARD_Callback(CMD_CODE_SYSTEM_ASYNC_STATUS,
-                            STS_REC_FILE_CREATION_ERR);
+                         STS_REC_FILE_CREATION_ERR);
         return false;
     }
     fclose(pDebugFile);
@@ -209,22 +205,22 @@ strEthConfigMode sEthConfigMode
     sprintf(s8DebugMsg, "\nConnectRFDCCard_ConfigMode : ");
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nau8Dca1000IpAddr : %d.%d.%d.%d",
-        sEthConfigMode.au8Dca1000IpAddr[0],
-        sEthConfigMode.au8Dca1000IpAddr[1],
-        sEthConfigMode.au8Dca1000IpAddr[2],
-        sEthConfigMode.au8Dca1000IpAddr[3]);
+            sEthConfigMode.au8Dca1000IpAddr[0],
+            sEthConfigMode.au8Dca1000IpAddr[1],
+            sEthConfigMode.au8Dca1000IpAddr[2],
+            sEthConfigMode.au8Dca1000IpAddr[3]);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32ConfigPortNo : %d",
-        sEthConfigMode.u32ConfigPortNo);
+            sEthConfigMode.u32ConfigPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32RecordPortNo : %d",
-        sEthConfigMode.u32RecordPortNo);
+            sEthConfigMode.u32RecordPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
 
     SINT32 s32RecvBuf = 0x7FFFFFFF;
     SINT32 s32SendBuf = 0xFFFFF;
-    SINT8  s8IpAddr[IP_ADDR_MAX_SIZE_BYTES];
+    SINT8 s8IpAddr[IP_ADDR_MAX_SIZE_BYTES];
     strEthConfigMode sRFDCCard_EthConfig;
 
     /** Reset the socket IDs and socket address structure                    */
@@ -248,13 +244,13 @@ strEthConfigMode sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_ConfigMode(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+                            "Invalid input parameters (u32RecordPortNo) : %d",
+                sEthConfigMode.u32RecordPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_ConfigMode(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+               "Invalid input parameters (u32RecordPortNo) : %d",
+               sEthConfigMode.u32RecordPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -263,33 +259,33 @@ strEthConfigMode sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_ConfigMode(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+                            "Invalid input parameters (u32ConfigPortNo) : %d",
+                sEthConfigMode.u32ConfigPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_ConfigMode(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+               "Invalid input parameters (u32ConfigPortNo) : %d",
+               sEthConfigMode.u32ConfigPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
-                                                      sEthConfigMode.u32ConfigPortNo))
+    if (SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
+                                                       sEthConfigMode.u32ConfigPortNo))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_ConfigMode(): "
-            "Invalid input parameters (Port numbers are same)");
+                            "Invalid input parameters (Port numbers are same)");
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_ConfigMode(): "
-            "Invalid input parameters (Port numbers are same)");
+               "Invalid input parameters (Port numbers are same)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
+    if (SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
     {
         printf("\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (au8Dca1000IpAddr)");
+               "Invalid input parameters (au8Dca1000IpAddr)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -299,16 +295,16 @@ strEthConfigMode sEthConfigMode
     sRFDCCard_EthConfig.u32RecordPortNo = sEthConfigMode.u32RecordPortNo;
 
     sprintf(s8IpAddr, "%d.%d.%d.%d", sEthConfigMode.au8Dca1000IpAddr[0],
-        sEthConfigMode.au8Dca1000IpAddr[1], sEthConfigMode.au8Dca1000IpAddr[2],
-        sEthConfigMode.au8Dca1000IpAddr[3]);
+            sEthConfigMode.au8Dca1000IpAddr[1], sEthConfigMode.au8Dca1000IpAddr[2],
+            sEthConfigMode.au8Dca1000IpAddr[3]);
 
     /** Create socket for config port */
     sRFDCCard_SockInfo.s32EthConfSock = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                               IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32EthConfSock < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
-            "Socket creation error (Config port)");
+                           "Socket creation error (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -324,30 +320,29 @@ strEthConfigMode sEthConfigMode
 
     /** Bind                                                                 */
     if (bind(sRFDCCard_SockInfo.s32EthConfSock,
-        (struct sockaddr *)&ethConf_PortAddress,
-        sizeof(ethConf_PortAddress)) < 0)
+             (struct sockaddr *)&ethConf_PortAddress,
+             sizeof(ethConf_PortAddress)) < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
-            "Bind failed (Config port)");
+                           "Bind failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfSock, SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
-            "setsockopt failed (Config port)");
+                           "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfSock, SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
-            "setsockopt failed (Config port)");
+                           "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
-
 
     return (STS_RFDCCARD_SUCCESS);
 }
@@ -367,17 +362,14 @@ strEthConfigMode sEthConfigMode
  * --> Structure filled with Ethernet config data
  * @return SINT32 value
  */
-STATUS ConnectRFDCCard_AsyncCommandMode
-(
-strEthConfigMode sEthConfigMode
-)
+STATUS ConnectRFDCCard_AsyncCommandMode(strEthConfigMode sEthConfigMode)
 {
 #ifdef ENABLE_DEBUG
     pDebugFile = fopen(s8DebugFileName, "wb");
     if (NULL == pDebugFile)
     {
         RFDCARD_Callback(CMD_CODE_SYSTEM_ASYNC_STATUS,
-                            STS_REC_FILE_CREATION_ERR);
+                         STS_REC_FILE_CREATION_ERR);
         return false;
     }
     fclose(pDebugFile);
@@ -386,28 +378,28 @@ strEthConfigMode sEthConfigMode
     sprintf(s8DebugMsg, "\nConnectRFDCCard_AsyncCommandMode : ");
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nau8Dca1000IpAddr : %d.%d.%d.%d",
-        sEthConfigMode.au8Dca1000IpAddr[0],
-        sEthConfigMode.au8Dca1000IpAddr[1],
-        sEthConfigMode.au8Dca1000IpAddr[2],
-        sEthConfigMode.au8Dca1000IpAddr[3]);
+            sEthConfigMode.au8Dca1000IpAddr[0],
+            sEthConfigMode.au8Dca1000IpAddr[1],
+            sEthConfigMode.au8Dca1000IpAddr[2],
+            sEthConfigMode.au8Dca1000IpAddr[3]);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32ConfigPortNo : %d",
-        sEthConfigMode.u32ConfigPortNo);
+            sEthConfigMode.u32ConfigPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32RecordPortNo : %d",
-        sEthConfigMode.u32RecordPortNo);
+            sEthConfigMode.u32RecordPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
 
     SINT32 s32RecvBuf = SOCK_RECV_BUF_SIZE;
     SINT32 s32SendBuf = SOCK_SEND_BUF_SIZE;
-    SINT8  s8IpAddr[IP_ADDR_MAX_SIZE_BYTES];
+    SINT8 s8IpAddr[IP_ADDR_MAX_SIZE_BYTES];
     strEthConfigMode sRFDCCard_EthConfig;
 
     /** Reset the socket IDs and socket address structure                    */
     sRFDCCard_SockInfo.s32EthConfAsyncSock = 0;
     memset((void *)&ethConf_PortAsyncAddress, '0',
-            sizeof(ethConf_PortAsyncAddress));
+           sizeof(ethConf_PortAsyncAddress));
 
 #if defined _WIN32
     WSADATA wsaData;
@@ -425,13 +417,13 @@ strEthConfigMode sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_AsyncCommandMode(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+                            "Invalid input parameters (u32RecordPortNo) : %d",
+                sEthConfigMode.u32RecordPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_AsyncCommandMode(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+               "Invalid input parameters (u32RecordPortNo) : %d",
+               sEthConfigMode.u32RecordPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -440,76 +432,75 @@ strEthConfigMode sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_AsyncCommandMode(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+                            "Invalid input parameters (u32ConfigPortNo) : %d",
+                sEthConfigMode.u32ConfigPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_AsyncCommandMode(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+               "Invalid input parameters (u32ConfigPortNo) : %d",
+               sEthConfigMode.u32ConfigPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
-                                                      sEthConfigMode.u32ConfigPortNo))
+    if (SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
+                                                       sEthConfigMode.u32ConfigPortNo))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_AsyncCommandMode(): "
-            "Invalid input parameters (Port numbers are same)");
+                            "Invalid input parameters (Port numbers are same)");
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_AsyncCommandMode(): "
-            "Invalid input parameters (Port numbers are same)");
+               "Invalid input parameters (Port numbers are same)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
-    if(SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
+    if (SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
     {
         printf("\nConnectRFDCCard_AsyncCommandMode(): "
-            "Invalid input parameters (au8Dca1000IpAddr)");
+               "Invalid input parameters (au8Dca1000IpAddr)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
     memcpy(sRFDCCard_EthConfig.au8Dca1000IpAddr, sEthConfigMode.au8Dca1000IpAddr,
-        4);
+           4);
     sRFDCCard_EthConfig.u32ConfigPortNo = sEthConfigMode.u32ConfigPortNo;
     sRFDCCard_EthConfig.u32RecordPortNo = sEthConfigMode.u32RecordPortNo;
 
     sprintf(s8IpAddr, "%d.%d.%d.%d", sEthConfigMode.au8Dca1000IpAddr[0],
-        sEthConfigMode.au8Dca1000IpAddr[1], sEthConfigMode.au8Dca1000IpAddr[2],
-        sEthConfigMode.au8Dca1000IpAddr[3]);
+            sEthConfigMode.au8Dca1000IpAddr[1], sEthConfigMode.au8Dca1000IpAddr[2],
+            sEthConfigMode.au8Dca1000IpAddr[3]);
 
     /** Create socket for config port */
     sRFDCCard_SockInfo.s32EthConfAsyncSock = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                                    IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32EthConfAsyncSock < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_AsyncCommandMode(): "
-            "Socket creation error (Config port)");
+                           "Socket creation error (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     ethConf_PortAsyncAddress.sin_family = AF_INET;
     ethConf_PortAsyncAddress.sin_port = htons(sRFDCCard_EthConfig.u32ConfigPortNo);
     struct hostent *pHost = gethostbyname("localhost");
-       memcpy(&ethConf_PortAsyncAddress.sin_addr.s_addr, pHost->h_addr,
-              pHost->h_length);
+    memcpy(&ethConf_PortAsyncAddress.sin_addr.s_addr, pHost->h_addr,
+           pHost->h_length);
 
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfAsyncSock, SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_AsyncCommandMode(): "
-            "setsockopt failed (Config port)");
+                           "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfAsyncSock, SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_AsyncCommandMode(): "
-            "setsockopt failed (Config port)");
+                           "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
-
 
     return (STS_RFDCCARD_SUCCESS);
 }
@@ -531,17 +522,14 @@ strEthConfigMode sEthConfigMode
  * --> Structure filled with Ethernet config data
  * @return SINT32 value
  */
-STATUS ConnectRFDCCard_RecordMode
-(
-strEthConfigMode sEthConfigMode
-)
+STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
 {
 #ifdef ENABLE_DEBUG
     pDebugFile = fopen(s8DebugFileName, "wb");
     if (NULL == pDebugFile)
     {
         RFDCARD_Callback(CMD_CODE_SYSTEM_ASYNC_STATUS,
-                            STS_REC_FILE_CREATION_ERR);
+                         STS_REC_FILE_CREATION_ERR);
         return false;
     }
     fclose(pDebugFile);
@@ -550,16 +538,16 @@ strEthConfigMode sEthConfigMode
     sprintf(s8DebugMsg, "\nConnectRFDCCard_RecordMode : ");
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nau8Dca1000IpAddr : %d.%d.%d.%d",
-        sEthConfigMode.au8Dca1000IpAddr[0],
-        sEthConfigMode.au8Dca1000IpAddr[1],
-        sEthConfigMode.au8Dca1000IpAddr[2],
-        sEthConfigMode.au8Dca1000IpAddr[3]);
+            sEthConfigMode.au8Dca1000IpAddr[0],
+            sEthConfigMode.au8Dca1000IpAddr[1],
+            sEthConfigMode.au8Dca1000IpAddr[2],
+            sEthConfigMode.au8Dca1000IpAddr[3]);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32ConfigPortNo : %d",
-        sEthConfigMode.u32ConfigPortNo);
+            sEthConfigMode.u32ConfigPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32RecordPortNo : %d",
-        sEthConfigMode.u32RecordPortNo);
+            sEthConfigMode.u32RecordPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
 
@@ -567,12 +555,12 @@ strEthConfigMode sEthConfigMode
     SINT32 s32SendBuf = SOCK_SEND_BUF_SIZE;
     strEthConfigMode sRFDCCard_EthConfig;
 
-    struct sockaddr_in      ethRaw_ServAddr;
-    struct sockaddr_in      ethDT1_ServAddr;
-    struct sockaddr_in      ethDT2_ServAddr;
-    struct sockaddr_in      ethDT3_ServAddr;
-    struct sockaddr_in      ethDT4_ServAddr;
-    SINT8  s8IpAddr[IP_ADDR_MAX_SIZE_BYTES];
+    struct sockaddr_in ethRaw_ServAddr;
+    struct sockaddr_in ethDT1_ServAddr;
+    struct sockaddr_in ethDT2_ServAddr;
+    struct sockaddr_in ethDT3_ServAddr;
+    struct sockaddr_in ethDT4_ServAddr;
+    SINT8 s8IpAddr[IP_ADDR_MAX_SIZE_BYTES];
 
     /** Reset the socket IDs and socket address structure                    */
     sRFDCCard_SockInfo.s32EthConfSock = 0;
@@ -610,13 +598,13 @@ strEthConfigMode sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+                            "Invalid input parameters (u32RecordPortNo) : %d",
+                sEthConfigMode.u32RecordPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+               "Invalid input parameters (u32RecordPortNo) : %d",
+               sEthConfigMode.u32RecordPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -625,33 +613,33 @@ strEthConfigMode sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+                            "Invalid input parameters (u32ConfigPortNo) : %d",
+                sEthConfigMode.u32ConfigPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+               "Invalid input parameters (u32ConfigPortNo) : %d",
+               sEthConfigMode.u32ConfigPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
-                                                      sEthConfigMode.u32ConfigPortNo))
+    if (SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
+                                                       sEthConfigMode.u32ConfigPortNo))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (Port numbers are same)");
+                            "Invalid input parameters (Port numbers are same)");
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (Port numbers are same)");
+               "Invalid input parameters (Port numbers are same)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
+    if (SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
     {
         printf("\nConnectRFDCCard_RecordMode(): "
-            "Invalid input parameters (au8Dca1000IpAddr)");
+               "Invalid input parameters (au8Dca1000IpAddr)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -661,16 +649,16 @@ strEthConfigMode sEthConfigMode
     sRFDCCard_EthConfig.u32RecordPortNo = sEthConfigMode.u32RecordPortNo;
 
     sprintf(s8IpAddr, "%d.%d.%d.%d", sEthConfigMode.au8Dca1000IpAddr[0],
-        sEthConfigMode.au8Dca1000IpAddr[1], sEthConfigMode.au8Dca1000IpAddr[2],
-        sEthConfigMode.au8Dca1000IpAddr[3]);
+            sEthConfigMode.au8Dca1000IpAddr[1], sEthConfigMode.au8Dca1000IpAddr[2],
+            sEthConfigMode.au8Dca1000IpAddr[3]);
 
     /** Create socket for raw port                                           */
     sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX] = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                                            IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX] < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode():  "
-            "Socket creation error (ADC data port)");
+                           "Socket creation error (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -680,8 +668,8 @@ strEthConfigMode sEthConfigMode
     ethRaw_ServAddr.sin_port = htons(sRFDCCard_EthConfig.u32RecordPortNo);
 
     /** Setting the timeout for ADC data port */
-    if(osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX],
-                           SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
+    if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX],
+                                SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
         THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (ADC data port)");
@@ -690,37 +678,37 @@ strEthConfigMode sEthConfigMode
 
     /** Bind                                                                 */
     if (bind(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX],
-        (struct sockaddr *)&ethRaw_ServAddr,
-        sizeof(ethRaw_ServAddr)) < 0)
+             (struct sockaddr *)&ethRaw_ServAddr,
+             sizeof(ethRaw_ServAddr)) < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Bind failed (ADC data port)");
+                           "Bind failed (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX], SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (ADC data port)");
+                           "setsockopt failed (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX], SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (ADC data port)");
+                           "setsockopt failed (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     /** Create socket for Data type 1 (CP)                                   */
     sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX] = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                                             IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX] < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Socket creation error (CP Data port)");
+                           "Socket creation error (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -730,8 +718,8 @@ strEthConfigMode sEthConfigMode
     ethDT1_ServAddr.sin_port = htons(sEthConfigMode.u32RecordPortNo + 1);
 
     /** Setting the timeout for CP data port */
-    if(osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX],
-                           SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
+    if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX],
+                                SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
         THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (CP data port)");
@@ -740,37 +728,37 @@ strEthConfigMode sEthConfigMode
 
     /** Bind                                                                 */
     if (bind(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX],
-        (struct sockaddr *)&ethDT1_ServAddr,
-        sizeof(ethDT1_ServAddr)) < 0)
+             (struct sockaddr *)&ethDT1_ServAddr,
+             sizeof(ethDT1_ServAddr)) < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Bind failed (CP Data port)");
+                           "Bind failed (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX], SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (CP Data port)");
+                           "setsockopt failed (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX], SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (CP Data port)");
+                           "setsockopt failed (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     /** Create socket for Data type 2 (CQ)                                   */
     sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX] = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                                             IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX] < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Socket creation error (CQ Data port)");
+                           "Socket creation error (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -780,8 +768,8 @@ strEthConfigMode sEthConfigMode
     ethDT2_ServAddr.sin_port = htons(sEthConfigMode.u32RecordPortNo + 2);
 
     /** Setting the timeout for CQ data port */
-    if(osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX],
-                           SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
+    if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX],
+                                SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
         THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (CQ data port)");
@@ -790,37 +778,37 @@ strEthConfigMode sEthConfigMode
 
     /** Bind                                                                 */
     if (bind(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX],
-        (struct sockaddr *)&ethDT2_ServAddr,
-        sizeof(ethDT2_ServAddr)) < 0)
+             (struct sockaddr *)&ethDT2_ServAddr,
+             sizeof(ethDT2_ServAddr)) < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Bind failed (CQ Data port)");
+                           "Bind failed (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX], SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (CQ Data port)");
+                           "setsockopt failed (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX], SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (CQ Data port)");
+                           "setsockopt failed (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     /** Create socket for Data type 3 (R4F) */
     sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX] = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                                              IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX] < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Socket creation error (R4F Data port)");
+                           "Socket creation error (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -829,10 +817,9 @@ strEthConfigMode sEthConfigMode
     ethDT3_ServAddr.sin_addr.s_addr = inet_addr("0.0.0.0");
     ethDT3_ServAddr.sin_port = htons(sEthConfigMode.u32RecordPortNo + 3);
 
-
     /** Setting the timeout for R4F data port */
-    if(osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX],
-                           SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
+    if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX],
+                                SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
         THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (R4F data port)");
@@ -841,37 +828,37 @@ strEthConfigMode sEthConfigMode
 
     /** Bind                                                                 */
     if (bind(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX],
-        (struct sockaddr *)&ethDT3_ServAddr,
-        sizeof(ethDT3_ServAddr)) < 0)
+             (struct sockaddr *)&ethDT3_ServAddr,
+             sizeof(ethDT3_ServAddr)) < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Bind failed (R4F Data port)");
+                           "Bind failed (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX], SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (R4F Data port)");
+                           "setsockopt failed (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX], SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (R4F Data port)");
+                           "setsockopt failed (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     /** Create socket for Data type 4 (DSP) */
     sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX] = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                                              IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX] < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Socket creation error (DSP Data port)");
+                           "Socket creation error (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -880,10 +867,9 @@ strEthConfigMode sEthConfigMode
     ethDT4_ServAddr.sin_addr.s_addr = inet_addr("0.0.0.0");
     ethDT4_ServAddr.sin_port = htons(sEthConfigMode.u32RecordPortNo + 4);
 
-
     /** Setting the timeout for DSP data port */
-    if(osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX],
-                           SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
+    if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX],
+                                SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
         THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (DSP data port)");
@@ -892,37 +878,37 @@ strEthConfigMode sEthConfigMode
 
     /** Bind                                                                  */
     if (bind(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX],
-        (struct sockaddr *)&ethDT4_ServAddr,
-        sizeof(ethDT4_ServAddr)) < 0)
+             (struct sockaddr *)&ethDT4_ServAddr,
+             sizeof(ethDT4_ServAddr)) < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Bind failed (DSP Data port)");
+                           "Bind failed (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (DSP Data port)");
+                           "setsockopt failed (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (DSP Data port)");
+                           "setsockopt failed (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     /** Create socket for config port */
     sRFDCCard_SockInfo.s32EthConfSock = socket(AF_INET, SOCK_DGRAM,
-        IPPROTO_UDP);
+                                               IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32EthConfSock < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Socket creation error (Config port)");
+                           "Socket creation error (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -936,10 +922,9 @@ strEthConfigMode sEthConfigMode
     ethConf_PortAddress.sin_addr.s_addr = inet_addr("0.0.0.0");
     ethConf_PortAddress.sin_port = htons(sRFDCCard_EthConfig.u32ConfigPortNo);
 
-
     /** Setting the timeout for config port response */
-    if(osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32EthConfSock,
-                           SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
+    if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32EthConfSock,
+                                SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
         THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (config port)");
@@ -948,27 +933,27 @@ strEthConfigMode sEthConfigMode
 
     /** Bind                                                                 */
     if (bind(sRFDCCard_SockInfo.s32EthConfSock,
-        (struct sockaddr *)&ethConf_PortAddress,
-        sizeof(ethConf_PortAddress)) < 0)
+             (struct sockaddr *)&ethConf_PortAddress,
+             sizeof(ethConf_PortAddress)) < 0)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "Bind failed (Config port)");
+                           "Bind failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_RCVBUF,
-        (char*)&s32RecvBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (Config port)");
+                           "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_SNDBUF,
-        (char*)&s32SendBuf, sizeof(SINT32)) == -1)
+                   (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
         THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
-            "setsockopt failed (Config port)");
+                           "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -988,10 +973,7 @@ strEthConfigMode sEthConfigMode
  * @pre Application should be connected to DCA1000EVM system
  * @return SINT32 value
  */
-STATUS ConfigureRFDCCard_Fpga
-(
-strFpgaConfigMode      sConfigMode
-)
+STATUS ConfigureRFDCCard_Fpga(strFpgaConfigMode sConfigMode)
 {
 #ifdef ENABLE_DEBUG
     sprintf(s8DebugMsg, "\n\nConfigureRFDCCard_Mode : ");
@@ -1003,10 +985,10 @@ strFpgaConfigMode      sConfigMode
     sprintf(s8DebugMsg, "\neDataXferMode : %d", sConfigMode.eDataXferMode);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\neDataCaptureMode : %d",
-        sConfigMode.eDataCaptureMode);
+            sConfigMode.eDataCaptureMode);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\neDataFormatMode : %d",
-        sConfigMode.eDataFormatMode);
+            sConfigMode.eDataFormatMode);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu8Timer : %d", sConfigMode.u8Timer);
     DEBUG_FILE_WRITE(s8DebugMsg);
@@ -1014,82 +996,82 @@ strFpgaConfigMode      sConfigMode
 
     /** Validate the Logging Mode                                            */
     if (!((RAW_MODE == sConfigMode.eLogMode) ||
-        (MULTI_MODE == sConfigMode.eLogMode)))
+          (MULTI_MODE == sConfigMode.eLogMode)))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eLogMode) : %d",
-            sConfigMode.eLogMode);
+                            "Invalid input parameters (eLogMode) : %d",
+                sConfigMode.eLogMode);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eLogMode) : %d",
-            sConfigMode.eLogMode);
+               "Invalid input parameters (eLogMode) : %d",
+               sConfigMode.eLogMode);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
     /** Validate the LVDS Mode                                               */
     if (!((FOUR_LANE != sConfigMode.eLvdsMode) ||
-        (TWO_LANE != sConfigMode.eLvdsMode)))
+          (TWO_LANE != sConfigMode.eLvdsMode)))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eLvdsMode) : %d",
-            sConfigMode.eLvdsMode);
+                            "Invalid input parameters (eLvdsMode) : %d",
+                sConfigMode.eLvdsMode);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eLvdsMode) : %d",
-            sConfigMode.eLvdsMode);
+               "Invalid input parameters (eLvdsMode) : %d",
+               sConfigMode.eLvdsMode);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
     /** Validate the Data Transfer Mode                                      */
     if (!((CAPTURE != sConfigMode.eDataXferMode) ||
-        (PLAYBACK != sConfigMode.eDataXferMode)))
+          (PLAYBACK != sConfigMode.eDataXferMode)))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eDataXferMode) : %d",
-            sConfigMode.eDataXferMode);
+                            "Invalid input parameters (eDataXferMode) : %d",
+                sConfigMode.eDataXferMode);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eDataXferMode) : %d",
-            sConfigMode.eDataXferMode);
+               "Invalid input parameters (eDataXferMode) : %d",
+               sConfigMode.eDataXferMode);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
     /** Validate the Data Capture Mode                                       */
     if (!((SD_STORAGE != sConfigMode.eDataCaptureMode) ||
-        (ETH_STREAM != sConfigMode.eDataCaptureMode)))
+          (ETH_STREAM != sConfigMode.eDataCaptureMode)))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eDataCaptureMode) : %d",
-            sConfigMode.eDataCaptureMode);
+                            "Invalid input parameters (eDataCaptureMode) : %d",
+                sConfigMode.eDataCaptureMode);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eDataCaptureMode) : %d",
-            sConfigMode.eDataCaptureMode);
+               "Invalid input parameters (eDataCaptureMode) : %d",
+               sConfigMode.eDataCaptureMode);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
     /* Validate the Data Format Mode                                        */
     if (!((BIT12 != sConfigMode.eDataFormatMode) ||
-        (BIT14 != sConfigMode.eDataFormatMode) ||
-        (BIT16 != sConfigMode.eDataFormatMode)))
+          (BIT14 != sConfigMode.eDataFormatMode) ||
+          (BIT16 != sConfigMode.eDataFormatMode)))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eDataFormatMode) : %d",
-            sConfigMode.eDataFormatMode);
+                            "Invalid input parameters (eDataFormatMode) : %d",
+                sConfigMode.eDataFormatMode);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_Mode(): "
-            "Invalid input parameters (eDataFormatMode) : %d",
-            sConfigMode.eDataFormatMode);
+               "Invalid input parameters (eDataFormatMode) : %d",
+               sConfigMode.eDataFormatMode);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -1112,7 +1094,7 @@ strFpgaConfigMode      sConfigMode
     std::cout << "RDFCard Configure RDFCard_FPGA sendt!" << std::endl;
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nConfigureRFDCCard_Mode(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -1142,7 +1124,7 @@ STATUS SendConfigCmdRequest(SINT8 *s8Data, UINT16 u16PacketLen)
 {
     std::cout << "Sendt message" << std::endl;
     return (sendto(sRFDCCard_SockInfo.s32EthConfSock, s8Data, u16PacketLen,
-        0, (struct sockaddr *)&ethConf_ServAddr, sizeof(ethConf_ServAddr)));
+                   0, (struct sockaddr *)&ethConf_ServAddr, sizeof(ethConf_ServAddr)));
 }
 
 /** @fn STATUS GetConfigCmdResponse(const SINT8 *s8Cmd)
@@ -1157,8 +1139,8 @@ STATUS GetConfigCmdResponse(const SINT8 *s8Cmd)
     DATA_CAPTURE_RESP strConfigResp;
 
     /** Setting the timeout for command response */
-    if(osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32EthConfSock,
-                           CMD_TIMEOUT_DURATION_SEC) < 0)
+    if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32EthConfSock,
+                                CMD_TIMEOUT_DURATION_SEC) < 0)
     {
         THROW_ERROR_STATUS("\n\nConfigureRFDCCard_Mode(): UDP write failed");
         return (STS_RFDCCARD_OS_ERR);
@@ -1168,14 +1150,14 @@ STATUS GetConfigCmdResponse(const SINT8 *s8Cmd)
     socklen_t s32Config_SenderAddrSize = sizeof(config_SenderAddr);
 
     SINT32 s32BytesRecvd = recvfrom(sRFDCCard_SockInfo.s32EthConfSock,
-                               (SINT8 *)&strConfigResp,
-                               sizeof(DATA_CAPTURE_RESP), 0,
-                               (struct sockaddr *)&config_SenderAddr,
-                               &s32Config_SenderAddrSize);
+                                    (SINT8 *)&strConfigResp,
+                                    sizeof(DATA_CAPTURE_RESP), 0,
+                                    (struct sockaddr *)&config_SenderAddr,
+                                    &s32Config_SenderAddrSize);
 
-    if(s32BytesRecvd <= SOCKET_ERROR)
+    if (s32BytesRecvd <= SOCKET_ERROR)
     {
-        if(osalObj_api.IsCmdTimeout())
+        if (osalObj_api.IsCmdTimeout())
         {
             return STS_RFDCCARD_TIMEOUT_ERR;
         }
@@ -1204,39 +1186,36 @@ STATUS GetConfigCmdResponse(const SINT8 *s8Cmd)
  * @pre Application should be connected to DCA1000EVM system
  * @return SINT32 value
  */
-STATUS ConfigureRFDCCard_Eeprom
-(
-strEthConfigMode      sEthConfigMode
-)
+STATUS ConfigureRFDCCard_Eeprom(strEthConfigMode sEthConfigMode)
 {
 #ifdef ENABLE_DEBUG
     sprintf(s8DebugMsg, "\n\nConfigureRFDCCard_EEPROM : ");
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nau8PcIpAddr : %d.%d.%d.%d",
-        sEthConfigMode.au8PcIpAddr[0],
-        sEthConfigMode.au8PcIpAddr[1],
-        sEthConfigMode.au8PcIpAddr[2],
-        sEthConfigMode.au8PcIpAddr[3]);
+            sEthConfigMode.au8PcIpAddr[0],
+            sEthConfigMode.au8PcIpAddr[1],
+            sEthConfigMode.au8PcIpAddr[2],
+            sEthConfigMode.au8PcIpAddr[3]);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nau8Dca1000IpAddr : %d.%d.%d.%d",
-        sEthConfigMode.au8Dca1000IpAddr[0],
-        sEthConfigMode.au8Dca1000IpAddr[1],
-        sEthConfigMode.au8Dca1000IpAddr[2],
-        sEthConfigMode.au8Dca1000IpAddr[3]);
+            sEthConfigMode.au8Dca1000IpAddr[0],
+            sEthConfigMode.au8Dca1000IpAddr[1],
+            sEthConfigMode.au8Dca1000IpAddr[2],
+            sEthConfigMode.au8Dca1000IpAddr[3]);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nau8MacId : %d-%d-%d-%d-%d-%d",
-        sEthConfigMode.au8MacId[0],
-        sEthConfigMode.au8MacId[1],
-        sEthConfigMode.au8MacId[2],
-        sEthConfigMode.au8MacId[3],
-        sEthConfigMode.au8MacId[4],
-        sEthConfigMode.au8MacId[5]);
+            sEthConfigMode.au8MacId[0],
+            sEthConfigMode.au8MacId[1],
+            sEthConfigMode.au8MacId[2],
+            sEthConfigMode.au8MacId[3],
+            sEthConfigMode.au8MacId[4],
+            sEthConfigMode.au8MacId[5]);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32ConfigPortNo : %d",
-        sEthConfigMode.u32ConfigPortNo);
+            sEthConfigMode.u32ConfigPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
     sprintf(s8DebugMsg, "\nu32RecordPortNo : %d",
-        sEthConfigMode.u32RecordPortNo);
+            sEthConfigMode.u32RecordPortNo);
     DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
 
@@ -1245,13 +1224,13 @@ strEthConfigMode      sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_EEPROM(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+                            "Invalid input parameters (u32RecordPortNo) : %d",
+                sEthConfigMode.u32RecordPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_EEPROM(): "
-            "Invalid input parameters (u32RecordPortNo) : %d",
-            sEthConfigMode.u32RecordPortNo);
+               "Invalid input parameters (u32RecordPortNo) : %d",
+               sEthConfigMode.u32RecordPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -1260,26 +1239,26 @@ strEthConfigMode      sEthConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_EEPROM(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+                            "Invalid input parameters (u32ConfigPortNo) : %d",
+                sEthConfigMode.u32ConfigPortNo);
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_EEPROM(): "
-            "Invalid input parameters (u32ConfigPortNo) : %d",
-            sEthConfigMode.u32ConfigPortNo);
+               "Invalid input parameters (u32ConfigPortNo) : %d",
+               sEthConfigMode.u32ConfigPortNo);
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
-                                                      sEthConfigMode.u32ConfigPortNo))
+    if (SUCCESS_STATUS != validatePortNumsForConflicts(sEthConfigMode.u32RecordPortNo,
+                                                       sEthConfigMode.u32ConfigPortNo))
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nConfigureRFDCCard_EEPROM(): "
-            "Invalid input parameters (Port numbers are same)");
+                            "Invalid input parameters (Port numbers are same)");
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nConfigureRFDCCard_EEPROM(): "
-            "Invalid input parameters (Port numbers are same)");
+               "Invalid input parameters (Port numbers are same)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -1288,17 +1267,17 @@ strEthConfigMode      sEthConfigMode
     UINT8 u8PacketData[MAX_DATA_BYTES];
     UINT16 u16DataSize = 0;
 
-    if(SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
+    if (SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8Dca1000IpAddr))
     {
         printf("\nConfigureRFDCCard_Eeprom(): "
-            "Invalid input parameters (au8Dca1000IpAddr)");
+               "Invalid input parameters (au8Dca1000IpAddr)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8PcIpAddr))
+    if (SUCCESS_STATUS != validateIPAddr(sEthConfigMode.au8PcIpAddr))
     {
         printf("\nConfigureRFDCCard_Eeprom(): "
-            "Invalid input parameters (au8PcIpAddr)");
+               "Invalid input parameters (au8PcIpAddr)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
@@ -1334,7 +1313,7 @@ strEthConfigMode      sEthConfigMode
     std::cout << "RDFCard EPPROM sendt!" << std::endl;
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nConfigureRFDCCard_EEPROM(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -1352,16 +1331,12 @@ strEthConfigMode      sEthConfigMode
     return (STS_RFDCCARD_SUCCESS);
 }
 
-
 /** @fn EXPORT STATUS HandshakeRFDCCard(void)
  * @brief This function is to verify the DCA1000EVM system connectivity
  * @pre Application should be connected to DCA1000EVM system
  * @return SINT32 value
  */
-STATUS HandshakeRFDCCard
-(
-void
-)
+STATUS HandshakeRFDCCard(void)
 {
     /** Copy the system aliveness check info to Command packet               */
     SINT8 s8Data[sizeof(DATA_CAPTURE_REQ)];
@@ -1370,7 +1345,7 @@ void
     /** Send the command packet to FPGA                                      */
     std::cout << "Handshake sendt!" << std::endl;
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nHandshakeRFDCCard(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -1396,16 +1371,12 @@ void
  * --> \ref ConnectRFDCCard_RecordMode API
  * @return SINT32 value
  */
-STATUS DisconnectRFDCCard_RecordMode
-(
-void
-)
+STATUS DisconnectRFDCCard_RecordMode(void)
 {
     /** Deinitialize waiting events             */
     osalObj_api.DeInitEvent(&sgnCmdTimeoutWaitEvent);
     osalObj_api.DeInitEvent(&sgnDurationStopModeWaitEvent);
     osalObj_api.DeInitEvent(&sgnCaptureTimeoutWaitEvent);
-
 
     objUdpConfigRecv.setSocketClose();
     objUdpDataRecv.setSocketClose();
@@ -1462,13 +1433,10 @@ void
  * --> \ref ConnectRFDCCard_AsyncCommandMode API
  * @return SINT32 value
  */
-STATUS DisconnectRFDCCard_AsyncCommandMode
-(
-void
-)
+STATUS DisconnectRFDCCard_AsyncCommandMode(void)
 {
     /* Close ports */
-   if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32EthConfAsyncSock) != 0)
+    if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32EthConfAsyncSock) != 0)
     {
         THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (Config port)");
     }
@@ -1490,10 +1458,7 @@ void
  * --> \ref ConnectRFDCCard_ConfigMode API
  * @return SINT32 value
  */
-STATUS DisconnectRFDCCard_ConfigMode
-(
-void
-)
+STATUS DisconnectRFDCCard_ConfigMode(void)
 {
     /* Close ports */
 
@@ -1512,13 +1477,7 @@ void
     return (STS_RFDCCARD_SUCCESS);
 }
 
-
-
-
-STATUS JustStartRecordData
-        (
-                strStartRecConfigMode sStartRecConfigMode
-        )
+STATUS JustStartRecordData(strStartRecConfigMode sStartRecConfigMode)
 {
 #ifdef ENABLE_DEBUG
     sprintf(s8DebugMsg, "\n\nStartRecordData : ");
@@ -1555,11 +1514,11 @@ STATUS JustStartRecordData
     /** Fill zero bytes array for dropped packets  */
     memset(s8ZeroBuf, 0, (MAX_BYTES_PER_PACKET * sizeof(SINT8)));
 
-    if(sStartRecConfigMode.eRecordStopMode == BYTES)
+    if (sStartRecConfigMode.eRecordStopMode == BYTES)
     {
-        if(SUCCESS_STATUS != validateBytesStopConfig(
-                sStartRecConfigMode.u32BytesToCapture,
-                sStartRecConfigMode.eLvdsMode))
+        if (SUCCESS_STATUS != validateBytesStopConfig(
+                                  sStartRecConfigMode.u32BytesToCapture,
+                                  sStartRecConfigMode.eLvdsMode))
         {
             printf("\nStartRecordData(): "
                    "Invalid input parameters (sStartRecConfigMode.u32BytesToCapture)");
@@ -1567,33 +1526,32 @@ STATUS JustStartRecordData
         }
     }
 
-    else if(sStartRecConfigMode.eRecordStopMode == FRAMES)
+    else if (sStartRecConfigMode.eRecordStopMode == FRAMES)
     {
-        if( SUCCESS_STATUS != validateFramesStopConfig(
-                sStartRecConfigMode.u32FramesToCapture))
+        if (SUCCESS_STATUS != validateFramesStopConfig(
+                                  sStartRecConfigMode.u32FramesToCapture))
         {
             printf("\nStartRecordData(): "
                    "Invalid input parameters (sStartRecConfigMode.u32FramesToCapture)");
             return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
         }
     }
-    else if(sStartRecConfigMode.eRecordStopMode == DURATION)
+    else if (sStartRecConfigMode.eRecordStopMode == DURATION)
     {
-        if(SUCCESS_STATUS != validateDurationStopConfig(
-                sStartRecConfigMode.u32DurationToCapture))
+        if (SUCCESS_STATUS != validateDurationStopConfig(
+                                  sStartRecConfigMode.u32DurationToCapture))
         {
             printf("\nStartRecordData(): "
                    "Invalid input parameters (sStartRecConfigMode.u32DurationToCapture)");
             return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
         }
     }
-    else if(sStartRecConfigMode.eRecordStopMode != NON_STOP)
+    else if (sStartRecConfigMode.eRecordStopMode != NON_STOP)
     {
         printf("\nStartRecordData(): "
                "Invalid input parameters (sStartRecConfigMode.eRecordStopMode)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
-
 
     memcpy(&sRFDCCard_StartRecConfig, &sStartRecConfigMode,
            sizeof(strStartRecConfigMode));
@@ -1601,7 +1559,7 @@ STATUS JustStartRecordData
     u32MaxFileSizeToCapture = sRFDCCard_StartRecConfig.u16MaxRecFileSize *
                               1024 * 1024;
 
-    if(sRFDCCard_StartRecConfig.eLvdsMode == TWO_LANE)
+    if (sRFDCCard_StartRecConfig.eLvdsMode == TWO_LANE)
         u8LaneNumber = 2;
     else
         u8LaneNumber = 4;
@@ -1610,7 +1568,7 @@ STATUS JustStartRecordData
     WriteRecordSettingsInLogFile();
 
     /** Resetting the inline stats structure */
-    for(int i = 0; i < NUM_DATA_TYPES; i++)
+    for (int i = 0; i < NUM_DATA_TYPES; i++)
     {
         sRFDCCard_InlineStats.u64OutOfSeqCount[i] = 0;
         sRFDCCard_InlineStats.u32FirstPktId[i] = 0;
@@ -1637,40 +1595,40 @@ STATUS JustStartRecordData
 //    std::thread tRawData2([&] { objUdpDataRecv.Thread_WriteDataToFile(); });
 //    tRawData2.detach();
 #endif
-//
-//    if(sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
-//    {
-//        /** Start thread to record data into file for each of the data ports */
-//        objUdpCpDataRecv.setSocketOpen();
-//        std::thread tCpData([&] { objUdpCpDataRecv.readData(); });
-//        tCpData.detach();
-//        objUdpCqDataRecv.setSocketOpen();
-//        std::thread tCqData([&] { objUdpCqDataRecv.readData(); });
-//        tCqData.detach();
-//        objUdpR4fDataRecv.setSocketOpen();
-//        std::thread tR4fData([&] { objUdpR4fDataRecv.readData(); });
-//        tR4fData.detach();
-//        objUdpDspDataRecv.setSocketOpen();
-//        std::thread tDspData([&] { objUdpDspDataRecv.readData(); });
-//        tDspData.detach();
-//        objUdpCpDataRecv.setThreadStart();
-//        objUdpCqDataRecv.setThreadStart();
-//        objUdpR4fDataRecv.setThreadStart();
-//        objUdpDspDataRecv.setThreadStart();
-//#ifndef POST_PROCESSING
-//        /** Start thread for writing data into file from buffer for each of the
-//         * data ports (Inline processing)
-//         */
-//        std::thread tCpData2([&] { objUdpCpDataRecv.Thread_WriteDataToFile(); });
-//        tCpData2.detach();
-//        std::thread tCqData2([&] { objUdpCqDataRecv.Thread_WriteDataToFile(); });
-//        tCqData2.detach();
-//        std::thread tR4fData2([&] { objUdpR4fDataRecv.Thread_WriteDataToFile(); });
-//        tR4fData2.detach();
-//        std::thread tDspData2([&] { objUdpDspDataRecv.Thread_WriteDataToFile(); });
-//        tDspData2.detach();
-//#endif
-//    }
+    //
+    //    if(sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
+    //    {
+    //        /** Start thread to record data into file for each of the data ports */
+    //        objUdpCpDataRecv.setSocketOpen();
+    //        std::thread tCpData([&] { objUdpCpDataRecv.readData(); });
+    //        tCpData.detach();
+    //        objUdpCqDataRecv.setSocketOpen();
+    //        std::thread tCqData([&] { objUdpCqDataRecv.readData(); });
+    //        tCqData.detach();
+    //        objUdpR4fDataRecv.setSocketOpen();
+    //        std::thread tR4fData([&] { objUdpR4fDataRecv.readData(); });
+    //        tR4fData.detach();
+    //        objUdpDspDataRecv.setSocketOpen();
+    //        std::thread tDspData([&] { objUdpDspDataRecv.readData(); });
+    //        tDspData.detach();
+    //        objUdpCpDataRecv.setThreadStart();
+    //        objUdpCqDataRecv.setThreadStart();
+    //        objUdpR4fDataRecv.setThreadStart();
+    //        objUdpDspDataRecv.setThreadStart();
+    // #ifndef POST_PROCESSING
+    //        /** Start thread for writing data into file from buffer for each of the
+    //         * data ports (Inline processing)
+    //         */
+    //        std::thread tCpData2([&] { objUdpCpDataRecv.Thread_WriteDataToFile(); });
+    //        tCpData2.detach();
+    //        std::thread tCqData2([&] { objUdpCqDataRecv.Thread_WriteDataToFile(); });
+    //        tCqData2.detach();
+    //        std::thread tR4fData2([&] { objUdpR4fDataRecv.Thread_WriteDataToFile(); });
+    //        tR4fData2.detach();
+    //        std::thread tDspData2([&] { objUdpDspDataRecv.Thread_WriteDataToFile(); });
+    //        tDspData2.detach();
+    // #endif
+    //    }
 
     /** Copy the start record mode info to Command packet                    */
     SINT8 s8Data[sizeof(DATA_CAPTURE_REQ)];
@@ -1681,16 +1639,16 @@ STATUS JustStartRecordData
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
     /** Verifies the start record command sent status */
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
-//        objUdpDataRecv.setThreadStop();
-//        if(sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
-//        {
-//            objUdpCpDataRecv.setThreadStop();
-//            objUdpCqDataRecv.setThreadStop();
-//            objUdpR4fDataRecv.setThreadStop();
-//            objUdpDspDataRecv.setThreadStop();
-//        }
+        //        objUdpDataRecv.setThreadStop();
+        //        if(sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
+        //        {
+        //            objUdpCpDataRecv.setThreadStop();
+        //            objUdpCqDataRecv.setThreadStop();
+        //            objUdpR4fDataRecv.setThreadStop();
+        //            objUdpDspDataRecv.setThreadStop();
+        //        }
 
         THROW_ERROR_STATUS("\n\nStartRecordData(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -1698,15 +1656,15 @@ STATUS JustStartRecordData
     else
     {
         /** Start duration stop mode timer if enabled */
-        if(sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
+        if (sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
         {
-//            std::thread tTimerToStopRecCp([&] { startDurationStopModeTimer(); });
-//            tTimerToStopRecCp.detach();
+            //            std::thread tTimerToStopRecCp([&] { startDurationStopModeTimer(); });
+            //            tTimerToStopRecCp.detach();
         }
 
         /** Wait for the start record command response  */
         if (STS_RFDCCARD_EVENT_TIMEOUT_ERR == osalObj_api.WaitForSignal(
-                &sgnCmdTimeoutWaitEvent, CMD_TIMEOUT_DURATION_SEC))
+                                                  &sgnCmdTimeoutWaitEvent, CMD_TIMEOUT_DURATION_SEC))
         {
 
             return STS_RFDCCARD_TIMEOUT_ERR;
@@ -1736,10 +1694,7 @@ STATUS JustStartRecordData
  * --> FPGA and record packet delay should be configured
  * @return SINT32 value
  */
-STATUS StartRecordData
-(
-strStartRecConfigMode sStartRecConfigMode
-)
+STATUS StartRecordData(strStartRecConfigMode sStartRecConfigMode)
 {
 #ifdef ENABLE_DEBUG
     sprintf(s8DebugMsg, "\n\nStartRecordData : ");
@@ -1781,69 +1736,67 @@ strStartRecConfigMode sStartRecConfigMode
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg, "\nStartRecordData(): "
-            "Invalid input parameters (sStartRecConfigMode.s8FileBasePath)");
+                            "Invalid input parameters (sStartRecConfigMode.s8FileBasePath)");
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\nStartRecordData(): "
-            "Invalid input parameters (sStartRecConfigMode.s8FileBasePath)");
+               "Invalid input parameters (sStartRecConfigMode.s8FileBasePath)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-
-    if(SUCCESS_STATUS != validateFileMaxSize(sStartRecConfigMode.u16MaxRecFileSize))
+    if (SUCCESS_STATUS != validateFileMaxSize(sStartRecConfigMode.u16MaxRecFileSize))
     {
         printf("\nStartRecordData(): "
-            "Invalid input parameters (sStartRecConfigMode.u16MaxRecFileSize)");
+               "Invalid input parameters (sStartRecConfigMode.u16MaxRecFileSize)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
 
-    if(sStartRecConfigMode.eRecordStopMode == BYTES)
+    if (sStartRecConfigMode.eRecordStopMode == BYTES)
     {
-        if(SUCCESS_STATUS != validateBytesStopConfig(
-                                    sStartRecConfigMode.u32BytesToCapture,
-                                    sStartRecConfigMode.eLvdsMode))
+        if (SUCCESS_STATUS != validateBytesStopConfig(
+                                  sStartRecConfigMode.u32BytesToCapture,
+                                  sStartRecConfigMode.eLvdsMode))
         {
             printf("\nStartRecordData(): "
-                "Invalid input parameters (sStartRecConfigMode.u32BytesToCapture)");
+                   "Invalid input parameters (sStartRecConfigMode.u32BytesToCapture)");
             return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
         }
     }
 
-    else if(sStartRecConfigMode.eRecordStopMode == FRAMES)
+    else if (sStartRecConfigMode.eRecordStopMode == FRAMES)
     {
-        if( SUCCESS_STATUS != validateFramesStopConfig(
-                                    sStartRecConfigMode.u32FramesToCapture))
+        if (SUCCESS_STATUS != validateFramesStopConfig(
+                                  sStartRecConfigMode.u32FramesToCapture))
         {
             printf("\nStartRecordData(): "
-                "Invalid input parameters (sStartRecConfigMode.u32FramesToCapture)");
+                   "Invalid input parameters (sStartRecConfigMode.u32FramesToCapture)");
             return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
         }
     }
-    else if(sStartRecConfigMode.eRecordStopMode == DURATION)
+    else if (sStartRecConfigMode.eRecordStopMode == DURATION)
     {
-        if(SUCCESS_STATUS != validateDurationStopConfig(
-                                sStartRecConfigMode.u32DurationToCapture))
+        if (SUCCESS_STATUS != validateDurationStopConfig(
+                                  sStartRecConfigMode.u32DurationToCapture))
         {
             printf("\nStartRecordData(): "
-                "Invalid input parameters (sStartRecConfigMode.u32DurationToCapture)");
+                   "Invalid input parameters (sStartRecConfigMode.u32DurationToCapture)");
             return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
         }
     }
-    else if(sStartRecConfigMode.eRecordStopMode != NON_STOP)
+    else if (sStartRecConfigMode.eRecordStopMode != NON_STOP)
     {
         printf("\nStartRecordData(): "
-            "Invalid input parameters (sStartRecConfigMode.eRecordStopMode)");
+               "Invalid input parameters (sStartRecConfigMode.eRecordStopMode)");
         return (STS_RFDCCARD_INVALID_INPUT_PARAMS);
     }
-
 
     memcpy(&sRFDCCard_StartRecConfig, &sStartRecConfigMode,
            sizeof(strStartRecConfigMode));
 
     u32MaxFileSizeToCapture = sRFDCCard_StartRecConfig.u16MaxRecFileSize *
-                                1024 * 1024;
+                              1024 * 1024;
 
-    if(sRFDCCard_StartRecConfig.eLvdsMode == TWO_LANE)
+    if (sRFDCCard_StartRecConfig.eLvdsMode == TWO_LANE)
         u8LaneNumber = 2;
     else
         u8LaneNumber = 4;
@@ -1852,7 +1805,7 @@ strStartRecConfigMode sStartRecConfigMode
     WriteRecordSettingsInLogFile();
 
     /** Resetting the inline stats structure */
-    for(int i = 0; i < NUM_DATA_TYPES; i++)
+    for (int i = 0; i < NUM_DATA_TYPES; i++)
     {
         sRFDCCard_InlineStats.u64OutOfSeqCount[i] = 0;
         sRFDCCard_InlineStats.u32FirstPktId[i] = 0;
@@ -1868,32 +1821,39 @@ strStartRecConfigMode sStartRecConfigMode
 
     /** Start thread to record data into file for ADC data port */
     objUdpConfigRecv.setSocketOpen();
-    std::thread tConfigData([&] { objUdpConfigRecv.readConfigDatagrams(); });
+    std::thread tConfigData([&]
+                            { objUdpConfigRecv.readConfigDatagrams(); });
     tConfigData.detach();
     objUdpDataRecv.setSocketOpen();
-    std::thread tRawData([&] { objUdpDataRecv.readData(); });
+    std::thread tRawData([&]
+                         { objUdpDataRecv.readData(); });
     tRawData.detach();
     objUdpDataRecv.setThreadStart();
 #ifndef POST_PROCESSING
     /** Start thread for writing data into file from buffer for ADC port (inline processing) */
-    std::thread tRawData2([&] { objUdpDataRecv.Thread_WriteDataToFile(); });
+    std::thread tRawData2([&]
+                          { objUdpDataRecv.Thread_WriteDataToFile(); });
     tRawData2.detach();
 #endif
 
-    if(sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
+    if (sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
     {
         /** Start thread to record data into file for each of the data ports */
         objUdpCpDataRecv.setSocketOpen();
-        std::thread tCpData([&] { objUdpCpDataRecv.readData(); });
+        std::thread tCpData([&]
+                            { objUdpCpDataRecv.readData(); });
         tCpData.detach();
         objUdpCqDataRecv.setSocketOpen();
-        std::thread tCqData([&] { objUdpCqDataRecv.readData(); });
+        std::thread tCqData([&]
+                            { objUdpCqDataRecv.readData(); });
         tCqData.detach();
         objUdpR4fDataRecv.setSocketOpen();
-        std::thread tR4fData([&] { objUdpR4fDataRecv.readData(); });
+        std::thread tR4fData([&]
+                             { objUdpR4fDataRecv.readData(); });
         tR4fData.detach();
         objUdpDspDataRecv.setSocketOpen();
-        std::thread tDspData([&] { objUdpDspDataRecv.readData(); });
+        std::thread tDspData([&]
+                             { objUdpDspDataRecv.readData(); });
         tDspData.detach();
         objUdpCpDataRecv.setThreadStart();
         objUdpCqDataRecv.setThreadStart();
@@ -1903,13 +1863,17 @@ strStartRecConfigMode sStartRecConfigMode
         /** Start thread for writing data into file from buffer for each of the
          * data ports (Inline processing)
          */
-        std::thread tCpData2([&] { objUdpCpDataRecv.Thread_WriteDataToFile(); });
+        std::thread tCpData2([&]
+                             { objUdpCpDataRecv.Thread_WriteDataToFile(); });
         tCpData2.detach();
-        std::thread tCqData2([&] { objUdpCqDataRecv.Thread_WriteDataToFile(); });
+        std::thread tCqData2([&]
+                             { objUdpCqDataRecv.Thread_WriteDataToFile(); });
         tCqData2.detach();
-        std::thread tR4fData2([&] { objUdpR4fDataRecv.Thread_WriteDataToFile(); });
+        std::thread tR4fData2([&]
+                              { objUdpR4fDataRecv.Thread_WriteDataToFile(); });
         tR4fData2.detach();
-        std::thread tDspData2([&] { objUdpDspDataRecv.Thread_WriteDataToFile(); });
+        std::thread tDspData2([&]
+                              { objUdpDspDataRecv.Thread_WriteDataToFile(); });
         tDspData2.detach();
 #endif
     }
@@ -1923,10 +1887,10 @@ strStartRecConfigMode sStartRecConfigMode
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
     /** Verifies the start record command sent status */
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         objUdpDataRecv.setThreadStop();
-        if(sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
+        if (sStartRecConfigMode.eConfigLogMode == MULTI_MODE)
         {
             objUdpCpDataRecv.setThreadStop();
             objUdpCqDataRecv.setThreadStop();
@@ -1940,18 +1904,19 @@ strStartRecConfigMode sStartRecConfigMode
     else
     {
         /** Start duration stop mode timer if enabled */
-        if(sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
+        if (sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
         {
-            std::thread tTimerToStopRecCp([&] { startDurationStopModeTimer(); });
+            std::thread tTimerToStopRecCp([&]
+                                          { startDurationStopModeTimer(); });
             tTimerToStopRecCp.detach();
         }
 
         /** Wait for the start record command response  */
         if (STS_RFDCCARD_EVENT_TIMEOUT_ERR == osalObj_api.WaitForSignal(
-                    &sgnCmdTimeoutWaitEvent, CMD_TIMEOUT_DURATION_SEC))
+                                                  &sgnCmdTimeoutWaitEvent, CMD_TIMEOUT_DURATION_SEC))
         {
             /** Exit from the duration stop mode timer on unsuccessful start */
-            if(sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
+            if (sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
             {
                 sRFDCCard_StartRecConfig.u32DurationToCapture = 1;
                 osalObj_api.SignalEvent(&sgnDurationStopModeWaitEvent);
@@ -1962,7 +1927,8 @@ strStartRecConfigMode sStartRecConfigMode
         else
         {
             /** Start a timer to handle data capture timeout(if system disconnected) */
-            std::thread tToHandleCaptureTimeout([&] { handleCaptureThreadTimeout(); });
+            std::thread tToHandleCaptureTimeout([&]
+                                                { handleCaptureThreadTimeout(); });
             tToHandleCaptureTimeout.detach();
 
             /** Return the command response to the calling application */
@@ -1991,9 +1957,9 @@ void startDurationStopModeTimer()
     osalObj_api.SleepInMilliSec(sRFDCCard_StartRecConfig.u32DurationToCapture);
 
     /** Send the record completed status unless stop command is not sent */
-    if(!gbRecStopCmdSent)
+    if (!gbRecStopCmdSent)
         RFDCARD_Callback(CMD_CODE_SYSTEM_ASYNC_STATUS,
-                     STS_REC_COMPLETED);
+                         STS_REC_COMPLETED);
 }
 
 /** @fn  void handleCaptureThreadTimeout()
@@ -2002,13 +1968,13 @@ void startDurationStopModeTimer()
  */
 void handleCaptureThreadTimeout()
 {
-    while(!gbRecStopCmdSent)
+    while (!gbRecStopCmdSent)
     {
         if (STS_RFDCCARD_EVENT_TIMEOUT_ERR == osalObj_api.WaitForSignal(
-                    &sgnCaptureTimeoutWaitEvent, CAPTURE_TIMEOUT_DURATION_SEC))
+                                                  &sgnCaptureTimeoutWaitEvent, CAPTURE_TIMEOUT_DURATION_SEC))
         {
             /** Callback when Timeout occurs */
-            if(!gbRecStopCmdSent)
+            if (!gbRecStopCmdSent)
             {
                 RFDCARD_Callback(STS_CAPTURE_THREAD_TIMEOUT, 0);
             }
@@ -2033,8 +1999,8 @@ STATUS StopRecordAsyncCmd(void)
 
     /** Send the stop record async command packet to record process */
     if (sendto(sRFDCCard_SockInfo.s32EthConfAsyncSock, s8Data, u16PacketLen,
-        0, (struct sockaddr *)&ethConf_PortAsyncAddress,
-        sizeof(ethConf_PortAsyncAddress)) < u16PacketLen)
+               0, (struct sockaddr *)&ethConf_PortAsyncAddress,
+               sizeof(ethConf_PortAsyncAddress)) < u16PacketLen)
     {
         THROW_ERROR_STATUS("\n\nStopRecordAsyncCmd(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -2054,13 +2020,10 @@ STATUS StopRecordAsyncCmd(void)
  * @pre Record process should be running using \ref StartRecordData API
  * @return SINT32 value
  */
-STATUS StopRecordData
-(
-void
-)
+STATUS StopRecordData(void)
 {
     /** To avoid multiple stop record being called  */
-    if(gbRecStopCmdSent)
+    if (gbRecStopCmdSent)
         return (STS_RFDCCARD_SUCCESS);
 
     /** Resetting record global status    */
@@ -2073,7 +2036,7 @@ void
     UINT16 u16PacketLen = objCmdsProto.stopRecordCommand(s8Data);
 
     objUdpDataRecv.setThreadStop();
-    if(sRFDCCard_StartRecConfig.eConfigLogMode == MULTI_MODE)
+    if (sRFDCCard_StartRecConfig.eConfigLogMode == MULTI_MODE)
     {
         objUdpCpDataRecv.setThreadStop();
         objUdpCqDataRecv.setThreadStop();
@@ -2083,7 +2046,7 @@ void
 
     /** Verifies the stop record command sent status */
     std::cout << "Stop record data" << std::endl;
-    if(SendConfigCmdRequest(s8Data, u16PacketLen) <= SOCKET_ERROR)
+    if (SendConfigCmdRequest(s8Data, u16PacketLen) <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nStopRecordData(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -2092,11 +2055,11 @@ void
     {
         /** Wait for the stop record command response  */
         if (STS_RFDCCARD_EVENT_TIMEOUT_ERR == osalObj_api.WaitForSignal(
-                    &sgnCmdTimeoutWaitEvent, CMD_TIMEOUT_DURATION_SEC))
+                                                  &sgnCmdTimeoutWaitEvent, CMD_TIMEOUT_DURATION_SEC))
         {
 #ifdef ENABLE_DEBUG
-    sprintf(s8DebugMsg, "\n\nStopRecordData: Response timeout error");
-    DEBUG_FILE_WRITE(s8DebugMsg);
+            sprintf(s8DebugMsg, "\n\nStopRecordData: Response timeout error");
+            DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
 
             WriteInlineProcSummaryInLogFile();
@@ -2108,8 +2071,8 @@ void
         else
         {
 #ifdef ENABLE_DEBUG
-    sprintf(s8DebugMsg, "\n\nStopRecordData: Sent successfully");
-    DEBUG_FILE_WRITE(s8DebugMsg);
+            sprintf(s8DebugMsg, "\n\nStopRecordData: Sent successfully");
+            DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
 
             WriteInlineProcSummaryInLogFile();
@@ -2129,10 +2092,7 @@ void
  * @pre Application should be connected to DCA1000EVM system
  * @return SINT32 value
  */
-STATUS ResetRFDCCard_FPGA
-(
-void
-)
+STATUS ResetRFDCCard_FPGA(void)
 {
     /** Copy the reset DC card FPGA info to Command packet                   */
     SINT8 s8Data[sizeof(DATA_CAPTURE_REQ)];
@@ -2142,7 +2102,7 @@ void
     std::cout << "Reset RFDCard sendt!" << std::endl;
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nResetDCCard_FPGA(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -2152,7 +2112,6 @@ void
         /** Receive the command response from FPGA                          */
         return GetConfigCmdResponse("ResetDCCard_FPGA");
     }
-
 
 #ifdef ENABLE_DEBUG
     sprintf(s8DebugMsg, "\n\nResetDCCard_FPGA: Sent successfully");
@@ -2167,10 +2126,7 @@ void
  * @pre Application should be connected to DCA1000EVM system
  * @return SINT32 value
  */
-STATUS ResetRadarEVM
-(
-void
-)
+STATUS ResetRadarEVM(void)
 {
     /** Copy the reset Radar EVM info to Command packet                      */
     SINT8 s8Data[sizeof(DATA_CAPTURE_REQ)];
@@ -2180,7 +2136,7 @@ void
     std::cout << "Reset Radar EVM!" << std::endl;
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nResetRadarEVM(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -2204,16 +2160,13 @@ void
  * @param [in] RFDCCard_EventCallback  [EVENT_HANDLER] - Callback function
  * @return SINT32 value
  */
-STATUS StatusRFDCCard_EventRegister
-(
-    EVENT_HANDLER		RFDCCard_EventCallback
-)
+STATUS StatusRFDCCard_EventRegister(EVENT_HANDLER RFDCCard_EventCallback)
 {
     if (NULL == RFDCCard_EventCallback)
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg,
-            "\n\nStatusDCCard_EventRegister(RFDCCard_EventCallback is null)");
+                "\n\nStatusDCCard_EventRegister(RFDCCard_EventCallback is null)");
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\n\nStatusDCCard_EventRegister(RFDCCard_EventCallback is null)");
@@ -2238,16 +2191,13 @@ STATUS StatusRFDCCard_EventRegister
  * @pre Record process should be running using \ref StartRecordData API
  * @return SINT32 value
  */
-STATUS RecInlineProcStats_EventRegister
-(
-    INLINE_PROC_HANDLER   RecordStats_Callback
-)
+STATUS RecInlineProcStats_EventRegister(INLINE_PROC_HANDLER RecordStats_Callback)
 {
     if (NULL == RecordStats_Callback)
     {
 #ifdef ENABLE_DEBUG
         sprintf(s8DebugMsg,
-            "\n\nRecInlineProcStats_EventRegister(RecordStats_Callback is null)");
+                "\n\nRecInlineProcStats_EventRegister(RecordStats_Callback is null)");
         DEBUG_FILE_WRITE(s8DebugMsg);
 #endif
         printf("\n\nRecInlineProcStats_EventRegister(RecordStats_Callback is null)");
@@ -2273,10 +2223,7 @@ STATUS RecInlineProcStats_EventRegister
  * @pre Application should be connected to DCA1000EVM system
  * @return SINT32 value
  */
-STATUS ConfigureRFDCCard_Record
-(
-strRecConfigMode sRecConfigMode
-)
+STATUS ConfigureRFDCCard_Record(strRecConfigMode sRecConfigMode)
 {
 #ifdef ENABLE_DEBUG
     sprintf(s8DebugMsg, "\n\nConfigureRFDCCard_Record : ");
@@ -2297,8 +2244,8 @@ strRecConfigMode sRecConfigMode
     u16DataSize += UINT16_DATA_SIZE;
 
     u16Data = ((UINT16)sRecConfigMode.u16RecDelay *
-                         FPGA_CLK_CONVERSION_FACTOR /
-                         FPGA_CLK_PERIOD_IN_NANO_SEC);
+               FPGA_CLK_CONVERSION_FACTOR /
+               FPGA_CLK_PERIOD_IN_NANO_SEC);
     memcpy(&u8PacketData[u16DataSize], &u16Data,
            sizeof(UINT16));
     u16DataSize += UINT16_DATA_SIZE;
@@ -2309,13 +2256,13 @@ strRecConfigMode sRecConfigMode
 
     SINT8 s8Data[sizeof(DATA_CAPTURE_REQ)];
     UINT16 u16PacketLen = objCmdsProto.configDataPacketCommand(s8Data,
-        u8PacketData, u16DataSize);
+                                                               u8PacketData, u16DataSize);
 
     /** Send the command packet to FPGA                                      */
     std::cout << "Configure_rdfcard_record sendt!" << std::endl;
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nConfigureRFDCCard_Record(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -2339,10 +2286,7 @@ strRecConfigMode sRecConfigMode
  * @param [out] s8DllVersion [SINT8 *] - Array filled with version
  * @return SINT32 value
  */
-STATUS ReadRFDCCard_DllVersion
-(
-SINT8 *s8DllVersion
-)
+STATUS ReadRFDCCard_DllVersion(SINT8 *s8DllVersion)
 {
     memset(s8DllVersion, 0, 10);
     memcpy(s8DllVersion, DCA1000EVM_DLL_VERSION, 10);
@@ -2355,10 +2299,7 @@ SINT8 *s8DllVersion
  * @pre Application should be connected to DCA1000EVM system
  * @return SINT32 value
  */
-STATUS ReadRFDCCard_FpgaVersion
-(
-SINT8 *s8FpgaVersion
-)
+STATUS ReadRFDCCard_FpgaVersion(SINT8 *s8FpgaVersion)
 {
     /** Copy the read FPGA version command info to Command packet            */
     SINT8 s8Data[sizeof(DATA_CAPTURE_REQ)];
@@ -2368,7 +2309,7 @@ SINT8 *s8FpgaVersion
     std::cout << "Read FPGA version sendt!" << std::endl;
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
 
-    if(s32BytesSent <= SOCKET_ERROR)
+    if (s32BytesSent <= SOCKET_ERROR)
     {
         THROW_ERROR_STATUS("\n\nReadRFDCCard_FpgaVersion(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
@@ -2378,7 +2319,7 @@ SINT8 *s8FpgaVersion
         /** Receive the command response        */
         SINT32 s32Status = GetConfigCmdResponse("ReadRFDCCard_FpgaVersion");
 
-        if(s32Status < SUCCESS_STATUS)
+        if (s32Status < SUCCESS_STATUS)
         {
             sprintf(s8FpgaVersion, "\nUnable to read FPGA Version. [error %d]\n",
                     s32Status);
@@ -2392,15 +2333,15 @@ SINT8 *s8FpgaVersion
 
             memset(s8FpgaVersion, 0, 50);
 
-            if((s32Status & PLAYBACK_BIT_DECODE) == PLAYBACK_BIT_DECODE)
+            if ((s32Status & PLAYBACK_BIT_DECODE) == PLAYBACK_BIT_DECODE)
             {
                 sprintf(s8FpgaVersion, "\nFPGA Version : %d.%d [Playback]\n",
-                        u8MajorVersion,u8MinorVersion);
+                        u8MajorVersion, u8MinorVersion);
             }
             else
             {
                 sprintf(s8FpgaVersion, "\nFPGA Version : %d.%d [Record]\n",
-                        u8MajorVersion,u8MinorVersion);
+                        u8MajorVersion, u8MinorVersion);
             }
         }
         return s32Status;
@@ -2418,10 +2359,7 @@ SINT8 *s8FpgaVersion
  * @brief This function is to display the error message in console or file(if debug mode enabled)
  * @param [in] s8Msg [const SINT8 *] - Error message to display
  */
-void THROW_ERROR_STATUS
-(
-const SINT8 *s8Msg
-)
+void THROW_ERROR_STATUS(const SINT8 *s8Msg)
 {
     SINT32 s32LastErrorMain = 0;
 
@@ -2439,10 +2377,8 @@ const SINT8 *s8Msg
  * @brief This function is to write the error message in a file (if debug mode enabled)
  * @param [in] s8Msg [const SINT8 *]  - Error message to display
  */
-void DEBUG_FILE_WRITE
-(
-const SINT8 *s8Msg
-)
+void DEBUG_FILE_WRITE(
+    const SINT8 *s8Msg)
 {
     pDebugFile = fopen(s8DebugFileName, "a");
 
@@ -2470,7 +2406,7 @@ void WriteRecordSettingsInLogFile()
 #endif
     strcat(s8LogMsg, sRFDCCard_StartRecConfig.s8FilePrefix);
 
-    if(sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
+    if (sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
     {
         strcat(s8LogMsg, RAW_MODE_FILE_NAME);
     }
@@ -2492,30 +2428,30 @@ void WriteRecordSettingsInLogFile()
     {
         sprintf(s8LogMsg2, "Start record configuration : \n,");
         strcpy(s8LogMsg, s8LogMsg2);
-        if(sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
+        if (sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
             sprintf(s8LogMsg2, "\nLog mode : Raw");
-        else if(sRFDCCard_StartRecConfig.eConfigLogMode == MULTI_MODE)
-                sprintf(s8LogMsg2, "\nLog mode : Multi");
+        else if (sRFDCCard_StartRecConfig.eConfigLogMode == MULTI_MODE)
+            sprintf(s8LogMsg2, "\nLog mode : Multi");
         strcat(s8LogMsg, s8LogMsg2);
-        if(sRFDCCard_StartRecConfig.eLvdsMode == FOUR_LANE)
+        if (sRFDCCard_StartRecConfig.eLvdsMode == FOUR_LANE)
             sprintf(s8LogMsg2, "\nLVDS lane mode : 4 lane");
-        else if(sRFDCCard_StartRecConfig.eLvdsMode == TWO_LANE)
-                sprintf(s8LogMsg2, "\nLVDS lane mode : 2 lane");
+        else if (sRFDCCard_StartRecConfig.eLvdsMode == TWO_LANE)
+            sprintf(s8LogMsg2, "\nLVDS lane mode : 2 lane");
         strcat(s8LogMsg, s8LogMsg2);
-        if(sRFDCCard_StartRecConfig.eRecordStopMode == NON_STOP)
+        if (sRFDCCard_StartRecConfig.eRecordStopMode == NON_STOP)
             sprintf(s8LogMsg2, "\nRecord stop mode : Infinite");
-        else if(sRFDCCard_StartRecConfig.eRecordStopMode == BYTES)
+        else if (sRFDCCard_StartRecConfig.eRecordStopMode == BYTES)
             sprintf(s8LogMsg2, "\nBytes mode : Bytes (%d)",
                     sRFDCCard_StartRecConfig.u32BytesToCapture);
-        else if(sRFDCCard_StartRecConfig.eRecordStopMode == FRAMES)
+        else if (sRFDCCard_StartRecConfig.eRecordStopMode == FRAMES)
             sprintf(s8LogMsg2, "\nFrames mode : Frames (%d)",
                     sRFDCCard_StartRecConfig.u32FramesToCapture);
-        else if(sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
+        else if (sRFDCCard_StartRecConfig.eRecordStopMode == DURATION)
             sprintf(s8LogMsg2, "\nDuration mode : Duration (%d)",
                     sRFDCCard_StartRecConfig.u32DurationToCapture);
         strcat(s8LogMsg, s8LogMsg2);
 #ifdef POST_PROCESSING
-        if(sRFDCCard_StartRecConfig.bSequenceNumberEnable)
+        if (sRFDCCard_StartRecConfig.bSequenceNumberEnable)
             sprintf(s8LogMsg2, "\nSequence number : true");
         else
             sprintf(s8LogMsg2, "\nSequence number : false");
@@ -2527,12 +2463,12 @@ void WriteRecordSettingsInLogFile()
 #ifndef POST_PROCESSING
 
 #ifdef LOG_DROPPED_PKTS_OFFSET
-        if(sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
+        if (sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
             sprintf(s8LogMsg2, "\n,*DT 1,");
         else
             sprintf(s8LogMsg2, "\n,*DT 1,,*DT 2,,*DT 3,,*DT 4,,*DT 5,");
-#else //LOG_OUT_OF_SEQ_OFFSET
-        if(sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
+#else // LOG_OUT_OF_SEQ_OFFSET
+        if (sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
             sprintf(s8LogMsg2, "\n,*DT 1,");
         else
             sprintf(s8LogMsg2, "\n,*DT 1,,,,,*DT 2,,,,,*DT 3,,,,,*DT 4,,,,,*DT 5,,,,,");
@@ -2552,30 +2488,31 @@ void WriteInlineProcSummaryInLogFile()
     SINT8 s8LogMsg2[MAX_NAME_LEN];
     UINT8 u8NumDataTypes = NUM_DATA_TYPES;
 
-    if(pInlineLogFile != NULL)
+    if (pInlineLogFile != NULL)
     {
-        if(sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
+        if (sRFDCCard_StartRecConfig.eConfigLogMode == RAW_MODE)
         {
             u8NumDataTypes = 1;
         }
 
-        for(int i = 0; i < u8NumDataTypes; i ++)
+        for (int i = 0; i < u8NumDataTypes; i++)
         {
-            if(u8NumDataTypes == 1)
+            if (u8NumDataTypes == 1)
             {
                 sprintf(s8LogMsg2, "\nRaw Data :");
-            }else
+            }
+            else
             {
-                if(strcmp(sRFDCCard_InlineStats.s8HeaderId[i],
-                       "") == 0)
+                if (strcmp(sRFDCCard_InlineStats.s8HeaderId[i],
+                           "") == 0)
                 {
                     sprintf(s8LogMsg2, "\nDT %d Header Data : (No data received)",
-                            i+1);
+                            i + 1);
                 }
                 else
                 {
                     sprintf(s8LogMsg2, "\n%s Header Data :",
-                        sRFDCCard_InlineStats.s8HeaderId[i]);
+                            sRFDCCard_InlineStats.s8HeaderId[i]);
                 }
             }
             strcpy(s8LogMsg, s8LogMsg2);
@@ -2612,7 +2549,7 @@ void WriteInlineProcSummaryInLogFile()
                     ctime(&sRFDCCard_InlineStats.EndTime[i]));
             strcat(s8LogMsg, s8LogMsg2);
             ULONG64 seconds = difftime(sRFDCCard_InlineStats.EndTime[i],
-                                      sRFDCCard_InlineStats.StartTime[i]);
+                                       sRFDCCard_InlineStats.StartTime[i]);
             sprintf(s8LogMsg2, "Duration(sec) - %llu", seconds);
             strcat(s8LogMsg, s8LogMsg2);
 
