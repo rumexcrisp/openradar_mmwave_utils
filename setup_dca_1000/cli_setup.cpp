@@ -157,6 +157,7 @@ void ListOfCmds()
            "Read status of record process");
     printf("\n%s\t\t%s", CMD_QUERY_SYSTEM_ALIVENESS,
            "DCA1000EVM System aliveness");
+    printf("\n%s\t\t\t\t%s", CMD_RUN_TASK, "run task");
     printf("\n%s\t\t\t\t%s", CMD_HELP_S_CLI_APP, "List of commands supported");
     printf("\n%s\t\t\t\t%s", CMD_QUIET_MODE_CLI_APP,
            "Quiet mode - No status display in the console\n");
@@ -1369,17 +1370,15 @@ void DecodeCommandStatus(SINT32 s32Status, const SINT8 *strCommand)
     WRITE_TO_LOG_FILE(msgData);
 }
 
-/** @fn SINT32 main(SINT32 argc, SINT8* argv[])
+/** @fn SINT32 do_command(SINT32 argc, SINT8* argv[])
  * @brief This function is the main function to handle configuration <!--
  * --> commands to be executed, validation of JSON file and command line  <!--
  * --> arguments
- * @param [in] argc [SINT32] - Number of arguments
- * @param [in] argv [SINT8 *] - Arguments array
+ * @param [in] s8Command [SINT8] - command
+ * @param [in] s8CommandArg [SINT8 *] - command argument
  * @return SINT32 value
  */
-
 SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
-
 {
     /** Command line argument  1 - Command name */
     //    SINT8 s8Command[MAX_PARAMS_LEN];
@@ -1395,61 +1394,15 @@ SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
     strcpy(s8CliVersion, CLI_CTRL_VERSION);
     bool bValue = false;
 
-//    s8Command
-//            s8CommandArg
-#ifdef CLI_TESTING_MODE
-    if (argc < 2)
-    {
-        printf("\nEnter the command : ");
-        scanf("%s", s8Command);
-
-        if ((strcmp(s8Command, CMD_HELP_CLI_APP) == 0) ||
-            (strcmp(s8Command, CMD_HELP_S_CLI_APP) == 0))
-        {
-            ListOfCmds();
-            return SUCCESS_STATUS;
-        }
-        if (strcmp(s8Command, CMD_READ_DLL_VER) == 0)
-        {
-            /** API Call - Read API DLL version                              */
-            memset(s8Version, '\0', MAX_NAME_LEN);
-            WRITE_TO_LOG_FILE("Read DLL Verison Command (req)");
-            if (ReadRFDCCard_DllVersion(s8Version) == SUCCESS_STATUS)
-            {
-                sprintf(s8DebugMsg, "\nDLL Version : %s\n", s8Version);
-                WRITE_TO_CONSOLE(s8DebugMsg);
-                WRITE_TO_LOG_FILE(s8DebugMsg);
-                return SUCCESS_STATUS;
-            }
-            else
-            {
-                sprintf(s8DebugMsg, "\nNot able to read DLL Version. error[%d]\n",
-                        CLI_READ_DLL_VERSION_ERR);
-                WRITE_TO_CONSOLE(s8DebugMsg);
-                WRITE_TO_LOG_FILE(s8DebugMsg);
-                return CLI_READ_DLL_VERSION_ERR;
-            }
-        }
-        else if (strcmp(s8Command, CMD_READ_CLI_VER) == 0)
-        {
-            u16CmdCode = CMD_CODE_CLI_READ_CLI_VERSION;
-            WRITE_TO_LOG_FILE("Read CLI Verison Command (req)");
-            sprintf(s8DebugMsg, "\nControl CLI Version : %s\n", s8CliVersion);
-            WRITE_TO_CONSOLE(s8DebugMsg);
-            WRITE_TO_LOG_FILE(s8DebugMsg);
-            return SUCCESS_STATUS;
-        }
-        else
-        {
-            printf("\nEnter the argument : ");
-            scanf("%s", s8CommandArg);
-        }
-    }
-#endif
-
     u16CmdCode = 0;
 
-    if (strcmp(s8Command, CMD_QUERY_SYSTEM_ALIVENESS) == 0)
+    if ((strcmp(s8Command, CMD_HELP_CLI_APP) == 0) ||
+        (strcmp(s8Command, CMD_HELP_S_CLI_APP) == 0))
+    {
+        ListOfCmds();
+        return SUCCESS_STATUS;
+    }
+    else if (strcmp(s8Command, CMD_QUERY_SYSTEM_ALIVENESS) == 0)
     {
         u16CmdCode = CMD_CODE_SYSTEM_ALIVENESS;
     }
@@ -1488,12 +1441,6 @@ SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
     else if (strcmp(s8Command, CMD_QUERY_CLI_PROC_STATUS) == 0)
     {
         u16CmdCode = CMD_CODE_CLI_PROC_STATUS_SHM;
-    }
-    else if ((strcmp(s8Command, CMD_HELP_CLI_APP) == 0) ||
-             (strcmp(s8Command, CMD_HELP_S_CLI_APP) == 0))
-    {
-        ListOfCmds();
-        return SUCCESS_STATUS;
     }
     else if (strcmp(s8Command, CMD_READ_DLL_VER) == 0)
     {
@@ -1830,28 +1777,44 @@ SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
     return s32CliStatus;
 }
 
+/** @fn SINT32 do_command(SINT32 argc) override with default argument
+ */
+SINT32 do_command(SINT8 s8Command[])
+{
+    do_command(s8Command, "../cf.json");
+}
+
 void startRecording()
 {
-    do_command(CMD_CONFIG_FPGA, "../cf.json");
-    do_command(CMD_START_RECORD, "../cf.json");
+    do_command(CMD_CONFIG_FPGA);
+    do_command(CMD_START_RECORD);
 }
 void stopRecording()
 {
-    do_command(CMD_RESET_FPGA, "../cf.json");
+    do_command(CMD_RESET_FPGA);
 }
 
 SINT32 main(SINT32 argc, SINT8 *argv[])
 {
-    if (argc > 1)
+    if (argc == 2)
     {
-        std::cout << argv[1] << std::endl;
+        if (strcmp(argv[1], CMD_RUN_TASK) == 0)
+        {
+            startRecording();
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            stopRecording();
+            UINT16 u16CmdCode = 0;
+            cli_DisconnectRFDCCard(u16CmdCode);
+            return SUCCESS_STATUS;
+        }
+        else
+        {
+            do_command(argv[1]);
+        }
     }
-    return 1;
-    do_command(CMD_HELP_CLI_APP, "../cf.json");
-    startRecording();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    stopRecording();
-    UINT16 u16CmdCode = 0;
-    cli_DisconnectRFDCCard(u16CmdCode);
+    else
+    {
+        do_command(CMD_HELP_CLI_APP);
+    }
     return 1;
 }
