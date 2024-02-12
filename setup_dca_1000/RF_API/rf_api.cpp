@@ -232,7 +232,7 @@ STATUS ConnectRFDCCard_ConfigMode(strEthConfigMode sEthConfigMode)
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
     {
-        THROW_ERROR_STATUS("\nServer: WSAStartup failed with error");
+        THROW_ERROR_STATUS("Server: WSAStartup failed with error");
         return (STS_RFDCCARD_OS_ERR);
     }
 #endif
@@ -303,7 +303,7 @@ STATUS ConnectRFDCCard_ConfigMode(strEthConfigMode sEthConfigMode)
                                                IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32EthConfSock < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_ConfigMode(): "
                            "Socket creation error (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -323,7 +323,7 @@ STATUS ConnectRFDCCard_ConfigMode(strEthConfigMode sEthConfigMode)
              (struct sockaddr *)&ethConf_PortAddress,
              sizeof(ethConf_PortAddress)) < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_ConfigMode(): "
                            "Bind failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -331,7 +331,7 @@ STATUS ConnectRFDCCard_ConfigMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfSock, SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_ConfigMode(): "
                            "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -339,7 +339,7 @@ STATUS ConnectRFDCCard_ConfigMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfSock, SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_ConfigMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_ConfigMode(): "
                            "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -405,7 +405,7 @@ STATUS ConnectRFDCCard_AsyncCommandMode(strEthConfigMode sEthConfigMode)
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
     {
-        THROW_ERROR_STATUS("\nServer: WSAStartup failed with error");
+        THROW_ERROR_STATUS("Server: WSAStartup failed with error");
         return (STS_RFDCCARD_OS_ERR);
     }
 #endif
@@ -475,7 +475,7 @@ STATUS ConnectRFDCCard_AsyncCommandMode(strEthConfigMode sEthConfigMode)
                                                     IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32EthConfAsyncSock < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_AsyncCommandMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_AsyncCommandMode(): "
                            "Socket creation error (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -489,7 +489,7 @@ STATUS ConnectRFDCCard_AsyncCommandMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfAsyncSock, SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_AsyncCommandMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_AsyncCommandMode(): "
                            "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -497,7 +497,7 @@ STATUS ConnectRFDCCard_AsyncCommandMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32EthConfAsyncSock, SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_AsyncCommandMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_AsyncCommandMode(): "
                            "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -586,7 +586,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR)
     {
-        THROW_ERROR_STATUS("\nServer: WSAStartup failed with error");
+        THROW_ERROR_STATUS("Server: WSAStartup failed with error");
         return (STS_RFDCCARD_OS_ERR);
     }
 #endif
@@ -657,7 +657,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
                                                             IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX] < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode():  "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode():  "
                            "Socket creation error (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -671,7 +671,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX],
                                 SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
-        THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -681,7 +681,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
              (struct sockaddr *)&ethRaw_ServAddr,
              sizeof(ethRaw_ServAddr)) < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Bind failed (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -689,7 +689,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX], SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -697,7 +697,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX], SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (ADC data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -707,7 +707,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
                                                              IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX] < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Socket creation error (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -721,7 +721,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX],
                                 SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
-        THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (CP data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -731,7 +731,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
              (struct sockaddr *)&ethDT1_ServAddr,
              sizeof(ethDT1_ServAddr)) < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Bind failed (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -739,7 +739,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX], SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -747,7 +747,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX], SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (CP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -757,7 +757,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
                                                              IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX] < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Socket creation error (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -771,7 +771,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX],
                                 SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
-        THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (CQ data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -781,7 +781,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
              (struct sockaddr *)&ethDT2_ServAddr,
              sizeof(ethDT2_ServAddr)) < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Bind failed (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -789,7 +789,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX], SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -797,7 +797,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX], SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (CQ Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -807,7 +807,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
                                                               IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX] < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Socket creation error (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -821,7 +821,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX],
                                 SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
-        THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (R4F data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -831,7 +831,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
              (struct sockaddr *)&ethDT3_ServAddr,
              sizeof(ethDT3_ServAddr)) < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Bind failed (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -839,7 +839,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX], SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -847,7 +847,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX], SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (R4F Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -857,7 +857,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
                                                               IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX] < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Socket creation error (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -871,7 +871,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX],
                                 SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
-        THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (DSP data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -881,7 +881,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
              (struct sockaddr *)&ethDT4_ServAddr,
              sizeof(ethDT4_ServAddr)) < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Bind failed (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -889,7 +889,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -897,7 +897,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (DSP Data port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -907,7 +907,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
                                                IPPROTO_UDP);
     if (sRFDCCard_SockInfo.s32EthConfSock < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Socket creation error (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -926,7 +926,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32EthConfSock,
                                 SOCKET_THREAD_TIMEOUT_DURATION_SEC) < 0)
     {
-        THROW_ERROR_STATUS("\n\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt timeout failed (config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -936,7 +936,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
              (struct sockaddr *)&ethConf_PortAddress,
              sizeof(ethConf_PortAddress)) < 0)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "Bind failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -944,7 +944,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_RCVBUF,
                    (char *)&s32RecvBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -952,7 +952,7 @@ STATUS ConnectRFDCCard_RecordMode(strEthConfigMode sEthConfigMode)
     if (setsockopt(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX], SOL_SOCKET, SO_SNDBUF,
                    (char *)&s32SendBuf, sizeof(SINT32)) == -1)
     {
-        THROW_ERROR_STATUS("\nConnectRFDCCard_RecordMode(): "
+        THROW_ERROR_STATUS("ConnectRFDCCard_RecordMode(): "
                            "setsockopt failed (Config port)");
         return (STS_RFDCCARD_OS_ERR);
     }
@@ -1096,7 +1096,7 @@ STATUS ConfigureRFDCCard_Fpga(strFpgaConfigMode sConfigMode)
 
     if (s32BytesSent <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nConfigureRFDCCard_Mode(): UDP write failed");
+        THROW_ERROR_STATUS("ConfigureRFDCCard_Mode(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -1142,7 +1142,7 @@ STATUS GetConfigCmdResponse(const SINT8 *s8Cmd)
     if (osalObj_api.sock_setopt(sRFDCCard_SockInfo.s32EthConfSock,
                                 CMD_TIMEOUT_DURATION_SEC) < 0)
     {
-        THROW_ERROR_STATUS("\n\nConfigureRFDCCard_Mode(): UDP write failed");
+        THROW_ERROR_STATUS("ConfigureRFDCCard_Mode(): UDP write failed");
         return (STS_RFDCCARD_OS_ERR);
     }
 
@@ -1163,7 +1163,7 @@ STATUS GetConfigCmdResponse(const SINT8 *s8Cmd)
         }
         else
         {
-            sprintf(s8Msg, "\n\n%s(): UDP recvfrom failed", s8Cmd);
+            sprintf(s8Msg, "%s(): UDP recvfrom failed", s8Cmd);
             THROW_ERROR_STATUS(s8Msg);
             return STS_RFDCCARD_OS_ERR;
         }
@@ -1315,7 +1315,7 @@ STATUS ConfigureRFDCCard_Eeprom(strEthConfigMode sEthConfigMode)
 
     if (s32BytesSent <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nConfigureRFDCCard_EEPROM(): UDP write failed");
+        THROW_ERROR_STATUS("ConfigureRFDCCard_EEPROM(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -1347,7 +1347,7 @@ STATUS HandshakeRFDCCard(void)
     SINT32 s32BytesSent = SendConfigCmdRequest(s8Data, u16PacketLen);
     if (s32BytesSent <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nHandshakeRFDCCard(): UDP write failed");
+        THROW_ERROR_STATUS("HandshakeRFDCCard(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -1388,27 +1388,27 @@ STATUS DisconnectRFDCCard_RecordMode(void)
     /** Close ports */
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32EthConfSock) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (Config port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (Config port)");
     }
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32DataSock[RAW_DATA_INDEX]) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (Data port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (Data port)");
     }
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32DataSock[CP_DATA_1_INDEX]) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (CP Data port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (CP Data port)");
     }
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32DataSock[CQ_DATA_2_INDEX]) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (CQ Data port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (CQ Data port)");
     }
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32DataSock[R4F_DATA_3_INDEX]) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (R4F Data port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (R4F Data port)");
     }
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32DataSock[DSP_DATA_4_INDEX]) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (DSP Data port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (DSP Data port)");
     }
 
     sRFDCCard_SockInfo.s32EthConfSock = -1;
@@ -1438,7 +1438,7 @@ STATUS DisconnectRFDCCard_AsyncCommandMode(void)
     /* Close ports */
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32EthConfAsyncSock) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (Config port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (Config port)");
     }
 
     sRFDCCard_SockInfo.s32EthConfAsyncSock = -1;
@@ -1464,7 +1464,7 @@ STATUS DisconnectRFDCCard_ConfigMode(void)
 
     if (osalObj_api.sock_Close(sRFDCCard_SockInfo.s32EthConfSock) != 0)
     {
-        THROW_ERROR_STATUS("\n osalObj_api.sock_Close(): (Config port)");
+        THROW_ERROR_STATUS("osalObj_api.sock_Close(): (Config port)");
     }
 
     sRFDCCard_SockInfo.s32EthConfSock = -1;
@@ -1650,7 +1650,7 @@ STATUS JustStartRecordData(strStartRecConfigMode sStartRecConfigMode)
         //            objUdpDspDataRecv.setThreadStop();
         //        }
 
-        THROW_ERROR_STATUS("\n\nStartRecordData(): UDP write failed");
+        THROW_ERROR_STATUS("StartRecordData(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -1898,7 +1898,7 @@ STATUS StartRecordData(strStartRecConfigMode sStartRecConfigMode)
             objUdpDspDataRecv.setThreadStop();
         }
 
-        THROW_ERROR_STATUS("\n\nStartRecordData(): UDP write failed");
+        THROW_ERROR_STATUS("StartRecordData(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -2002,7 +2002,7 @@ STATUS StopRecordAsyncCmd(void)
                0, (struct sockaddr *)&ethConf_PortAsyncAddress,
                sizeof(ethConf_PortAsyncAddress)) < u16PacketLen)
     {
-        THROW_ERROR_STATUS("\n\nStopRecordAsyncCmd(): UDP write failed");
+        THROW_ERROR_STATUS("StopRecordAsyncCmd(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
 
@@ -2048,7 +2048,7 @@ STATUS StopRecordData(void)
     std::cout << "Stop record data" << std::endl;
     if (SendConfigCmdRequest(s8Data, u16PacketLen) <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nStopRecordData(): UDP write failed");
+        THROW_ERROR_STATUS("StopRecordData(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -2104,7 +2104,7 @@ STATUS ResetRFDCCard_FPGA(void)
 
     if (s32BytesSent <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nResetDCCard_FPGA(): UDP write failed");
+        THROW_ERROR_STATUS("ResetDCCard_FPGA(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -2138,7 +2138,7 @@ STATUS ResetRadarEVM(void)
 
     if (s32BytesSent <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nResetRadarEVM(): UDP write failed");
+        THROW_ERROR_STATUS("ResetRadarEVM(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -2264,7 +2264,7 @@ STATUS ConfigureRFDCCard_Record(strRecConfigMode sRecConfigMode)
 
     if (s32BytesSent <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nConfigureRFDCCard_Record(): UDP write failed");
+        THROW_ERROR_STATUS("ConfigureRFDCCard_Record(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
@@ -2311,7 +2311,7 @@ STATUS ReadRFDCCard_FpgaVersion(SINT8 *s8FpgaVersion)
 
     if (s32BytesSent <= SOCKET_ERROR)
     {
-        THROW_ERROR_STATUS("\n\nReadRFDCCard_FpgaVersion(): UDP write failed");
+        THROW_ERROR_STATUS("ReadRFDCCard_FpgaVersion(): UDP write failed");
         return (STS_RFDCCARD_UDP_WRITE_ERR);
     }
     else
