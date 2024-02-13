@@ -103,6 +103,8 @@ strStartRecConfigMode gsStartRecConfigMode;
 /** JSON file data                              */
 std::stringstream fileData;
 
+SINT8 *jsonFile;
+
 /** @fn void WRITE_TO_CONSOLE(const SINT8 *msg)
  * @brief This function is to write the CLI messages in the console  <!--
  * --> if quiet mode is not enabled
@@ -141,26 +143,26 @@ void WRITE_TO_LOG_FILE(
  */
 void ListOfCmds()
 {
-    printf("Cli_Control [options]");
-    printf("\nOptions:");
-    printf("\n%s\t\t\t\t%s", CMD_CONFIG_FPGA, "Configure FPGA");
-    printf("\n%s\t\t\t\t%s", CMD_CONFIG_EEPROM, "Update EEPROM");
-    printf("\n%s\t\t\t%s", CMD_RESET_FPGA, "Reset FPGA");
-    printf("\n%s\t\t\t%s", CMD_RESET_AR_DEV, "Reset AR Device");
-    printf("\n%s\t\t\t%s", CMD_START_RECORD, "Start Record");
-    printf("\n%s\t\t\t%s", CMD_STOP_RECORD, "Stop Record");
-    printf("\n%s\t\t\t\t%s", CMD_CONFIG_RECORD, "Configure Record delay");
-    printf("\n%s\t\t\t%s", CMD_READ_DLL_VER, "Read DLL version");
-    printf("\n%s\t\t\t%s", CMD_READ_CLI_VER, "Read CLI_Control tool version");
-    printf("\n%s\t\t\t%s", CMD_READ_FPGA_VER, "Read FPGA version");
-    printf("\n%s\t\t\t%s", CMD_QUERY_CLI_PROC_STATUS,
+    printf("Cli_Control [options] <jsonFile>");
+    printf("\n\nOptions:");
+    printf("\n%s\t\t\t%s", CMD_HELP_S_CLI_APP, "List of commands supported");
+    printf("\n%s\t\t\t%s", CMD_QUIET_MODE_CLI_APP,
+           "Quiet mode - No status display in the console");
+    printf("\n%s\t\t\t%s", CMD_CONFIG_FPGA, "Configure FPGA");
+    printf("\n%s\t\t\t%s", CMD_CONFIG_EEPROM, "Update EEPROM");
+    printf("\n%s\t\t%s", CMD_RESET_FPGA, "Reset FPGA");
+    printf("\n%s\t\t%s", CMD_RESET_AR_DEV, "Reset AR Device");
+    printf("\n%s\t\t%s", CMD_START_RECORD, "Start Record");
+    printf("\n%s\t\t%s", CMD_STOP_RECORD, "Stop Record");
+    printf("\n%s\t\t\t%s", CMD_CONFIG_RECORD, "Configure Record delay");
+    printf("\n%s\t\t%s", CMD_READ_DLL_VER, "Read DLL version");
+    printf("\n%s\t\t%s", CMD_READ_CLI_VER, "Read CLI_Control tool version");
+    printf("\n%s\t\t%s", CMD_READ_FPGA_VER, "Read FPGA version");
+    printf("\n%s\t\t%s", CMD_QUERY_CLI_PROC_STATUS,
            "Read status of record process");
-    printf("\n%s\t\t%s", CMD_QUERY_SYSTEM_ALIVENESS,
+    printf("\n%s\t%s", CMD_QUERY_SYSTEM_ALIVENESS,
            "DCA1000EVM System aliveness");
-    printf("\n%s\t\t\t\t%s", CMD_RUN_TASK, "run task");
-    printf("\n%s\t\t\t\t%s", CMD_HELP_S_CLI_APP, "List of commands supported");
-    printf("\n%s\t\t\t\t%s", CMD_QUIET_MODE_CLI_APP,
-           "Quiet mode - No status display in the console\n");
+    printf("\n\n%s\t\t\t%s", CMD_RUN_TASK, "run custom task");
 }
 
 /** @fn void cli_DisconnectRFDCCard(UINT16 u16CmdCode)
@@ -1530,6 +1532,7 @@ SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
         }
     }
 
+    // main command decision switch-case
     switch (u16CmdCode)
     {
     case CMD_CODE_SYSTEM_ALIVENESS:
@@ -1693,7 +1696,7 @@ SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
     case CMD_CODE_CLI_ASYNC_RECORD_STOP:
 
         /** Timestamp logging                                                */
-        WRITE_TO_LOG_FILE("Stp Record Command (req)");
+        WRITE_TO_LOG_FILE("Stop Record Command (req)");
 
         /** API Call - Stop Record                                           */
         s32CliStatus = StopRecordAsyncCmd();
@@ -1720,7 +1723,7 @@ SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
             if (iLoop > timeoutCount)
             {
                 sprintf(s8DebugMsg,
-                        "Stop Record command : Timeout Error! Couldnt read the record process status. [error %d]",
+                        "Stop Record command : Timeout Error! Could not read the record process status. [error %d]",
                         CLI_CMD_REC_STOP_TIMEOUT_ERR);
                 osalObj.DestroyShm(gsEthConfigMode.u32ConfigPortNo);
                 WRITE_TO_LOG_FILE(s8DebugMsg);
@@ -1777,44 +1780,42 @@ SINT32 do_command(SINT8 s8Command[], SINT8 s8CommandArg[])
     return s32CliStatus;
 }
 
-/** @fn SINT32 do_command(SINT32 argc) override with default argument
- */
-SINT32 do_command(SINT8 s8Command[])
+void startRecording(SINT8 *json)
 {
-    do_command(s8Command, "../cf.json");
+    do_command(CMD_CONFIG_FPGA, json);
+    do_command(CMD_START_RECORD, json);
 }
-
-void startRecording()
+void stopRecording(SINT8 *json)
 {
-    do_command(CMD_CONFIG_FPGA);
-    do_command(CMD_START_RECORD);
-}
-void stopRecording()
-{
-    do_command(CMD_RESET_FPGA);
+    do_command(CMD_RESET_FPGA, json);
 }
 
 SINT32 main(SINT32 argc, SINT8 *argv[])
 {
     if (argc == 2)
     {
-        if (strcmp(argv[1], CMD_RUN_TASK) == 0)
+        do_command(argv[1], "../cf.json");
+    }
+    else if (argc == 3)
+    {
+        jsonFile = argv[1];
+        if (strcmp(argv[2], CMD_RUN_TASK) == 0)
         {
-            startRecording();
+            startRecording(jsonFile);
             std::this_thread::sleep_for(std::chrono::seconds(5));
-            stopRecording();
+            stopRecording(jsonFile);
             UINT16 u16CmdCode = 0;
             cli_DisconnectRFDCCard(u16CmdCode);
             return SUCCESS_STATUS;
         }
         else
         {
-            do_command(argv[1]);
+            do_command(argv[2], jsonFile);
         }
     }
     else
     {
-        do_command(CMD_HELP_CLI_APP);
+        do_command(CMD_HELP_CLI_APP, "../cf.json");
     }
     return 1;
 }
