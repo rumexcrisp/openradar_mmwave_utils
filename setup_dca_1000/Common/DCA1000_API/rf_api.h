@@ -41,7 +41,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 ///****************************************************************************
 /// HISTORY :
 /// VERSION        DATE              AUTHOR      CHANGE DESCRIPTION
@@ -69,142 +68,144 @@
 /** Standard declarations for date and time                                  */
 #include <time.h>
 
+#define ENABLE_DEBUG
+
 /** Socket includes for Windows / Linux                                      */
 #if defined _WIN32
-    #include <winsock2.h>
-    #include <ws2tcpip.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
-    /** Export Macro definition for APIs */
-    #define EXPORT __declspec(dllexport)
+/** Export Macro definition for APIs */
+#define EXPORT __declspec(dllexport)
 #else
-    /** Export Macro definition for APIs */
-    #define EXPORT __attribute__((visibility("default")))
+/** Export Macro definition for APIs */
+#define EXPORT __attribute__((visibility("default")))
 
 #endif
 
 /** To avoid structure padding                                               */
-#pragma pack (1)
+#pragma pack(1)
 
 ///****************
 /// Defines
 ///****************
 
 /** Macro definition for command return value                                */
-#define STATUS                              SINT32
+#define STATUS SINT32
 
 /** Success status for command                                               */
-#define	STS_RFDCCARD_SUCCESS                (0)
+#define STS_RFDCCARD_SUCCESS (0)
 
 /** Invalid input parameters status for command                              */
-#define STS_RFDCCARD_INVALID_INPUT_PARAMS   (-1)
+#define STS_RFDCCARD_INVALID_INPUT_PARAMS (-1)
 
 /** OS error status for command                                              */
-#define STS_RFDCCARD_OS_ERR                 (-2)
+#define STS_RFDCCARD_OS_ERR (-2)
 
 /** UDP write failure status for command                                     */
-#define STS_RFDCCARD_UDP_WRITE_ERR          (-3)
+#define STS_RFDCCARD_UDP_WRITE_ERR (-3)
 
 /** Ethernet cable connection error                                          */
-#define STS_RFDCCARD_ETH_CABLE_CON_ERROR    (-4)
+#define STS_RFDCCARD_ETH_CABLE_CON_ERROR (-4)
 
 /** Command response timeout error                                           */
-#define	STS_RFDCCARD_TIMEOUT_ERR            (-5)
+#define STS_RFDCCARD_TIMEOUT_ERR (-5)
 
 /** Event timeout error                                                      */
-#define	STS_RFDCCARD_EVENT_TIMEOUT_ERR      (-6)
+#define STS_RFDCCARD_EVENT_TIMEOUT_ERR (-6)
 
 /** Reset FPGA command code                                                  */
-#define CMD_CODE_RESET_FPGA                 0x01
+#define CMD_CODE_RESET_FPGA 0x01
 
 /** Reset AR device command code                                             */
-#define CMD_CODE_RESET_AR_DEV               0x02
+#define CMD_CODE_RESET_AR_DEV 0x02
 
 /** Configure FPGA data modes command code                                   */
-#define CMD_CODE_CONFIG_FPGA                0x03
+#define CMD_CODE_CONFIG_FPGA 0x03
 
 /** Configure EEPROM command code                                            */
-#define CMD_CODE_CONFIG_EEPROM              0x04
+#define CMD_CODE_CONFIG_EEPROM 0x04
 
 /** Start record command code                                                */
-#define CMD_CODE_START_RECORD               0x05
+#define CMD_CODE_START_RECORD 0x05
 
 /** Stop record command code                                                 */
-#define CMD_CODE_STOP_RECORD                0x06
+#define CMD_CODE_STOP_RECORD 0x06
 
 /** Playback start command code                                              */
-#define CMD_CODE_START_PLAYBACK             0x07
+#define CMD_CODE_START_PLAYBACK 0x07
 
 /** Playback stop command code                                               */
-#define CMD_CODE_STOP_PLAYBACK              0x08
+#define CMD_CODE_STOP_PLAYBACK 0x08
 
 /** System aliveness check command code                                      */
-#define CMD_CODE_SYSTEM_ALIVENESS           0x09
+#define CMD_CODE_SYSTEM_ALIVENESS 0x09
 
 /** System status command code                                               */
-#define CMD_CODE_SYSTEM_ASYNC_STATUS        0x0A
+#define CMD_CODE_SYSTEM_ASYNC_STATUS 0x0A
 
 /** Configure packet data delay and size command code                        */
-#define CMD_CODE_CONFIG_RECORD              0x0B
+#define CMD_CODE_CONFIG_RECORD 0x0B
 
 /** Configure AR device data mode command code                               */
-#define CMD_CODE_CONFIG_AR_DEV              0x0C
+#define CMD_CODE_CONFIG_AR_DEV 0x0C
 
 /** Initiate FPGA playback command code                                      */
-#define CMD_CODE_INIT_FPGA_PLAYBACK			0x0D
+#define CMD_CODE_INIT_FPGA_PLAYBACK 0x0D
 
 /** Read FPGA version command code                                           */
-#define CMD_CODE_READ_FPGA_VERSION			0x0E
+#define CMD_CODE_READ_FPGA_VERSION 0x0E
 
 /** CLI - Read record status from shared memory command code                 */
-#define CMD_CODE_CLI_PROC_STATUS_SHM        0x20
+#define CMD_CODE_CLI_PROC_STATUS_SHM 0x20
 
 /** CLI - Read DLL version command code                                      */
-#define CMD_CODE_CLI_READ_DLL_VERSION       0x21
+#define CMD_CODE_CLI_READ_DLL_VERSION 0x21
 
 /** CLI - Read CLI version command code                                      */
-#define CMD_CODE_CLI_READ_CLI_VERSION       0x23
+#define CMD_CODE_CLI_READ_CLI_VERSION 0x23
 
 /** CLI - Async Record stop command code                                     */
-#define CMD_CODE_CLI_ASYNC_RECORD_STOP      0x24
+#define CMD_CODE_CLI_ASYNC_RECORD_STOP 0x24
 
 /** Record packet out of sequence error code                                 */
-#define STS_RECORD_PKT_OUT_OF_SEQ           0xC3
+#define STS_RECORD_PKT_OUT_OF_SEQ 0xC3
 
 /** Record progress status code                                              */
-#define STS_RECORD_IS_IN_PROGRESS           0xC4
+#define STS_RECORD_IS_IN_PROGRESS 0xC4
 
 /** Playback from GUI to FPGA completed status code                          */
-#define STS_GUI_PLAYBACK_COMPLETED			0xC5
+#define STS_GUI_PLAYBACK_COMPLETED 0xC5
 
 /** Playback file open error code                                            */
-#define STS_PLAYBACK_FILE_OPEN_ERR          0xC6
+#define STS_PLAYBACK_FILE_OPEN_ERR 0xC6
 
 /** Playback UDP write failure error code                                    */
-#define STS_PLAYBACK_UDP_WRITE_ERR          0xC7
+#define STS_PLAYBACK_UDP_WRITE_ERR 0xC7
 
 /** Playback progress status code                                            */
-#define STS_PLAYBACK_IS_IN_PROGRESS         0xC8
+#define STS_PLAYBACK_IS_IN_PROGRESS 0xC8
 
 /** Record thread timeout error code                                         */
-#define STS_CAPTURE_THREAD_TIMEOUT          0xC9
+#define STS_CAPTURE_THREAD_TIMEOUT 0xC9
 
 /** Command header start bytes                                               */
-#define HEADER_START_BYTES                  0xA55A
+#define HEADER_START_BYTES 0xA55A
 
 /** Command footer start bytes                                               */
-#define FOOTER_STOP_BYTES                   0xEEAA
+#define FOOTER_STOP_BYTES 0xEEAA
 
 /** Maximum length of a string                                               */
-#define MAX_NAME_LEN                        255
+#define MAX_NAME_LEN 255
 
 /** Maximum length of version info                                           */
-#define MAX_VERSION_BUF_LEN                 20
+#define MAX_VERSION_BUF_LEN 20
 
 /** Number of data types for record                                          */
-#define NUM_DATA_TYPES                      5
+#define NUM_DATA_TYPES 5
 
 /** Maximum data bytes in command request                                    */
-#define MAX_DATA_BYTES                      504
+#define MAX_DATA_BYTES 504
 
 ///****************
 /// Enumerations
@@ -321,8 +322,7 @@ typedef enum CONFIG_LOG_MODE
 
     /** Multi mode                   */
     MULTI_MODE
-}ConfigLogMode;
-
+} ConfigLogMode;
 
 /** Data LVDS mode                                                           */
 typedef enum CONFIG_LVDS_MODE
@@ -332,8 +332,7 @@ typedef enum CONFIG_LVDS_MODE
 
     /** AR1642 - 2 lane               */
     TWO_LANE
-}ConfigLvdsMode;
-
+} ConfigLvdsMode;
 
 /** Data transfer mode                                                       */
 typedef enum CONFIG_TRANSFER_MODE
@@ -343,8 +342,7 @@ typedef enum CONFIG_TRANSFER_MODE
 
     /** Playback mode                */
     PLAYBACK
-}ConfigTransferMode;
-
+} ConfigTransferMode;
 
 /** Data format mode                                                         */
 typedef enum CONFIG_FORMAT_MODE
@@ -357,19 +355,17 @@ typedef enum CONFIG_FORMAT_MODE
 
     /** 16 bit mode                  */
     BIT16
-}ConfigFormatMode;
-
+} ConfigFormatMode;
 
 /** Data capture mode                                                        */
 typedef enum CONFIG_CAPTURE_MODE
 {
     /** SD card storage              */
-    SD_STORAGE =1,
+    SD_STORAGE = 1,
 
     /** Ethernet stream              */
     ETH_STREAM
-}ConfigCaptureMode;
-
+} ConfigCaptureMode;
 
 /** Record stop mode                                                         */
 typedef enum RECORD_STOP_MODE
@@ -385,7 +381,7 @@ typedef enum RECORD_STOP_MODE
 
     /** Infinite */
     NON_STOP
-}RecordStopMode;
+} RecordStopMode;
 
 ///****************
 /// Stucture Declarations
@@ -395,56 +391,55 @@ typedef enum RECORD_STOP_MODE
 typedef struct FPGA_CONFIG_MODE
 {
     /** Data log mode              */
-    ConfigLogMode       	eLogMode;
+    ConfigLogMode eLogMode;
 
     /** Data LVDS mode             */
-    ConfigLvdsMode          eLvdsMode;
+    ConfigLvdsMode eLvdsMode;
 
     /** Data transfer mode         */
-    ConfigTransferMode     	eDataXferMode;
+    ConfigTransferMode eDataXferMode;
 
     /** Data capture mode          */
-    ConfigCaptureMode      	eDataCaptureMode;
+    ConfigCaptureMode eDataCaptureMode;
 
     /** Data format mode           */
-    ConfigFormatMode       	eDataFormatMode;
+    ConfigFormatMode eDataFormatMode;
 
     /** Timeout value for LVDS data*/
-    UINT8                   u8Timer;
+    UINT8 u8Timer;
 } strFpgaConfigMode;
-
 
 /** System ethernet configuration                                            */
 typedef struct ETH_CONFIG_MODE
 {
     /** FPGA MAC address             */
-    UINT8          	au8MacId[6];
+    UINT8 au8MacId[6];
 
     /** PC IP address                */
-    UINT8       	au8PcIpAddr[4];
+    UINT8 au8PcIpAddr[4];
 
     /** FPGA IP address              */
-    UINT8			au8Dca1000IpAddr[4];
+    UINT8 au8Dca1000IpAddr[4];
 
     /** Record port number           */
-    UINT32        	u32RecordPortNo;
+    UINT32 u32RecordPortNo;
 
     /** Config port number           */
-    UINT32        	u32ConfigPortNo;
+    UINT32 u32ConfigPortNo;
 } strEthConfigMode;
 
 /** Record mode configuration                                                */
 typedef struct REC_CONFIG_MODE
 {
     /** Record  packet delay         */
-    UINT16          u16RecDelay;
+    UINT16 u16RecDelay;
 } strRecConfigMode;
 
 /** Start record modes configuration                                         */
 typedef struct START_REC_CONFIG_MODE
 {
     /** Record data file Base path                      */
-    SINT8   s8FileBasePath[MAX_NAME_LEN];
+    SINT8 s8FileBasePath[MAX_NAME_LEN];
 
     /** Record data file name prefix                    */
     SINT8 s8FilePrefix[MAX_NAME_LEN];
@@ -478,7 +473,7 @@ typedef struct START_REC_CONFIG_MODE
 
     /** Data LVDS mode                                  */
     ConfigLvdsMode eLvdsMode;
-}strStartRecConfigMode;
+} strStartRecConfigMode;
 
 /** Inline processing statistics                                             */
 typedef struct
@@ -516,58 +511,53 @@ typedef struct
     /** Packet out of sequence seen till offset     */
     UINT32 u32OutOfSeqPktToOffset[NUM_DATA_TYPES];
 
-}strRFDCCard_InlineProcStats;
+} strRFDCCard_InlineProcStats;
 
 /** Command request protocol                                                 */
 typedef struct
 {
     /** Header                       */
-    UINT16  u16Header;
+    UINT16 u16Header;
 
     /** Command code                 */
-    UINT16  u16CmdCode;
+    UINT16 u16CmdCode;
 
     /** Data size                    */
-    UINT16  u16DataSize;
+    UINT16 u16DataSize;
 
     /** Data                         */
-    UINT8   strData[MAX_DATA_BYTES];
+    UINT8 strData[MAX_DATA_BYTES];
 
     /** Footer                       */
-    UINT16  u16Footer;
-}DATA_CAPTURE_REQ;
-
+    UINT16 u16Footer;
+} DATA_CAPTURE_REQ;
 
 /** Command response protocol                                                */
 typedef struct
 {
     /** Header   					 */
-    UINT16  u16Header;
+    UINT16 u16Header;
 
     /** Command code                 */
-    UINT16  u16CmdCode;
+    UINT16 u16CmdCode;
 
     /** Command status               */
-    UINT16  u16Status;
+    UINT16 u16Status;
 
     /** Footer                       */
-    UINT16  u16Footer;
-}DATA_CAPTURE_RESP;
-
+    UINT16 u16Footer;
+} DATA_CAPTURE_RESP;
 
 /** Callback typedef for event handling                                      */
-typedef void (*EVENT_HANDLER)
-(
+typedef void (*EVENT_HANDLER)(
     /** Command code */
     UINT16 u16CmdCode,
 
     /** Command status */
-    UINT16 u16Status
-);
+    UINT16 u16Status);
 
 /** Callback typedef for record inlne processing handling                    */
-typedef void (*INLINE_PROC_HANDLER)
-(
+typedef void (*INLINE_PROC_HANDLER)(
     /** Inline process summary structure */
     strRFDCCard_InlineProcStats strInlineProcStats,
 
@@ -575,259 +565,240 @@ typedef void (*INLINE_PROC_HANDLER)
     bool u8OutOfSeqFlag,
 
     /** Data type index */
-    UINT8 u8DataIndex
-);
+    UINT8 u8DataIndex);
 
 ///*****************
 /// API Declarations
 ///*****************
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/** @fn EXPORT STATUS ConnectRFDCCard_ConfigMode (strEthConfigMode sEthConfigMode)
- * @brief This function is to create a socket communication to DCA1000EVM <!--
- * --> system over the config port with the following configuration @n <!--
- * -->	1.	FPGA IP Address @n  <!--
- * -->	2.	Record port number @n  <!--
- * -->	3.	Configuration port number <!--
- * --> This function is intended for handling config command request <!--
- * --> and responses over the config port. This assumes that another <!--
- * --> process has not called \ref ConnectRFDCCard_RecordMode in the <!--
- * --> background as that process could be holding onto the config port <!--
- * --> for reading async reports from DCA1000EVM system
- * @param [in] sEthConfigMode [strEthConfigMode] - <!--
- * --> Structure filled with Ethernet config data
- * @return SINT32 value
- */
-EXPORT STATUS ConnectRFDCCard_ConfigMode
-(
-    strEthConfigMode	sEthConfigMode
-);
+    /** @fn EXPORT STATUS ConnectRFDCCard_ConfigMode (strEthConfigMode sEthConfigMode)
+     * @brief This function is to create a socket communication to DCA1000EVM <!--
+     * --> system over the config port with the following configuration @n <!--
+     * -->	1.	FPGA IP Address @n  <!--
+     * -->	2.	Record port number @n  <!--
+     * -->	3.	Configuration port number <!--
+     * --> This function is intended for handling config command request <!--
+     * --> and responses over the config port. This assumes that another <!--
+     * --> process has not called \ref ConnectRFDCCard_RecordMode in the <!--
+     * --> background as that process could be holding onto the config port <!--
+     * --> for reading async reports from DCA1000EVM system
+     * @param [in] sEthConfigMode [strEthConfigMode] - <!--
+     * --> Structure filled with Ethernet config data
+     * @return SINT32 value
+     */
+    EXPORT STATUS ConnectRFDCCard_ConfigMode(
+        strEthConfigMode sEthConfigMode);
 
-/** @fn EXPORT STATUS ConnectRFDCCard_AsyncCommandMode (strEthConfigMode sEthConfigMode)
- * @brief This function is to create a socket communication to the local <!--
- * --> system over the config port with the following configuration @n <!--
- * -->	1.	FPGA IP Address @n  <!--
- * -->	2.	Record port number @n  <!--
- * -->	3.	Configuration port number <!--
- * --> This function is intended for sending async stop message to <!--
- * --> interrupt the ongoing record process (which was started using <!--
- * --> \ref ConnectRFDCCard_RecordMode). The message is sent over the <!--
- * --> local config port since the record process would already be <!--
- * --> listening to DCA1000EVM async messages over that port
- * @param [in] sEthConfigMode [strEthConfigMode] - <!--
- * --> Structure filled with Ethernet config data
- * @return SINT32 value
- */
-EXPORT STATUS ConnectRFDCCard_AsyncCommandMode
-(
-    strEthConfigMode	sEthConfigMode
-);
+    /** @fn EXPORT STATUS ConnectRFDCCard_AsyncCommandMode (strEthConfigMode sEthConfigMode)
+     * @brief This function is to create a socket communication to the local <!--
+     * --> system over the config port with the following configuration @n <!--
+     * -->	1.	FPGA IP Address @n  <!--
+     * -->	2.	Record port number @n  <!--
+     * -->	3.	Configuration port number <!--
+     * --> This function is intended for sending async stop message to <!--
+     * --> interrupt the ongoing record process (which was started using <!--
+     * --> \ref ConnectRFDCCard_RecordMode). The message is sent over the <!--
+     * --> local config port since the record process would already be <!--
+     * --> listening to DCA1000EVM async messages over that port
+     * @param [in] sEthConfigMode [strEthConfigMode] - <!--
+     * --> Structure filled with Ethernet config data
+     * @return SINT32 value
+     */
+    EXPORT STATUS ConnectRFDCCard_AsyncCommandMode(
+        strEthConfigMode sEthConfigMode);
 
-/** @fn EXPORT STATUS ConnectRFDCCard_RecordMode (strEthConfigMode sEthConfigMode)
- * @brief This function is to create a socket communication to DCA1000EVM <!--
- * --> system over the config and data ports with the following <!--
- * --> configuration @n <!--
- * -->	1.	FPGA IP Address @n  <!--
- * -->	2.	Record port number @n  <!--
- * -->	3.	Configuration port number <!--
- * --> This function is intended for handling config and record command <!--
- * --> request and responses over the config port and recording of data <!--
- * --> over the data ports. Interactive/UI Application can use this API <!--
- * --> to execute config and recording commands. Once a process has <!--
- * --> initiated recording using this API, another process can communicate <!--
- * --> with this process using \ref ConnectRFDCCard_AsyncCommandMode
- * @param [in] sEthConfigMode [strEthConfigMode] - <!--
- * --> Structure filled with Ethernet config data
- * @return SINT32 value
- */
-EXPORT STATUS ConnectRFDCCard_RecordMode
-(
-    strEthConfigMode	sEthConfigMode
-);
+    /** @fn EXPORT STATUS ConnectRFDCCard_RecordMode (strEthConfigMode sEthConfigMode)
+     * @brief This function is to create a socket communication to DCA1000EVM <!--
+     * --> system over the config and data ports with the following <!--
+     * --> configuration @n <!--
+     * -->	1.	FPGA IP Address @n  <!--
+     * -->	2.	Record port number @n  <!--
+     * -->	3.	Configuration port number <!--
+     * --> This function is intended for handling config and record command <!--
+     * --> request and responses over the config port and recording of data <!--
+     * --> over the data ports. Interactive/UI Application can use this API <!--
+     * --> to execute config and recording commands. Once a process has <!--
+     * --> initiated recording using this API, another process can communicate <!--
+     * --> with this process using \ref ConnectRFDCCard_AsyncCommandMode
+     * @param [in] sEthConfigMode [strEthConfigMode] - <!--
+     * --> Structure filled with Ethernet config data
+     * @return SINT32 value
+     */
+    EXPORT STATUS ConnectRFDCCard_RecordMode(
+        strEthConfigMode sEthConfigMode);
 
-/** @fn  EXPORT STATUS ConfigureRFDCCard_Fpga(strFpgaConfigMode sConfigMode)
- * @brief This function is to configure the DCA1000EVM system <!--
- * --> with the following mode configuration @n <!--
- * -->	1.	Logging Mode 		– RAW/MULTI @n <!--
- * -->	2.	LVDS Mode    		- FOUR/TWO LANE @n <!--
- * -->	3.	Data Transfer Mode 	– LVDS Capture/Playback @n <!--
- * -->	4.	Data Capture Mode 	– Ethernet Streaming/SD Card Storage @n  <!--
- * -->	5.	Data Format Mode  	- 12/14/16 bit @n <!--
- * -->  6.  Timer               - Timeout for LVDS data
- * @param [in] sConfigMode [strConfigMode] - Structure filled with config data
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS ConfigureRFDCCard_Fpga
-(
-  strFpgaConfigMode      sConfigMode
-);
+    /** @fn  EXPORT STATUS ConfigureRFDCCard_Fpga(strFpgaConfigMode sConfigMode)
+     * @brief This function is to configure the DCA1000EVM system <!--
+     * --> with the following mode configuration @n <!--
+     * -->	1.	Logging Mode 		– RAW/MULTI @n <!--
+     * -->	2.	LVDS Mode    		- FOUR/TWO LANE @n <!--
+     * -->	3.	Data Transfer Mode 	– LVDS Capture/Playback @n <!--
+     * -->	4.	Data Capture Mode 	– Ethernet Streaming/SD Card Storage @n  <!--
+     * -->	5.	Data Format Mode  	- 12/14/16 bit @n <!--
+     * -->  6.  Timer               - Timeout for LVDS data
+     * @param [in] sConfigMode [strConfigMode] - Structure filled with config data
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS ConfigureRFDCCard_Fpga(
+        strFpgaConfigMode sConfigMode);
 
-/** @fn EXPORT STATUS ConfigureRFDCCard_Eeprom (strEthConfigMode sEthConfigMode)
- * @brief This function is to configure the EEPROM of DCA1000EVM  <!--
- * --> system with the following configuration @n <!--
- * -->	1.	FPGA MAC ID @n   <!--
- * -->	2.	PC and FPGA IP Address @n  <!--
- * -->	3.	Record port number @n  <!--
- * -->	4.	Configuration port number
- * @param [in] sEthConfigMode [strEthConfigMode] - <!--
- * --> Structure filled with config data
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS ConfigureRFDCCard_Eeprom
-(
-  strEthConfigMode      sEthConfigMode
-);
+    /** @fn EXPORT STATUS ConfigureRFDCCard_Eeprom (strEthConfigMode sEthConfigMode)
+     * @brief This function is to configure the EEPROM of DCA1000EVM  <!--
+     * --> system with the following configuration @n <!--
+     * -->	1.	FPGA MAC ID @n   <!--
+     * -->	2.	PC and FPGA IP Address @n  <!--
+     * -->	3.	Record port number @n  <!--
+     * -->	4.	Configuration port number
+     * @param [in] sEthConfigMode [strEthConfigMode] - <!--
+     * --> Structure filled with config data
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS ConfigureRFDCCard_Eeprom(
+        strEthConfigMode sEthConfigMode);
 
-/** @fn EXPORT STATUS HandshakeRFDCCard(void)
- * @brief This function is to verify the DCA1000EVM system connectivity
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS HandshakeRFDCCard(void);
+    /** @fn EXPORT STATUS HandshakeRFDCCard(void)
+     * @brief This function is to verify the DCA1000EVM system connectivity
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS HandshakeRFDCCard(void);
 
-/** @fn EXPORT STATUS DisconnectRFDCCard_RecordMode(void)
- * @brief This function is to close config and data port socket connection <!--
- * --> and disconnect from the DCA1000EVM system.
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_RecordMode API
- * @return SINT32 value
- */
-EXPORT STATUS DisconnectRFDCCard_RecordMode (void);
+    /** @fn EXPORT STATUS DisconnectRFDCCard_RecordMode(void)
+     * @brief This function is to close config and data port socket connection <!--
+     * --> and disconnect from the DCA1000EVM system.
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_RecordMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS DisconnectRFDCCard_RecordMode(void);
 
-/** @fn  EXPORT STATUS DisconnectRFDCCard_ConfigMode(void)
- * @brief This function is to close bound config port socket connection <!--
- * --> and disconnect from the DCA1000EVM system.
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS DisconnectRFDCCard_ConfigMode (void);
+    /** @fn  EXPORT STATUS DisconnectRFDCCard_ConfigMode(void)
+     * @brief This function is to close bound config port socket connection <!--
+     * --> and disconnect from the DCA1000EVM system.
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS DisconnectRFDCCard_ConfigMode(void);
 
-/** @fn EXPORT STATUS DisconnectRFDCCard_AsyncCommandMode(void)
- * @brief This function is to close unbound config port socket connection <!--
- * --> which is used to send stop record async message to CLI Record tool.
- * @pre Application should be connected to CLI Record process using <!--
- * --> \ref ConnectRFDCCard_AsyncCommandMode API
- * @return SINT32 value
- */
-EXPORT STATUS DisconnectRFDCCard_AsyncCommandMode (void);
+    /** @fn EXPORT STATUS DisconnectRFDCCard_AsyncCommandMode(void)
+     * @brief This function is to close unbound config port socket connection <!--
+     * --> which is used to send stop record async message to CLI Record tool.
+     * @pre Application should be connected to CLI Record process using <!--
+     * --> \ref ConnectRFDCCard_AsyncCommandMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS DisconnectRFDCCard_AsyncCommandMode(void);
 
-EXPORT STATUS JustStartRecordData
-        (
-                strStartRecConfigMode sStartRecConfigMode
-        );
+    EXPORT STATUS JustStartRecordData(
+        strStartRecConfigMode sStartRecConfigMode);
 
+    /** @fn EXPORT STATUS StartRecordData(strStartRecConfigMode sStartRecConfigMode)
+     * @brief This function is to start recording the data streamed over <!--
+     * --> Ethernet from the DCA1000EVM system with the \ref <!--
+     * --> strStartRecConfigMode structure configuration
+     * @param [in] sStartRecConfigMode [strStartRecConfigMode] - <!--
+     * --> Structure filled with record config data
+     * @pre FPGA and record packet delay should be configured. <!--
+     * --> Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_RecordMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS StartRecordData(
+        strStartRecConfigMode sStartRecConfigMode);
 
-/** @fn EXPORT STATUS StartRecordData(strStartRecConfigMode sStartRecConfigMode)
- * @brief This function is to start recording the data streamed over <!--
- * --> Ethernet from the DCA1000EVM system with the \ref <!--
- * --> strStartRecConfigMode structure configuration
- * @param [in] sStartRecConfigMode [strStartRecConfigMode] - <!--
- * --> Structure filled with record config data
- * @pre FPGA and record packet delay should be configured. <!--
- * --> Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_RecordMode API
- * @return SINT32 value
- */
-EXPORT STATUS StartRecordData
-(
-    strStartRecConfigMode sStartRecConfigMode
-);
+    /** @fn EXPORT STATUS StopRecordData(void)
+     * @brief This function is to send command to FPGA to stop recording the <!--
+     * --> data streamed over Ethernet from the DCA1000EVM system
+     * @pre Record process should be running using \ref StartRecordData API
+     * @return SINT32 value
+     */
+    EXPORT STATUS StopRecordData(void);
 
-/** @fn EXPORT STATUS StopRecordData(void)
- * @brief This function is to send command to FPGA to stop recording the <!--
- * --> data streamed over Ethernet from the DCA1000EVM system
- * @pre Record process should be running using \ref StartRecordData API
- * @return SINT32 value
- */
-EXPORT STATUS StopRecordData (void);
+    /** @fn EXPORT STATUS StopRecordAsyncCmd(void)
+     * @brief This function is to send a message to CLI record process over the <!--
+     * --> config port to initiate stop recording data from the DCA1000EVM system <!--
+     * --> using \ref StopRecordData API
+     * @pre Record process should be running using \ref StartRecordData API. <!--
+     * --> Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_AsyncCommandMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS StopRecordAsyncCmd(void);
 
-/** @fn EXPORT STATUS StopRecordAsyncCmd(void)
- * @brief This function is to send a message to CLI record process over the <!--
- * --> config port to initiate stop recording data from the DCA1000EVM system <!--
- * --> using \ref StopRecordData API
- * @pre Record process should be running using \ref StartRecordData API. <!--
- * --> Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_AsyncCommandMode API
- * @return SINT32 value
- */
-EXPORT STATUS StopRecordAsyncCmd (void);
+    /** @fn EXPORT STATUS ResetRFDCCard_FPGA(void)
+     * @brief This function is to reset DCA1000EVM FPGA
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS ResetRFDCCard_FPGA(void);
 
-/** @fn EXPORT STATUS ResetRFDCCard_FPGA(void)
- * @brief This function is to reset DCA1000EVM FPGA
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS ResetRFDCCard_FPGA (void);
+    /** @fn  EXPORT STATUS ResetRadarEVM(void)
+     * @brief This function is to reset RADAR AR device
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS ResetRadarEVM(void);
 
-/** @fn  EXPORT STATUS ResetRadarEVM(void)
- * @brief This function is to reset RADAR AR device
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS ResetRadarEVM (void);
+    /** @fn EXPORT STATUS StatusRFDCCard_EventRegister (EVENT_HANDLER RFDCCard_EventCallback)
+     * @brief This function is to register user event callback for handling <!--
+     * --> async status from FPGA and stop record command response
+     * @param [in] RFDCCard_EventCallback  [EVENT_HANDLER] - Callback function
+     * @return SINT32 value
+     */
+    EXPORT STATUS StatusRFDCCard_EventRegister(
+        EVENT_HANDLER RFDCCard_EventCallback);
 
-/** @fn EXPORT STATUS StatusRFDCCard_EventRegister (EVENT_HANDLER RFDCCard_EventCallback)
- * @brief This function is to register user event callback for handling <!--
- * --> async status from FPGA and stop record command response
- * @param [in] RFDCCard_EventCallback  [EVENT_HANDLER] - Callback function
- * @return SINT32 value
- */
-EXPORT STATUS StatusRFDCCard_EventRegister
-(
-    EVENT_HANDLER   RFDCCard_EventCallback
-);
+    /** @fn EXPORT STATUS ReadRFDCCard_FpgaVersion(SINT8 *s8FpgaVersion)
+     * @brief This function is to read FPGA version
+     * @param [out] s8FpgaVersion [SINT8 *] - Array filled with version
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS ReadRFDCCard_FpgaVersion(SINT8 *s8FpgaVersion);
 
-/** @fn EXPORT STATUS ReadRFDCCard_FpgaVersion(SINT8 *s8FpgaVersion)
- * @brief This function is to read FPGA version
- * @param [out] s8FpgaVersion [SINT8 *] - Array filled with version
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS ReadRFDCCard_FpgaVersion(SINT8 *s8FpgaVersion);
+    /** @fn EXPORT STATUS ReadRFDCCard_DllVersion(SINT8 *s8DllVersion)
+     * @brief This function is to read API DLL version
+     * @param [out] s8DllVersion [SINT8 *] - Array filled with version
+     * @return SINT32 value
+     */
+    EXPORT STATUS ReadRFDCCard_DllVersion(SINT8 *s8DllVersion);
 
-/** @fn EXPORT STATUS ReadRFDCCard_DllVersion(SINT8 *s8DllVersion)
- * @brief This function is to read API DLL version
- * @param [out] s8DllVersion [SINT8 *] - Array filled with version
- * @return SINT32 value
- */
-EXPORT STATUS ReadRFDCCard_DllVersion(SINT8 *s8DllVersion);
+    /** @fn EXPORT STATUS ConfigureRFDCCard_Record(strRecConfigMode sRecConfigMode)
+     * @brief This function is to configure record data packet delay <!--
+     * --> in data recording with the following configuration @n <!--
+     * -->	1.	Record delay
+     * @param [in] sRecConfigMode [strRecConfigMode] - <!--
+     * --> Structure filled with config data
+     * @pre Application should be connected to DCA1000EVM system using <!--
+     * --> \ref ConnectRFDCCard_ConfigMode API
+     * @return SINT32 value
+     */
+    EXPORT STATUS ConfigureRFDCCard_Record(strRecConfigMode sRecConfigMode);
 
-/** @fn EXPORT STATUS ConfigureRFDCCard_Record(strRecConfigMode sRecConfigMode)
- * @brief This function is to configure record data packet delay <!--
- * --> in data recording with the following configuration @n <!--
- * -->	1.	Record delay
- * @param [in] sRecConfigMode [strRecConfigMode] - <!--
- * --> Structure filled with config data
- * @pre Application should be connected to DCA1000EVM system using <!--
- * --> \ref ConnectRFDCCard_ConfigMode API
- * @return SINT32 value
- */
-EXPORT STATUS ConfigureRFDCCard_Record(strRecConfigMode sRecConfigMode);
-
-/** @fn EXPORT STATUS RecInlineProcStats_EventRegister (INLINE_PROC_HANDLER RecordStats_Callback)
- * @brief This function is to register user event callback for updating <!--
- * --> inline processing statistics of recording process
- * @param [in] RecordStats_Callback  [INLINE_PROC_HANDLER] - <!--
- * --> Callback function
- * @pre Record process should be running using \ref StartRecordData API
- * @return SINT32 value
- */
-EXPORT STATUS RecInlineProcStats_EventRegister
-(
-    INLINE_PROC_HANDLER   RecordStats_Callback
-);
+    /** @fn EXPORT STATUS RecInlineProcStats_EventRegister (INLINE_PROC_HANDLER RecordStats_Callback)
+     * @brief This function is to register user event callback for updating <!--
+     * --> inline processing statistics of recording process
+     * @param [in] RecordStats_Callback  [INLINE_PROC_HANDLER] - <!--
+     * --> Callback function
+     * @pre Record process should be running using \ref StartRecordData API
+     * @return SINT32 value
+     */
+    EXPORT STATUS RecInlineProcStats_EventRegister(
+        INLINE_PROC_HANDLER RecordStats_Callback);
 
 #ifdef __cplusplus
 }
