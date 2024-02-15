@@ -35,32 +35,32 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
- /*
- ****************************************************************************************
- * Revision History   :
- *---------------------------------------------------------------------------------------
- * Version  Date        Author             Defect No               Description
- *---------------------------------------------------------------------------------------
- * 0.1.0    12May2015   Kaushal Kukkar    -               Initial Version
- *
- * 0.5.2    23Sep2016   Kaushal Kukkar    AUTORADAR-541   xWR1642 Support
- *
- * 0.6.0    15Nov2016   Kaushal Kukkar    AUTORADAR-666   Logging Feature
- *                      Kaushal Kukkar    AUTORADAR-716   Cascade API change
- *
- * 0.7.0    11May2017   Kaushal Kukkar    MMWSDK-362      LDRA static analysis Issue Fix
- *
- * 0.8.6    24Jul2017   Jitendra Gupta    MMWL-25         Support for 2K Message size
- *                      Kaushal Kukkar    MMWL-23         Big Endian Support
- *
- * 0.9.1       -        Jitendra Gupta    MMWL-5          Code size optimization
- *
- * 1.2.2    14Feb2019   Pavan Penikalapati MMWL-159       Fixed log prints in rlDeviceAddDevices
- *
- * 1.2.5.15 15Jul2019   Pavan Penikalapati MMWL-217       Flush mechanism fix, when SYNC for ACK
- *                                                        corrupted.
- ****************************************************************************************
- */
+/*
+****************************************************************************************
+* Revision History   :
+*---------------------------------------------------------------------------------------
+* Version  Date        Author             Defect No               Description
+*---------------------------------------------------------------------------------------
+* 0.1.0    12May2015   Kaushal Kukkar    -               Initial Version
+*
+* 0.5.2    23Sep2016   Kaushal Kukkar    AUTORADAR-541   xWR1642 Support
+*
+* 0.6.0    15Nov2016   Kaushal Kukkar    AUTORADAR-666   Logging Feature
+*                      Kaushal Kukkar    AUTORADAR-716   Cascade API change
+*
+* 0.7.0    11May2017   Kaushal Kukkar    MMWSDK-362      LDRA static analysis Issue Fix
+*
+* 0.8.6    24Jul2017   Jitendra Gupta    MMWL-25         Support for 2K Message size
+*                      Kaushal Kukkar    MMWL-23         Big Endian Support
+*
+* 0.9.1       -        Jitendra Gupta    MMWL-5          Code size optimization
+*
+* 1.2.2    14Feb2019   Pavan Penikalapati MMWL-159       Fixed log prints in rlDeviceAddDevices
+*
+* 1.2.5.15 15Jul2019   Pavan Penikalapati MMWL-217       Flush mechanism fix, when SYNC for ACK
+*                                                        corrupted.
+****************************************************************************************
+*/
 
 /******************************************************************************
  * INCLUDE FILES
@@ -68,6 +68,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <ti/control/mmwavelink/mmwavelink.h>
 #include <ti/control/mmwavelink/include/rl_driver.h>
 #include <ti/control/mmwavelink/include/rl_messages.h>
@@ -76,57 +77,56 @@
 #include <ti/control/mmwavelink/include/rl_trace.h>
 
 /****************************************************************************************
-* MACRO DEFINITIONS
-****************************************************************************************
-*/
+ * MACRO DEFINITIONS
+ ****************************************************************************************
+ */
 /*  Check if Interrupt is pending */
-#define RL_PENDING_RX_MSG(driverData, index)   \
-     (((driverData)->rxIrqCnt[(index)]) != ((driverData)->rxDoneCnt[(index)]))
+#define RL_PENDING_RX_MSG(driverData, index) \
+    (((driverData)->rxIrqCnt[(index)]) != ((driverData)->rxDoneCnt[(index)]))
 
 /*  mmwave radar Communication Interface Read/Write  */
-#define RL_IF_WRITE(fd,pBuff,len)   \
-            rl_driverData.clientCtx.comIfCb.rlComIfWrite((fd),(pBuff),(len))
-#define RL_IF_READ(fd,pBuff,len)    \
-           rl_driverData.clientCtx.comIfCb.rlComIfRead((fd),(pBuff),(len))
-
+#define RL_IF_WRITE(fd, pBuff, len) \
+    rl_driverData.clientCtx.comIfCb.rlComIfWrite((fd), (pBuff), (len))
+#define RL_IF_READ(fd, pBuff, len) \
+    rl_driverData.clientCtx.comIfCb.rlComIfRead((fd), (pBuff), (len))
 
 /*  mmwave radar Communication Interface Read/Write Error Check  */
-#define RL_IF_WRITE_CHECK(fd,pBuff,len) \
-            {\
-                if (((rlInt32_t)(len)) != RL_IF_WRITE((fd), (pBuff), (len)))\
-                {\
-                     return RL_RET_CODE_RADAR_IF_ERROR;\
-                }\
-            }
-#define RL_IF_READ_CHECK(fd,pBuff,len)  \
-            {\
-                if (((rlInt32_t)(len)) != RL_IF_READ((fd), (pBuff), (len)))\
-                {\
-                     return RL_RET_CODE_RADAR_IF_ERROR;\
-                }\
-            }
+#define RL_IF_WRITE_CHECK(fd, pBuff, len)                            \
+    {                                                                \
+        if (((rlInt32_t)(len)) != RL_IF_WRITE((fd), (pBuff), (len))) \
+        {                                                            \
+            return RL_RET_CODE_RADAR_IF_ERROR;                       \
+        }                                                            \
+    }
+#define RL_IF_READ_CHECK(fd, pBuff, len)                            \
+    {                                                               \
+        if (((rlInt32_t)(len)) != RL_IF_READ((fd), (pBuff), (len))) \
+        {                                                           \
+            return RL_RET_CODE_RADAR_IF_ERROR;                      \
+        }                                                           \
+    }
 
 /* MAX Retry of SYNC Match */
-#define RL_SYNC_SCAN_THRESHOLD           (252U)
+#define RL_SYNC_SCAN_THRESHOLD (252U)
 
 /* mmWaveLink Header Opcode Class */
-#define RL_RHCP_HDR_OPCODE_CLASS(ptr)  \
-         (rlUInt8_t) (((rlProtHeader_t *)(ptr))->opcode.b2MsgType)
+#define RL_RHCP_HDR_OPCODE_CLASS(ptr) \
+    (rlUInt8_t)(((rlProtHeader_t *)(ptr))->opcode.b2MsgType)
 
 /* mmWaveLink Header Payload */
-#define RL_RHCP_HDR_PL_LENGTH(ptr)     (((rlProtHeader_t *)(ptr))->len)
+#define RL_RHCP_HDR_PL_LENGTH(ptr) (((rlProtHeader_t *)(ptr))->len)
 
-#define PATTERN_NOT_MATCHED             ((rlInt32_t)0x0)
-#define SYNC_PATTERN_MATCHED            ((rlInt32_t)0x1)
-#define CNYS_PATTERN_MATCHED            ((rlInt32_t)0x2)
+#define PATTERN_NOT_MATCHED ((rlInt32_t)0x0)
+#define SYNC_PATTERN_MATCHED ((rlInt32_t)0x1)
+#define CNYS_PATTERN_MATCHED ((rlInt32_t)0x2)
 
 /*  Protocol SYNC Patterns */
-#define D2H_SYNC_PATTERN_1              (0xDCBAU)
-#define D2H_SYNC_PATTERN_2              (0xABCDU)
-#define H2D_SYNC_PATTERN_1              (0x1234U)
-#define H2D_SYNC_PATTERN_2              (0x4321U)
-#define H2D_CNYS_PATTERN_1              (0x5678U)
-#define H2D_CNYS_PATTERN_2              (0x8765U)
+#define D2H_SYNC_PATTERN_1 (0xDCBAU)
+#define D2H_SYNC_PATTERN_2 (0xABCDU)
+#define H2D_SYNC_PATTERN_1 (0x1234U)
+#define H2D_SYNC_PATTERN_2 (0x4321U)
+#define H2D_CNYS_PATTERN_1 (0x5678U)
+#define H2D_CNYS_PATTERN_2 (0x8765U)
 
 /******************************************************************************
  * GLOBAL VARIABLES/DATA-TYPES DEFINITIONS
@@ -153,13 +153,12 @@ rlRhcpMsg_t rl_rxMsg[RL_CASCADE_NUM_DEVICES] = {0};
  * FUNCTION PROTOTYPES
  ******************************************************************************
  */
-static rlReturnVal_t  rlDriverOriginDirCheck(rlUInt8_t deviceRunId, rlUInt8_t dataDir);
+static rlReturnVal_t rlDriverOriginDirCheck(rlUInt8_t deviceRunId, rlUInt8_t dataDir);
 static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
-                                 rlInt32_t *syncType);
+                                     rlInt32_t *syncType);
 static rlReturnVal_t rlDriverClientCbCheck(rlClientCbs_t clientCb);
 static rlReturnVal_t rlDriverOsiCbCheck(rlClientCbs_t clientCb);
-static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t* outMsg);
-
+static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t *outMsg);
 
 /******************************************************************************
  * FUNCTION DEFINITIONS
@@ -167,12 +166,12 @@ static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t* outMsg
  */
 
 /** @fn void rlDriverShiftDWord(rlUInt8_t buf[])
-*
-*   @brief Shifts one byte in the byte array
-*   @param[in] buf - Byte array
-*
-*   Shifts one byte in the byte array
-*/
+ *
+ *   @brief Shifts one byte in the byte array
+ *   @param[in] buf - Byte array
+ *
+ *   Shifts one byte in the byte array
+ */
 /* SourceId :  */
 /* DesignId :  */
 /* Requirements :  */
@@ -192,22 +191,22 @@ void rlDriverShiftDWord(rlUInt8_t buf[])
 }
 
 /** @fn rlReturnVal_t rlDriverCalCRC(rlUInt8_t* data, rlUInt16_t dataLen,
-*                      rlUInt8_t crcType, rlUInt8_t crc[RL_CRC_LEN_MAX])
-*
-*   @brief Calculates 16bit/32bit/64bit CRC
-*   @param[in] data - Byte array
-*   @param[in] dataLen - Length of the byte array
-*   @param[in] crcType - Type of CRC 16/32/64bit
-*   @param[in] crc - Received CRC
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Calculates 16bit/32bit/64bit CRC
-*/
+ *                      rlUInt8_t crcType, rlUInt8_t crc[RL_CRC_LEN_MAX])
+ *
+ *   @brief Calculates 16bit/32bit/64bit CRC
+ *   @param[in] data - Byte array
+ *   @param[in] dataLen - Length of the byte array
+ *   @param[in] crcType - Type of CRC 16/32/64bit
+ *   @param[in] crc - Received CRC
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Calculates 16bit/32bit/64bit CRC
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-774 */
-rlReturnVal_t rlDriverCalCRC(rlUInt8_t* data, rlUInt16_t dataLen,
-                           rlUInt8_t crcType, rlUInt8_t crc[RL_CRC_LEN_MAX])
+rlReturnVal_t rlDriverCalCRC(rlUInt8_t *data, rlUInt16_t dataLen,
+                             rlUInt8_t crcType, rlUInt8_t crc[RL_CRC_LEN_MAX])
 {
     rlReturnVal_t retVal;
 
@@ -245,8 +244,8 @@ rlReturnVal_t rlDriverCalCRC(rlUInt8_t* data, rlUInt16_t dataLen,
 */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-780 */
-rlReturnVal_t rlDriverVerifyCRC(rlUInt8_t* data, rlUInt16_t dataLen,
-                        rlUInt8_t crcType, rlUInt8_t crc[RL_CRC_LEN_MAX])
+rlReturnVal_t rlDriverVerifyCRC(rlUInt8_t *data, rlUInt16_t dataLen,
+                                rlUInt8_t crcType, rlUInt8_t crc[RL_CRC_LEN_MAX])
 {
     rlUInt8_t indx;
     rlUInt8_t crcByte[RL_CRC_LEN_MAX];
@@ -255,7 +254,7 @@ rlReturnVal_t rlDriverVerifyCRC(rlUInt8_t* data, rlUInt16_t dataLen,
     RL_LOGV_ARG0("rlDriverVerifyCRC starts...\n");
 
     /* compute CRC on given data */
-    if (RL_RET_CODE_OK != rl_driverData.clientCtx.crcCb.rlComputeCRC(data, dataLen, \
+    if (RL_RET_CODE_OK != rl_driverData.clientCtx.crcCb.rlComputeCRC(data, dataLen,
                                                                      crcType, &crcByte[0U]))
     {
         /* set error code if CRC callback returns non-zero */
@@ -280,21 +279,21 @@ rlReturnVal_t rlDriverVerifyCRC(rlUInt8_t* data, rlUInt16_t dataLen,
 }
 
 /** @fn rlReturnVal_t rlDriverCalChkSum(rlUInt8_t* data, rlUInt8_t len,
-*                             rlUInt16_t* checksum)
-*
-*   @brief Calculates the 16 bit Checksum on a byte array
-*   @param[in] hdrData - Header data
-*   @param[in] len -  Length of the byte array
-*   @param[out] checksum - Calcualted checksum of the byte array
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Compares Calculates the 16 bit checksum on a byte array
-*/
+ *                             rlUInt16_t* checksum)
+ *
+ *   @brief Calculates the 16 bit Checksum on a byte array
+ *   @param[in] hdrData - Header data
+ *   @param[in] len -  Length of the byte array
+ *   @param[out] checksum - Calcualted checksum of the byte array
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Compares Calculates the 16 bit checksum on a byte array
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-774, AUTORADAR_REQ-777 */
-rlReturnVal_t rlDriverCalChkSum(rlProtHeader_t* hdrData, rlUInt8_t len,
-                                   rlUInt16_t* checksum)
+rlReturnVal_t rlDriverCalChkSum(rlProtHeader_t *hdrData, rlUInt8_t len,
+                                rlUInt16_t *checksum)
 {
     /* TBD - MISRA compliant Checksum code */
     rlUInt32_t checkSumVal = 0U;
@@ -314,7 +313,7 @@ rlReturnVal_t rlDriverCalChkSum(rlProtHeader_t* hdrData, rlUInt8_t len,
              * to calculate Checksum" */
             /*LDRA_INSPECTED 94 S */
             /*LDRA_INSPECTED 95 S */
-            checkSumVal += *((rlUInt16_t*) localGenHdr);
+            checkSumVal += *((rlUInt16_t *)localGenHdr);
             localGenHdr += 2U;
 
             /* If high order bit set, fold */
@@ -328,7 +327,7 @@ rlReturnVal_t rlDriverCalChkSum(rlProtHeader_t* hdrData, rlUInt8_t len,
         /* Take care of left over byte */
         if (len > 0U)
         {
-            checkSumVal += (rlUInt32_t) (*((rlUInt8_t *)localGenHdr));
+            checkSumVal += (rlUInt32_t)(*((rlUInt8_t *)localGenHdr));
         }
         /* Add all half words to calcuated SUM */
         while ((checkSumVal >> 16U) != 0U)
@@ -351,16 +350,15 @@ rlReturnVal_t rlDriverCalChkSum(rlProtHeader_t* hdrData, rlUInt8_t len,
     return retVal;
 }
 
-
 /** @fn rlReturnVal_t rlDriverValidateHdr(rlProtHeader_t protHdr)
-*
-*   @brief Validates the header by comparing Checksum
-*   @param[in] protHdr - Protocol Header
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Validates the header by comparing checksum
-*/
+ *
+ *   @brief Validates the header by comparing Checksum
+ *   @param[in] protHdr - Protocol Header
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Validates the header by comparing checksum
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-777 */
 rlReturnVal_t rlDriverValidateHdr(rlProtHeader_t protHdr)
@@ -372,7 +370,7 @@ rlReturnVal_t rlDriverValidateHdr(rlProtHeader_t protHdr)
     /* AR_CODE_REVIEW MR:R.2.2 <APPROVED> "Checksum is getting updated in called function" */
     /*LDRA_INSPECTED 8 D */
     if (RL_RET_CODE_OK != rlDriverCalChkSum(&protHdr, ((rlUInt8_t)(RHCP_HEADER_LEN - 2U)),
-                                                                                &checkSum))
+                                            &checkSum))
     {
         /* Set error code if checksum callback returns non-zero value */
         retVal = RL_RET_CODE_RADAR_IF_ERROR;
@@ -390,7 +388,7 @@ rlReturnVal_t rlDriverValidateHdr(rlProtHeader_t protHdr)
         {
             /* checksum successfully matched */
             RL_LOGD_ARG0("Checksum validation is successful\n");
-            retVal= RL_RET_CODE_OK;
+            retVal = RL_RET_CODE_OK;
         }
     }
 
@@ -398,15 +396,15 @@ rlReturnVal_t rlDriverValidateHdr(rlProtHeader_t protHdr)
 }
 
 /** @fn rlUInt8_t rlDeviceIdentifyCmdDir(rlUInt16_t msgId, rlUInt8_t platform)
-*
-*   @brief Get the direction of command packet based on MsgID and platform
-*   @param[in] msgId - Message ID of data packet
-*   @param[in] platform - Platform Type where mmWaveLink instance is running
-*
-*   @return rlUInt8_t command packet direction
-*
-*   Returns direction of command packet based on MsgID and platform.
-*/
+ *
+ *   @brief Get the direction of command packet based on MsgID and platform
+ *   @param[in] msgId - Message ID of data packet
+ *   @param[in] platform - Platform Type where mmWaveLink instance is running
+ *
+ *   @return rlUInt8_t command packet direction
+ *
+ *   Returns direction of command packet based on MsgID and platform.
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlUInt8_t rlDeviceIdentifyCmdDir(rlUInt16_t msgId, rlUInt8_t platform)
@@ -433,8 +431,8 @@ rlUInt8_t rlDeviceIdentifyCmdDir(rlUInt16_t msgId, rlUInt8_t platform)
         {
             cmdDir = RL_API_DIR_DSS_TO_BSS;
         }
-        RL_LOGV_ARG1("cmdDir for radarSS = %d (1:host2Bss, 10:dss2Bss, 8:mss2bss)\n",\
-         cmdDir);
+        RL_LOGV_ARG1("cmdDir for radarSS = %d (1:host2Bss, 10:dss2Bss, 8:mss2bss)\n",
+                     cmdDir);
     }
     /* if MsgId is for MSS */
     else if ((RL_DEV_POWERUP_MSG <= msgId) && (RL_DEV_ASYNC_EVENT_MSG > msgId))
@@ -483,23 +481,23 @@ rlUInt8_t rlDeviceIdentifyCmdDir(rlUInt16_t msgId, rlUInt8_t platform)
 }
 
 /** @fn rlReturnVal_t rlDriverAsyncEventHandler(rlUInt8_t devIndex,
-*               rlUInt16_t nsbc, rlUInt8_t *payload, rlUInt16_t payloadLen)
-*
-*   @brief Handles asynchronous response/error from mmwave radar device
-*   @param[in] devIndex - Device Index
-*   @param[in] nsbc - No. of Sub-Block in MSG
-*   @param[in] payload - Protocol payload message data
-*   @param[in] payloadLen - Length of payload message data
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Handles asynchronous response/error from mmwave radar device
-*/
+ *               rlUInt16_t nsbc, rlUInt8_t *payload, rlUInt16_t payloadLen)
+ *
+ *   @brief Handles asynchronous response/error from mmwave radar device
+ *   @param[in] devIndex - Device Index
+ *   @param[in] nsbc - No. of Sub-Block in MSG
+ *   @param[in] payload - Protocol payload message data
+ *   @param[in] payloadLen - Length of payload message data
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Handles asynchronous response/error from mmwave radar device
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-783 */
 rlReturnVal_t rlDriverAsyncEventHandler(rlUInt8_t devIndex,
-                                       rlUInt16_t nsbc, rlUInt8_t *payload,
-                                       rlUInt16_t payloadLen)
+                                        rlUInt16_t nsbc, rlUInt8_t *payload,
+                                        rlUInt16_t payloadLen)
 {
     rlUInt16_t indx;
     rlUInt16_t sbLen = 0U;
@@ -534,9 +532,9 @@ rlReturnVal_t rlDriverAsyncEventHandler(rlUInt8_t devIndex,
             /* AR_CODE_REVIEW MR:R.18.1,R.18.4 <APPROVED> "pointer arithmetic required" */
             /*LDRA_INSPECTED 567 S */
             /*LDRA_INSPECTED 87 S */
-            rl_driverData.clientCtx.eventCb.rlAsyncEvent(devIndex, sbcId, \
-                                 ((rlUInt16_t)(sbLen - RL_MIN_SBC_LEN)),\
-                                 (payldAddr + RL_SBC_PL_INDEX));
+            rl_driverData.clientCtx.eventCb.rlAsyncEvent(devIndex, sbcId,
+                                                         ((rlUInt16_t)(sbLen - RL_MIN_SBC_LEN)),
+                                                         (payldAddr + RL_SBC_PL_INDEX));
             /* Increase received payload length*/
             recSbsLen += (sbLen);
 
@@ -550,23 +548,23 @@ rlReturnVal_t rlDriverAsyncEventHandler(rlUInt8_t devIndex,
 }
 
 /** @fn void rlDriverHostIrqHandler(rlUInt8_t deviceIndex, void *pValue)
-*
-*   @brief Interrupt Service Routine to handle host interrupt from mmwave
-*          radar device
-*   @param[in] deviceIndex - source device Index
-*   @param[in] pValue - Interrupt Routine Argument
-*
-*   @return none
-*
-*   Interrupt Service Routine to handle host interrupt from mmwave radar device
-*/
+ *
+ *   @brief Interrupt Service Routine to handle host interrupt from mmwave
+ *          radar device
+ *   @param[in] deviceIndex - source device Index
+ *   @param[in] pValue - Interrupt Routine Argument
+ *
+ *   @return none
+ *
+ *   Interrupt Service Routine to handle host interrupt from mmwave radar device
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-777 */
 void rlDriverHostIrqHandler(rlUInt8_t deviceIndex, void *pValue)
 {
     rlUInt8_t tempVar;
     /* get rlDriver global structure pointer */
-    rlDriverData_t* rlDrvData = rlDriverGetHandle();
+    rlDriverData_t *rlDrvData = rlDriverGetHandle();
 
     RL_LOGV_ARG0("rlDriverHostIrqHandler starts...\n");
 
@@ -581,12 +579,11 @@ void rlDriverHostIrqHandler(rlUInt8_t deviceIndex, void *pValue)
     /* AR_CODE_REVIEW MR:D.4.1,D.4.14 <APPROVED> "rlDrvData is pointer to a global strcture,
         can't be NULL" */
     /*LDRA_INSPECTED 45 D */
-    if ((RL_NULL_PTR != rlDrvData->clientCtx.devCtrlCb.rlDeviceMaskHostIrq)\
-          && ((rlComIfHdl_t)RL_NULL_PTR != rlDrvData->commDevIdx.comIfHdl[deviceIndex]))
+    if ((RL_NULL_PTR != rlDrvData->clientCtx.devCtrlCb.rlDeviceMaskHostIrq) && ((rlComIfHdl_t)RL_NULL_PTR != rlDrvData->commDevIdx.comIfHdl[deviceIndex]))
     {
         /* Mask Host IRQ */
-        rlDrvData->clientCtx.devCtrlCb.rlDeviceMaskHostIrq((rlComIfHdl_t) \
-                              rlDrvData->commDevIdx.comIfHdl[deviceIndex]);
+        rlDrvData->clientCtx.devCtrlCb.rlDeviceMaskHostIrq((rlComIfHdl_t)
+                                                               rlDrvData->commDevIdx.comIfHdl[deviceIndex]);
         RL_LOGD_ARG0("rlDriverHostIrqHandler Mask the Interrupt\n");
     }
 
@@ -598,14 +595,14 @@ void rlDriverHostIrqHandler(rlUInt8_t deviceIndex, void *pValue)
     /* store deviceIndex in Global */
     rlDrvData->commDevIdx.rlDevIndex[deviceIndex] = deviceIndex;
 
-    tempVar = (rlDrvData->isCmdRespWaited[deviceIndex] | \
+    tempVar = (rlDrvData->isCmdRespWaited[deviceIndex] |
                rlDrvData->isRespWriteWaited[deviceIndex]);
     /* Check if command transaction is in progress*/
     if (RL_TRUE == tempVar)
     {
         /* Release command response wait semaphore to unblock command thread*/
         (void)rlDrvData->clientCtx.osiCb.sem.rlOsiSemSignal(
-                                        &rlDrvData->cmdSem[deviceIndex]);
+            &rlDrvData->cmdSem[deviceIndex]);
         RL_LOGD_ARG0("rlDriverHostIrqHandler Release command response \n");
     }
     else
@@ -624,19 +621,19 @@ void rlDriverHostIrqHandler(rlUInt8_t deviceIndex, void *pValue)
 }
 
 /** @fn rlReturnVal_t rlDriverProcRdMsg(rlUInt8_t devIdx, rlReturnVal_t inVal)
-*
-*   @brief Process received message for Async event message
-*   @param[in] devIdx - device Index
-*   @param[in] inVal  - status value
-*
-*   @return error status
-*
-*   Process received message for Async event message
-*/
+ *
+ *   @brief Process received message for Async event message
+ *   @param[in] devIdx - device Index
+ *   @param[in] inVal  - status value
+ *
+ *   @return error status
+ *
+ *   Process received message for Async event message
+ */
 rlReturnVal_t rlDriverProcRdMsg(rlUInt8_t devIdx, rlReturnVal_t inVal)
 {
     /* get rlDriver global structure pointer */
-    rlDriverData_t* rlDrvData = rlDriverGetHandle();
+    rlDriverData_t *rlDrvData = rlDriverGetHandle();
     rlReturnVal_t retVal;
 
     /* Increment IRQ done IR*/
@@ -650,87 +647,87 @@ rlReturnVal_t rlDriverProcRdMsg(rlUInt8_t devIdx, rlReturnVal_t inVal)
     /* Check received message class*/
     switch (rlDrvData->funcParams[devIdx].rxMsgClass)
     {
-        case RL_API_CLASS_ASYNC:
-            /* If CRC check passed then only parse Async Event */
-            if (inVal == RL_RET_CODE_OK)
-            {
-                /* parse received Async Event Message */
-                /*LDRA_INSPECTED 95 S */
-                retVal = rlDriverAsyncEventHandler(devIdx,\
-                         rlDrvData->funcParams[devIdx].asyncEvt.evtMsg.hdr.nsbc,\
-                         (rlUInt8_t *)&rlDrvData->funcParams[devIdx].asyncEvt.evtMsg.payload[0],\
-                         (rlUInt16_t)(rlDrvData->funcParams[devIdx].asyncEvt.evtMsg.hdr.len - \
-                         RHCP_HEADER_LEN));
-            }
-            else
-            {
-                rlUInt16_t errPayload[RL_MIN_SBC_LEN + 4U];
-                /* Generate local payload containing [SBID+SBLEN+error value] */
-                errPayload[0] = ((RL_MMWL_ASYNC_EVENT_MSG * RL_MAX_SB_IN_MSG) +\
-                                    RL_MMWL_AE_MISMATCH_REPORT);
-                errPayload[1] = (RL_MIN_SBC_LEN + 4U);
+    case RL_API_CLASS_ASYNC:
+        /* If CRC check passed then only parse Async Event */
+        if (inVal == RL_RET_CODE_OK)
+        {
+            /* parse received Async Event Message */
+            /*LDRA_INSPECTED 95 S */
+            retVal = rlDriverAsyncEventHandler(devIdx,
+                                               rlDrvData->funcParams[devIdx].asyncEvt.evtMsg.hdr.nsbc,
+                                               (rlUInt8_t *)&rlDrvData->funcParams[devIdx].asyncEvt.evtMsg.payload[0],
+                                               (rlUInt16_t)(rlDrvData->funcParams[devIdx].asyncEvt.evtMsg.hdr.len -
+                                                            RHCP_HEADER_LEN));
+        }
+        else
+        {
+            rlUInt16_t errPayload[RL_MIN_SBC_LEN + 4U];
+            /* Generate local payload containing [SBID+SBLEN+error value] */
+            errPayload[0] = ((RL_MMWL_ASYNC_EVENT_MSG * RL_MAX_SB_IN_MSG) +
+                             RL_MMWL_AE_MISMATCH_REPORT);
+            errPayload[1] = (RL_MIN_SBC_LEN + 4U);
 
-                /* Copy last return value[error] to payload of this async event msg */
-                (void)memcpy(&errPayload[2], (rlUInt8_t*) &inVal, sizeof(rlReturnVal_t));
+            /* Copy last return value[error] to payload of this async event msg */
+            (void)memcpy(&errPayload[2], (rlUInt8_t *)&inVal, sizeof(rlReturnVal_t));
 
-                /* Send error Async Event message to application containing error value */
-                /* AR_CODE_REVIEW MR:R.10.3 <INSPECTED> "All param types are matching to function
-                                           argument type. LDRA tool issue." */
-                /*LDRA_INSPECTED 458 S */
-                retVal = rlDriverAsyncEventHandler(devIdx, 1U,\
-                            (rlUInt8_t *)&errPayload[0],\
-                            (rlUInt16_t)(RL_MIN_SBC_LEN + 4U));
-            }
-            break;
-        case RL_API_CLASS_NACK:
-            /* These types are legal in this context. Do nothing */
-            retVal = RL_RET_CODE_OK;
-            break;
-        case RL_API_CLASS_RSP:
-            /* Command response is illegal in this context. */
-            retVal = RL_RET_CODE_OK;
-            break;
-        /* if mmWaveLink is running on MSS/DSS and receives command from other Core/HOST */
-        case RL_API_CLASS_CMD:
-        case RL_API_CLASS_BYPASS:
-            {
-                /* Check if command parser API callback is assigned by the application */
-                if (rl_driverData.clientCtx.cmdParserCb.rlCmdParser != RL_NULL_PTR)
-                {
-                    /* invoke callback to parse the received command packet */
-                    (void)rl_driverData.clientCtx.cmdParserCb.rlCmdParser(
-                                        rlDrvData->funcParams[devIdx].rxMsgClass, inVal);
-                }
-                else
-                {
-                    /* do nothing */
-                }
-                retVal = RL_RET_CODE_OK;
-            }
-            break;
-        case RL_API_CLASS_MAX:
+            /* Send error Async Event message to application containing error value */
+            /* AR_CODE_REVIEW MR:R.10.3 <INSPECTED> "All param types are matching to function
+                                       argument type. LDRA tool issue." */
+            /*LDRA_INSPECTED 458 S */
+            retVal = rlDriverAsyncEventHandler(devIdx, 1U,
+                                               (rlUInt8_t *)&errPayload[0],
+                                               (rlUInt16_t)(RL_MIN_SBC_LEN + 4U));
+        }
+        break;
+    case RL_API_CLASS_NACK:
+        /* These types are legal in this context. Do nothing */
+        retVal = RL_RET_CODE_OK;
+        break;
+    case RL_API_CLASS_RSP:
+        /* Command response is illegal in this context. */
+        retVal = RL_RET_CODE_OK;
+        break;
+    /* if mmWaveLink is running on MSS/DSS and receives command from other Core/HOST */
+    case RL_API_CLASS_CMD:
+    case RL_API_CLASS_BYPASS:
+    {
+        /* Check if command parser API callback is assigned by the application */
+        if (rl_driverData.clientCtx.cmdParserCb.rlCmdParser != RL_NULL_PTR)
+        {
+            /* invoke callback to parse the received command packet */
+            (void)rl_driverData.clientCtx.cmdParserCb.rlCmdParser(
+                rlDrvData->funcParams[devIdx].rxMsgClass, inVal);
+        }
+        else
+        {
             /* do nothing */
-            retVal = RL_RET_CODE_OK;
-            break;
-        default:
-            /* set error code */
-            retVal = RL_RET_CODE_PROTOCOL_ERROR;
-            RL_LOGE_ARG0("rlDriverProcRdMsg, Rl protocol error\n");
-            break;
+        }
+        retVal = RL_RET_CODE_OK;
+    }
+    break;
+    case RL_API_CLASS_MAX:
+        /* do nothing */
+        retVal = RL_RET_CODE_OK;
+        break;
+    default:
+        /* set error code */
+        retVal = RL_RET_CODE_PROTOCOL_ERROR;
+        RL_LOGE_ARG0("rlDriverProcRdMsg, Rl protocol error\n");
+        break;
     }
 
     return retVal;
 }
 
 /** @fn rlReturnVal_t rlDriverMsgReadSpawnCtx(void *pValue)
-*
-*   @brief Handles Interrupt in application(user) context
-*   @param[in] pValue - Interrupt Routine Argument
-*
-*   @return none
-*
-*   Handles Interrupt in application(user) context
-*/
+ *
+ *   @brief Handles Interrupt in application(user) context
+ *   @param[in] pValue - Interrupt Routine Argument
+ *
+ *   @return none
+ *
+ *   Handles Interrupt in application(user) context
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-782, AUTORADAR_REQ-1038 */
 rlReturnVal_t rlDriverMsgReadSpawnCtx(const void *pValue)
@@ -739,7 +736,7 @@ rlReturnVal_t rlDriverMsgReadSpawnCtx(const void *pValue)
     rlUInt8_t deviceIndex;
     rlUInt8_t lclRxIrqCnt, lclRxDoneCnt;
     /* get rlDriver global structure pointer */
-    rlDriverData_t* rlDrvData = rlDriverGetHandle();
+    rlDriverData_t *rlDrvData = rlDriverGetHandle();
 
     RL_LOGV_ARG0("rlDriverMsgReadSpawnCtx starts...\n");
 
@@ -753,7 +750,7 @@ rlReturnVal_t rlDriverMsgReadSpawnCtx(const void *pValue)
     else
     {
         /* argument passed is Device Index */
-        deviceIndex = *(const rlUInt8_t*)pValue;
+        deviceIndex = *(const rlUInt8_t *)pValue;
     }
 
     /* This function pointer is always being checked on powerOn and mmwavelink
@@ -762,21 +759,20 @@ rlReturnVal_t rlDriverMsgReadSpawnCtx(const void *pValue)
     /* AR_CODE_REVIEW MR:D.4.1,D.4.14 <APPROVED> "rlDrvData is pointer to a global strcture,
         can't be NULL" */
     /*LDRA_INSPECTED 45 D */
-    if (RL_RET_CODE_OK != rlDrvData->clientCtx.osiCb.mutex.rlOsiMutexLock
-              (&rlDrvData->devMutex[deviceIndex], (rlOsiTime_t)RL_OSI_WAIT_FOREVER))
+    if (RL_RET_CODE_OK != rlDrvData->clientCtx.osiCb.mutex.rlOsiMutexLock(&rlDrvData->devMutex[deviceIndex], (rlOsiTime_t)RL_OSI_WAIT_FOREVER))
     {
         rlUInt16_t errPayload[RL_MIN_SBC_LEN + 4U];
         rlReturnVal_t inVal;
-        rlReturnVal_t* ptrData;
-        
+        rlReturnVal_t *ptrData;
+
         /* Generate local payload containing [SBID+SBLEN+error value] */
-        errPayload[0] = ((RL_MMWL_ASYNC_EVENT_MSG * RL_MAX_SB_IN_MSG) +\
-                            RL_MMWL_AE_INTERNALERR_REPORT);
+        errPayload[0] = ((RL_MMWL_ASYNC_EVENT_MSG * RL_MAX_SB_IN_MSG) +
+                         RL_MMWL_AE_INTERNALERR_REPORT);
         errPayload[1] = (RL_MIN_SBC_LEN + 4U);
 
         /* If MutexLock returns non-zero then treat this as error and set error code to inVal */
         inVal = RL_RET_CODE_RADAR_OSIF_ERROR;
-        
+
         ptrData = &inVal;
         if (RL_NULL_PTR != ptrData)
         {
@@ -784,22 +780,22 @@ rlReturnVal_t rlDriverMsgReadSpawnCtx(const void *pValue)
             /* AR_CODE_REVIEW MR:R.21.17 <INSPECTED> "Local variable and array can't be null.
                                         LDRA tool issue." */
             /*LDRA_INSPECTED 140 D */
-            (void)memcpy((void*)&errPayload[2], (void*)ptrData, sizeof(rlReturnVal_t));
+            (void)memcpy((void *)&errPayload[2], (void *)ptrData, sizeof(rlReturnVal_t));
         }
-        
+
         /* Send error Async Event message to application containing error value */
         /* AR_CODE_REVIEW MR:R.10.3 <INSPECTED> "All param types are matching to function
                                    argument type. LDRA tool issue." */
         /*LDRA_INSPECTED 458 S */
-        retVal = rlDriverAsyncEventHandler(deviceIndex, 1U,\
-                                           (rlUInt8_t *)&errPayload[0],\
+        retVal = rlDriverAsyncEventHandler(deviceIndex, 1U,
+                                           (rlUInt8_t *)&errPayload[0],
                                            (rlUInt16_t)(RL_MIN_SBC_LEN + 4U));
     }
     else
     {
         /* Messages might have been read by CmdResp context. Therefore after getting LockObj,
             check again where the Pending Rx Msg is still present. */
-        lclRxIrqCnt  = rlDrvData->rxIrqCnt[deviceIndex];
+        lclRxIrqCnt = rlDrvData->rxIrqCnt[deviceIndex];
         lclRxDoneCnt = rlDrvData->rxDoneCnt[deviceIndex];
 
         /* unlock Mutex if all Received IRQ are handled i.e. DONE */
@@ -821,8 +817,7 @@ rlReturnVal_t rlDriverMsgReadSpawnCtx(const void *pValue)
             retVal = rlDriverProcRdMsg(deviceIndex, msgRdRetVal);
 
             /* Unlock Global Mutex */
-            (void)rlDrvData->clientCtx.osiCb.mutex.rlOsiMutexUnLock
-                                        (&rlDrvData->devMutex[deviceIndex]);
+            (void)rlDrvData->clientCtx.osiCb.mutex.rlOsiMutexUnLock(&rlDrvData->devMutex[deviceIndex]);
         }
     }
     RL_LOGV_ARG0("rlDriverMsgReadSpawnCtx ends...\n");
@@ -831,18 +826,18 @@ rlReturnVal_t rlDriverMsgReadSpawnCtx(const void *pValue)
 }
 
 /** @fn rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData,
-*                                           rlUInt8_t devIndex)
-*
-*   @brief Wait and handle command response
-*   @param[in] rlDrvData - Pointer to mmWaveLink global structure
-*   @param[in] devIndex - Device index of slave device from where response
-*                         is expected
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Wait and handle command response
-*/
-rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
+ *                                           rlUInt8_t devIndex)
+ *
+ *   @brief Wait and handle command response
+ *   @param[in] rlDrvData - Pointer to mmWaveLink global structure
+ *   @param[in] devIndex - Device index of slave device from where response
+ *                         is expected
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Wait and handle command response
+ */
+rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t *rlDrvData, rlUInt8_t devIndex)
 {
     rlReturnVal_t retVal, retStatus;
     rlUInt8_t tempVar;
@@ -851,10 +846,10 @@ rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
 
     /* Receive data over communication channel */
     retStatus = rlDriverMsgRead(rlDrvData, devIndex);
-    
+
     /* Data received successfully */
     rlDrvData->rxDoneCnt[devIndex]++;
-    
+
     if (RL_RET_CODE_OK != (rlInt32_t)retStatus)
     {
         /* If Async event message has some issue then notify to the
@@ -863,19 +858,19 @@ rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
         {
             rlUInt16_t errPayload[RL_MIN_SBC_LEN + 4U];
             /* Generate local payload with [SBID+SBLEN+Error_value] */
-            errPayload[0] = ((RL_MMWL_ASYNC_EVENT_MSG * RL_MAX_SB_IN_MSG) +\
-                              RL_MMWL_AE_MISMATCH_REPORT);
+            errPayload[0] = ((RL_MMWL_ASYNC_EVENT_MSG * RL_MAX_SB_IN_MSG) +
+                             RL_MMWL_AE_MISMATCH_REPORT);
             errPayload[1] = (RL_MIN_SBC_LEN + 4U);
 
-            (void)memcpy(&errPayload[2], (rlUInt8_t*)&retStatus, sizeof(rlReturnVal_t));
+            (void)memcpy(&errPayload[2], (rlUInt8_t *)&retStatus, sizeof(rlReturnVal_t));
 
             /* Send error Async Event message to application containing error value */
             /* AR_CODE_REVIEW MR:R.10.3 <INSPECTED> "All param types are matching to function
                                            argument type. LDRA tool issue." */
             /*LDRA_INSPECTED 458 S */
-            (void)rlDriverAsyncEventHandler(devIndex, 1U,\
-                            (rlUInt8_t *)&errPayload[0],\
-                            (rlUInt16_t)(RL_MIN_SBC_LEN + 4U));
+            (void)rlDriverAsyncEventHandler(devIndex, 1U,
+                                            (rlUInt8_t *)&errPayload[0],
+                                            (rlUInt16_t)(RL_MIN_SBC_LEN + 4U));
 
             if (retStatus == RL_RET_CODE_CRC_FAILED)
             {
@@ -884,7 +879,7 @@ rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
                 retStatus = RL_RET_CODE_OK;
             }
         }
-        
+
         /* Error in received data, return error */
         retVal = retStatus;
         RL_LOGE_ARG0("Error in received data\n");
@@ -922,8 +917,7 @@ rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
             /* In case CmdResp has been read without  waiting on cmdSem that */
             /* Sem object. That to prevent old signal to be processed. */
             /* Clear the Semaphore */
-            rlDrvData->clientCtx.osiCb.sem.rlOsiSemWait
-                       (&(rlDrvData->cmdSem[devIndex]), (rlOsiTime_t)RL_OSI_NO_WAIT);
+            rlDrvData->clientCtx.osiCb.sem.rlOsiSemWait(&(rlDrvData->cmdSem[devIndex]), (rlOsiTime_t)RL_OSI_NO_WAIT);
         }
         else if (RL_API_CLASS_ASYNC == rlDrvData->funcParams[devIndex].rxMsgClass)
         {
@@ -933,11 +927,11 @@ rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
                                                        argument type. LDRA tool issue." */
             /*LDRA_INSPECTED 458 S */
             /*LDRA_INSPECTED 95 S */
-            (void)rlDriverAsyncEventHandler(devIndex, \
-                    rlDrvData->funcParams[devIndex].asyncEvt.evtMsg.hdr.nsbc, \
-                    (rlUInt8_t *)&rlDrvData->funcParams[devIndex].asyncEvt.evtMsg.payload[0],
-                    (rlUInt16_t)(rlDrvData->funcParams[devIndex].asyncEvt.evtMsg.hdr.len - \
-                    RHCP_HEADER_LEN));
+            (void)rlDriverAsyncEventHandler(devIndex,
+                                            rlDrvData->funcParams[devIndex].asyncEvt.evtMsg.hdr.nsbc,
+                                            (rlUInt8_t *)&rlDrvData->funcParams[devIndex].asyncEvt.evtMsg.payload[0],
+                                            (rlUInt16_t)(rlDrvData->funcParams[devIndex].asyncEvt.evtMsg.hdr.len -
+                                                         RHCP_HEADER_LEN));
             retVal = RL_RET_CODE_OK;
 
             /* If CRC check fails, the Async Event is Ignored */
@@ -963,23 +957,22 @@ rlReturnVal_t rlDriverMsgCmdReply(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
     return retVal;
 }
 
-
 /** @fn rlReturnVal_t rlDriverMsgReadCmdCtx(rlUInt8_t devIndex)
-*
-*   @brief Wait and handle command response
-*   @param[in] devIndex - Device index of slave device from where response
-*                         is expected
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Wait and handle command response
-*/
+ *
+ *   @brief Wait and handle command response
+ *   @param[in] devIndex - Device index of slave device from where response
+ *                         is expected
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Wait and handle command response
+ */
 /* DesignId : MMWL_DesignId_102 */
 /* Requirements : AUTORADAR_REQ-782, AUTORADAR_REQ-1038 */
 rlReturnVal_t rlDriverMsgReadCmdCtx(rlUInt8_t devIndex)
 {
     rlReturnVal_t retVal;
-    rlDriverData_t* rlDrvData = rlDriverGetHandle();
+    rlDriverData_t *rlDrvData = rlDriverGetHandle();
 
     RL_LOGV_ARG0("rlDriverMsgReadCmdCtx starts...\n");
     /* check for NULL pointer */
@@ -1021,8 +1014,8 @@ rlReturnVal_t rlDriverMsgReadCmdCtx(rlUInt8_t devIndex)
             {
                 /* cmdSem will be signaled by IRQ */
                 if (RL_RET_CODE_OK != rlDrvData->clientCtx.osiCb.sem.rlOsiSemWait(
-                                                   &(rlDrvData->cmdSem[devIndex]),
-                                                   (rlOsiTime_t)rlDrvData->clientCtx.ackTimeout))
+                                          &(rlDrvData->cmdSem[devIndex]),
+                                          (rlOsiTime_t)rlDrvData->clientCtx.ackTimeout))
                 {
                     /* setCmd Response Wait Tag to False when timer expires */
                     rlDrvData->isCmdRespWaited[devIndex] = RL_FALSE;
@@ -1035,13 +1028,11 @@ rlReturnVal_t rlDriverMsgReadCmdCtx(rlUInt8_t devIndex)
         }
 
         /* if any Rx Msg is pending to process and ACK Timout error hasn't happend */
-        if (RL_PENDING_RX_MSG(rlDrvData, devIndex) && (retVal != RL_RET_CODE_FATAL_ERROR) \
-            && (rlDrvData->isCmdRespWaited[devIndex] == RL_FALSE))
+        if (RL_PENDING_RX_MSG(rlDrvData, devIndex) && (retVal != RL_RET_CODE_FATAL_ERROR) && (rlDrvData->isCmdRespWaited[devIndex] == RL_FALSE))
         {
             /* Spawn a thread/task to read pending Rx Msg */
-            if (rlDrvData->clientCtx.osiCb.queue.rlOsiSpawn
-                ((RL_P_OSI_SPAWN_ENTRY)rlDriverMsgReadSpawnCtx, \
-                &rlDrvData->commDevIdx.rlDevIndex[devIndex], 0U) != RL_RET_CODE_OK)
+            if (rlDrvData->clientCtx.osiCb.queue.rlOsiSpawn((RL_P_OSI_SPAWN_ENTRY)rlDriverMsgReadSpawnCtx,
+                                                            &rlDrvData->commDevIdx.rlDevIndex[devIndex], 0U) != RL_RET_CODE_OK)
             {
                 retVal = RL_RET_CODE_RADAR_OSIF_ERROR;
             }
@@ -1053,22 +1044,22 @@ rlReturnVal_t rlDriverMsgReadCmdCtx(rlUInt8_t devIndex)
 }
 
 /** @fn rlReturnVal_t rlDriverOriginDirCheck(rlUInt8_t deviceRunId,
-*                            rlUInt8_t dataDir)
-*
-*   @brief Checks for Direction of data received if that matches with
-*          where mmWaveLink is running
-*   @param[in] deviceRunId - ID where mmWaveLink is running
-*   @param[in] dataDir - direction in rcvd data packet
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Checks for Direction of data received if that matches with where
-*   mmWaveLink is running
-*/
+ *                            rlUInt8_t dataDir)
+ *
+ *   @brief Checks for Direction of data received if that matches with
+ *          where mmWaveLink is running
+ *   @param[in] deviceRunId - ID where mmWaveLink is running
+ *   @param[in] dataDir - direction in rcvd data packet
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Checks for Direction of data received if that matches with where
+ *   mmWaveLink is running
+ */
 /* DesignId :  */
 /* Requirements :  */
-static rlReturnVal_t  rlDriverOriginDirCheck(rlUInt8_t deviceRunId,
-                               rlUInt8_t dataDir)
+static rlReturnVal_t rlDriverOriginDirCheck(rlUInt8_t deviceRunId,
+                                            rlUInt8_t dataDir)
 {
     rlReturnVal_t retVal;
 
@@ -1076,61 +1067,61 @@ static rlReturnVal_t  rlDriverOriginDirCheck(rlUInt8_t deviceRunId,
 
     switch (deviceRunId)
     {
-        /* if mmWaveLink instance is running on Host */
-        case RL_PLATFORM_HOST:
-            if ((RL_API_DIR_BSS_TO_HOST == dataDir) ||
-               (RL_API_DIR_MSS_TO_HOST == dataDir) ||
-               (RL_API_DIR_DSS_TO_HOST == dataDir))
-            {
-                /* set OK to return value, i.e. requested DataDir is correct
-                  as per running instance of mmWaveLink */
-                retVal = RL_RET_CODE_OK;
-            }
-            else
-            {
-                /* request DataDir is invalid as per running instance of mmWaveLink */
-                retVal = RL_RET_CODE_INVALID_INPUT;
-            }
-            break;
-        /* if mmWaveLink instance is running on MSS */
-        case RL_PLATFORM_MSS:
-            if ((RL_API_DIR_BSS_TO_MSS == dataDir) ||
-               (RL_API_DIR_DSS_TO_MSS == dataDir) ||
-               (RL_API_DIR_HOST_TO_MSS == dataDir))
-            {
-                /* set OK to return value, i.e. requested DataDir is correct
-                  as per running instance of mmWaveLink */
-                retVal = RL_RET_CODE_OK;
-            }
-            else
-            {
-                /* request DataDir is invalid as per running instance of mmWaveLink */
-                retVal = RL_RET_CODE_INVALID_INPUT;
-            }
-            break;
-        /* if mmWaveLink instance is running on DSS */
-        case RL_PLATFORM_DSS:
-            /* if Data direction is towards DSS */
-            if ((RL_API_DIR_BSS_TO_DSS == dataDir) ||
-               (RL_API_DIR_MSS_TO_DSS == dataDir) ||
-               (RL_API_DIR_HOST_TO_DSS == dataDir))
-            {
-                /* set OK to return value, i.e. requested DataDir is correct
-                  as per running instance of mmWaveLink */
-                retVal = RL_RET_CODE_OK;
-            }
-            else
-            {
-                /* request DataDir is invalid as per running instance of mmWaveLink */
-                retVal = RL_RET_CODE_INVALID_INPUT;
-            }
-            break;
-        default:
-            /* Invalid: set error code */
+    /* if mmWaveLink instance is running on Host */
+    case RL_PLATFORM_HOST:
+        if ((RL_API_DIR_BSS_TO_HOST == dataDir) ||
+            (RL_API_DIR_MSS_TO_HOST == dataDir) ||
+            (RL_API_DIR_DSS_TO_HOST == dataDir))
+        {
+            /* set OK to return value, i.e. requested DataDir is correct
+              as per running instance of mmWaveLink */
+            retVal = RL_RET_CODE_OK;
+        }
+        else
+        {
+            /* request DataDir is invalid as per running instance of mmWaveLink */
             retVal = RL_RET_CODE_INVALID_INPUT;
-            RL_LOGE_ARG2("Unknown platform %d, retVal = %d\n", \
-                dataDir, retVal);
-            break;
+        }
+        break;
+    /* if mmWaveLink instance is running on MSS */
+    case RL_PLATFORM_MSS:
+        if ((RL_API_DIR_BSS_TO_MSS == dataDir) ||
+            (RL_API_DIR_DSS_TO_MSS == dataDir) ||
+            (RL_API_DIR_HOST_TO_MSS == dataDir))
+        {
+            /* set OK to return value, i.e. requested DataDir is correct
+              as per running instance of mmWaveLink */
+            retVal = RL_RET_CODE_OK;
+        }
+        else
+        {
+            /* request DataDir is invalid as per running instance of mmWaveLink */
+            retVal = RL_RET_CODE_INVALID_INPUT;
+        }
+        break;
+    /* if mmWaveLink instance is running on DSS */
+    case RL_PLATFORM_DSS:
+        /* if Data direction is towards DSS */
+        if ((RL_API_DIR_BSS_TO_DSS == dataDir) ||
+            (RL_API_DIR_MSS_TO_DSS == dataDir) ||
+            (RL_API_DIR_HOST_TO_DSS == dataDir))
+        {
+            /* set OK to return value, i.e. requested DataDir is correct
+              as per running instance of mmWaveLink */
+            retVal = RL_RET_CODE_OK;
+        }
+        else
+        {
+            /* request DataDir is invalid as per running instance of mmWaveLink */
+            retVal = RL_RET_CODE_INVALID_INPUT;
+        }
+        break;
+    default:
+        /* Invalid: set error code */
+        retVal = RL_RET_CODE_INVALID_INPUT;
+        RL_LOGE_ARG2("Unknown platform %d, retVal = %d\n",
+                     dataDir, retVal);
+        break;
     }
     RL_LOGV_ARG0("rlDriverOriginDirCheck ends...\n");
 
@@ -1139,10 +1130,10 @@ static rlReturnVal_t  rlDriverOriginDirCheck(rlUInt8_t deviceRunId,
 
 rlReturnVal_t rlDriverRdVerifyMsg(rlReadBuf_t readBuf, rlUInt8_t devIndex)
 {
-    rlUInt16_t   rxLengthRecv;
+    rlUInt16_t rxLengthRecv;
     rlReturnVal_t retVal, readRetVal;
-    rlUInt16_t   payloadLen, msgCrcLen, msgCrcType;
-    rlUInt8_t    isCrcPresent;
+    rlUInt16_t payloadLen, msgCrcLen, msgCrcType;
+    rlUInt8_t isCrcPresent;
 
     /* get Received Message length excluding SYNC */
     rxLengthRecv = RL_RHCP_HDR_PL_LENGTH(&(readBuf.syncHeader.protHdr));
@@ -1154,7 +1145,7 @@ rlReturnVal_t rlDriverRdVerifyMsg(rlReadBuf_t readBuf, rlUInt8_t devIndex)
     }
     else
     {
-        rlRhcpMsg_t   *rhcpMsg;
+        rlRhcpMsg_t *rhcpMsg;
 
         /* Get Rx Message Class from received buffer header */
         /* Process Header Here - Verify each field */
@@ -1226,28 +1217,27 @@ rlReturnVal_t rlDriverRdVerifyMsg(rlReadBuf_t readBuf, rlUInt8_t devIndex)
         {
             /* Read the CRC Bytes */
             if (RL_IF_READ(rl_driverData.commDevIdx.comIfHdl[devIndex],
-                             rl_driverData.funcParams[devIndex].msgCRC,
-                             msgCrcLen) != (rlInt32_t)msgCrcLen)
+                           rl_driverData.funcParams[devIndex].msgCRC,
+                           msgCrcLen) != (rlInt32_t)msgCrcLen)
             {
                 /* Set the error code if read data fails */
                 retVal = RL_RET_CODE_RADAR_IF_ERROR;
             }
             else
             {
-                (void)memcpy(&rhcpMsg->payload[payloadLen], \
+                (void)memcpy(&rhcpMsg->payload[payloadLen],
                              &rl_driverData.funcParams[devIndex].msgCRC[0U], msgCrcLen);
                 /* Check if CRC is enabled from the application and it's type
                    matched with received MSG CRC type */
-                if ((rl_driverData.clientCtx.crcType != (rlUInt8_t)RL_CRC_TYPE_NO_CRC) && \
+                if ((rl_driverData.clientCtx.crcType != (rlUInt8_t)RL_CRC_TYPE_NO_CRC) &&
                     (rl_driverData.clientCtx.crcType == (rlUInt8_t)msgCrcType))
                 {
                     /* Validate CRC first as Opcode might be corrupt as well */
                     /* AR_CODE_REVIEW MR:R.10.3  <APPROVED> "All parameter types are matching to
                                                        function argument type. LDRA tool issue." */
                     /*LDRA_INSPECTED 458 S */
-                    retVal = rlDriverVerifyCRC((rlUInt8_t*)&rhcpMsg->hdr, (rxLengthRecv - \
-                                                msgCrcLen), (rlUInt8_t)(msgCrcType), \
-                                                rl_driverData.funcParams[devIndex].msgCRC);
+                    retVal = rlDriverVerifyCRC((rlUInt8_t *)&rhcpMsg->hdr, (rxLengthRecv - msgCrcLen), (rlUInt8_t)(msgCrcType),
+                                               rl_driverData.funcParams[devIndex].msgCRC);
                 }
                 else
                 {
@@ -1265,22 +1255,22 @@ rlReturnVal_t rlDriverRdVerifyMsg(rlReadBuf_t readBuf, rlUInt8_t devIndex)
 }
 
 /** @fn rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
-*
-*   @brief Receive and validate protocol header and payload
-*   @param[in] rlDrvData - Pointer to mmwavelink global structure
-*   @param[in] devIndex - Device index of slave device from where data is
-*                         received
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Receive and validate protocol header and payload
-*/
+ *
+ *   @brief Receive and validate protocol header and payload
+ *   @param[in] rlDrvData - Pointer to mmwavelink global structure
+ *   @param[in] devIndex - Device index of slave device from where data is
+ *                         received
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Receive and validate protocol header and payload
+ */
 /* DesignId : MMWL_DesignId_026 */
 /* Requirements : AUTORADAR_REQ-777, AUTORADAR_REQ-779 */
-rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
+rlReturnVal_t rlDriverMsgRead(rlDriverData_t *rlDrvData, rlUInt8_t devIndex)
 {
     rlReturnVal_t retVal, hdrRetVal;
-    rlReadBuf_t readBuf  = {0};
+    rlReadBuf_t readBuf = {0};
     rlUInt16_t payloadLen;
 
     RL_LOGV_ARG0("rlDriverMsgRead starts...\n");
@@ -1296,7 +1286,7 @@ rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
 
         /* Read message Header from given device index */
         hdrType = rlDriverRxHdrRead(readBuf.tempBuf,
-                      rlDrvData->commDevIdx.comIfHdl[devIndex]);
+                                    rlDrvData->commDevIdx.comIfHdl[devIndex]);
         RL_LOGV_ARG1("rlDriverRxHdrRead return val = %d\n", hdrType);
 
         /* if it's not CNYS pattern then calculate checksum before consuming or
@@ -1309,9 +1299,9 @@ rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
             /* Received msg can be command/response/async_event
              * and it is destined to the same device where this mmWaveLink ir running
              */
-            if ((RL_RET_CODE_OK == hdrRetVal) && (RL_RET_CODE_OK == \
-                rlDriverOriginDirCheck(rlDrvData->clientCtx.platform,
-                              (rlUInt8_t)readBuf.syncHeader.protHdr.opcode.b4Direction)))
+            if ((RL_RET_CODE_OK == hdrRetVal) && (RL_RET_CODE_OK ==
+                                                  rlDriverOriginDirCheck(rlDrvData->clientCtx.platform,
+                                                                         (rlUInt8_t)readBuf.syncHeader.protHdr.opcode.b4Direction)))
             {
                 retVal = rlDriverRdVerifyMsg(readBuf, devIndex);
             }
@@ -1329,8 +1319,8 @@ rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
                 payloadLen = readBuf.syncHeader.protHdr.len - (rlUInt16_t)RHCP_HEADER_LEN;
 
                 /* read full data before writing to destination COMM handle */
-                if (RL_IF_READ(rlDrvData->commDevIdx.comIfHdl[devIndex], \
-                         &rl_rxMsg[devIndex].payload[0], payloadLen) != (rlInt32_t)payloadLen)
+                if (RL_IF_READ(rlDrvData->commDevIdx.comIfHdl[devIndex],
+                               &rl_rxMsg[devIndex].payload[0], payloadLen) != (rlInt32_t)payloadLen)
                 {
                     /* Set error code if read is failed */
                     retVal = RL_RET_CODE_RADAR_IF_ERROR;
@@ -1341,32 +1331,31 @@ rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
                     retVal = RL_RET_CODE_OK;
                 }
             }
-            /* If checksum mismatched of the received message and link is running on 
-               Host then it needs to flush the AWR device's MibSPI RAM so that MSS 
+            /* If checksum mismatched of the received message and link is running on
+               Host then it needs to flush the AWR device's MibSPI RAM so that MSS
                can re-sync its buffer pointer */
-            else if ((RL_RET_CODE_CHKSUM_FAILED == hdrRetVal) && \
+            else if ((RL_RET_CODE_CHKSUM_FAILED == hdrRetVal) &&
                      (rl_driverData.clientCtx.platform == RL_PLATFORM_HOST))
             {
                 rlUInt16_t dummyToFlushSpi[8U] = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-                                                 0xFFFF, 0xFFFF, 0xFFFF};
+                                                  0xFFFF, 0xFFFF, 0xFFFF};
                 rlUInt16_t readCnt;
                 /* Get the CRC Length what is configured */
                 rlUInt16_t msgCrcLen = (2U << (rl_driverData.clientCtx.crcType & 0x3U));
-                
+
                 /* Read 240 bytes from SPI buff to allign MSS SPI_RX DMA with HOST TX buff */
                 for (readCnt = 1U; readCnt < (SYNC_PATTERN_LEN + RHCP_HEADER_LEN); readCnt++)
                 {
                     (void)RL_IF_READ(rlDrvData->commDevIdx.comIfHdl[devIndex],
-                                    (rlUInt8_t*)&dummyToFlushSpi[0U], (SYNC_PATTERN_LEN + \
-                                             RHCP_HEADER_LEN));
+                                     (rlUInt8_t *)&dummyToFlushSpi[0U], (SYNC_PATTERN_LEN + RHCP_HEADER_LEN));
                 }
-                
+
                 /* Check whether CRC is present read it from MibSPI buff */
                 if (rl_txMsg[devIndex].hdr.flags.b2Crc == 0U)
                 {
                     /* Read remaining data to clear SPI buffer */
                     (void)RL_IF_READ(rlDrvData->commDevIdx.comIfHdl[devIndex],
-                                    (rlUInt8_t*)&dummyToFlushSpi[0U], msgCrcLen);
+                                     (rlUInt8_t *)&dummyToFlushSpi[0U], msgCrcLen);
                 }
                 /* In case Checksum of header is corrupted MMWL will create internal Async event
                    message to Notify the application about checksum failure */
@@ -1381,7 +1370,7 @@ rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
                 retVal = hdrRetVal;
                 /* In case CRC/Checksum is corrupted then store RxMsg Class with Async event */
                 rl_driverData.funcParams[devIndex].rxMsgClass =
-                                        RL_RHCP_HDR_OPCODE_CLASS(&(readBuf.syncHeader.protHdr));
+                    RL_RHCP_HDR_OPCODE_CLASS(&(readBuf.syncHeader.protHdr));
             }
         }
         /* In case mmWaveLink instance is running on MSS, it may receive CNYS from Host Over SPI */
@@ -1411,18 +1400,18 @@ rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
             {
                 /* In case CRC/Checksum is corrupted then store RxMsg Class with Async event */
                 rl_driverData.funcParams[devIndex].rxMsgClass =
-                                    RL_RHCP_HDR_OPCODE_CLASS(&(readBuf.syncHeader.protHdr));
+                    RL_RHCP_HDR_OPCODE_CLASS(&(readBuf.syncHeader.protHdr));
             }
         }
 
         /*  Unmask Interrupt call */
-        if ((RL_NULL_PTR != rlDrvData->clientCtx.devCtrlCb.rlDeviceUnMaskHostIrq) &&\
+        if ((RL_NULL_PTR != rlDrvData->clientCtx.devCtrlCb.rlDeviceUnMaskHostIrq) &&
             (retVal != RL_RET_CODE_FATAL_ERROR))
         {
             /* Un Mask Interrupt */
-            rlDrvData->clientCtx.devCtrlCb.rlDeviceUnMaskHostIrq(\
+            rlDrvData->clientCtx.devCtrlCb.rlDeviceUnMaskHostIrq(
                 rlDrvData->commDevIdx.comIfHdl[devIndex]);
-           RL_LOGD_ARG0("rlDriverMsgRead Unmask Interrupt call\n");
+            RL_LOGD_ARG0("rlDriverMsgRead Unmask Interrupt call\n");
         }
     }
 
@@ -1432,20 +1421,20 @@ rlReturnVal_t rlDriverMsgRead(rlDriverData_t* rlDrvData, rlUInt8_t devIndex)
 }
 
 /** @fn rlReturnVal_t rlDriverMsgWrite(rlDriverData_t* rlDrvData, rlUInt8_t devIndex,
-*                                      rlComIfHdl_t comIfHdl)
-*
-*   @brief Write command header and payload data over communication channel
-*   @param[in] rlDrvData - Pointer to mmwavelink global structure
-*   @param[in] devIndex - device index
-*   @param[in] comIfHdl - Communication interface handle
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Write command header and payload data over communication channel
-*/
+ *                                      rlComIfHdl_t comIfHdl)
+ *
+ *   @brief Write command header and payload data over communication channel
+ *   @param[in] rlDrvData - Pointer to mmwavelink global structure
+ *   @param[in] devIndex - device index
+ *   @param[in] comIfHdl - Communication interface handle
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Write command header and payload data over communication channel
+ */
 /* DesignId : MMWL_DesignId_025 */
 /* Requirements : AUTORADAR_REQ_772, AUTORADAR_REQ-774 */
-rlReturnVal_t rlDriverMsgWrite(rlDriverData_t* rlDrvData, rlUInt8_t devIndex,
+rlReturnVal_t rlDriverMsgWrite(rlDriverData_t *rlDrvData, rlUInt8_t devIndex,
                                rlComIfHdl_t comIfHdl)
 {
     rlReturnVal_t retVal;
@@ -1470,9 +1459,9 @@ rlReturnVal_t rlDriverMsgWrite(rlDriverData_t* rlDrvData, rlUInt8_t devIndex,
         RL_LOGV_ARG1("API Dir = %d \n", rl_txMsg[devIndex].hdr.opcode.b4Direction);
 
         /* check for Data Direction to choose Sync Pattern */
-        if ((RL_API_DIR_DSS_TO_HOST == rl_txMsg[devIndex].hdr.opcode.b4Direction) || \
-           (RL_API_DIR_MSS_TO_HOST == rl_txMsg[devIndex].hdr.opcode.b4Direction) || \
-           (RL_API_DIR_DSS_TO_MSS  == rl_txMsg[devIndex].hdr.opcode.b4Direction))
+        if ((RL_API_DIR_DSS_TO_HOST == rl_txMsg[devIndex].hdr.opcode.b4Direction) ||
+            (RL_API_DIR_MSS_TO_HOST == rl_txMsg[devIndex].hdr.opcode.b4Direction) ||
+            (RL_API_DIR_DSS_TO_MSS == rl_txMsg[devIndex].hdr.opcode.b4Direction))
         {
             /* set device to Host Sync Pattern */
             rl_txMsg[devIndex].syncPattern.sync1 = D2H_SYNC_PATTERN_1;
@@ -1494,20 +1483,20 @@ rlReturnVal_t rlDriverMsgWrite(rlDriverData_t* rlDrvData, rlUInt8_t devIndex,
             /* AR_CODE_REVIEW MR:R.10.3 <INSPECTED> "All param types are matching to function
                            argument type. LDRA tool issue." */
             /*LDRA_INSPECTED 458 S */
-            (void)rlDriverCalCRC((rlUInt8_t *)&rl_txMsg[devIndex].hdr,\
-                    (rl_txMsg[devIndex].hdr.len - msgCrcLen),
-                    (rlUInt8_t)rlDrvData->clientCtx.crcType,
-                    &rlDrvData->funcParams[devIndex].msgCRC[0]);
+            (void)rlDriverCalCRC((rlUInt8_t *)&rl_txMsg[devIndex].hdr,
+                                 (rl_txMsg[devIndex].hdr.len - msgCrcLen),
+                                 (rlUInt8_t)rlDrvData->clientCtx.crcType,
+                                 &rlDrvData->funcParams[devIndex].msgCRC[0]);
             /* copy computed CRC to Tx Msg buffer */
-            (void)memcpy((rlUInt8_t*)(&rl_txMsg[devIndex].payload[payloadLen - msgCrcLen]),
-                   (rlUInt8_t*)&(rlDrvData->funcParams[devIndex].msgCRC[0]), msgCrcLen);
+            (void)memcpy((rlUInt8_t *)(&rl_txMsg[devIndex].payload[payloadLen - msgCrcLen]),
+                         (rlUInt8_t *)&(rlDrvData->funcParams[devIndex].msgCRC[0]), msgCrcLen);
         }
         tempLen = ((rlUInt16_t)(SYNC_PATTERN_LEN + RHCP_HEADER_LEN) + payloadLen);
 
         /* write Tx Msg to destination either over Mailbox internal to
            mmWave device or to External Host Over SPI */
-        if (RL_IF_WRITE(comIfHdl, ((rlUInt8_t *)&rl_txMsg[devIndex]), \
-                         tempLen) != (rlInt32_t)tempLen)
+        if (RL_IF_WRITE(comIfHdl, ((rlUInt8_t *)&rl_txMsg[devIndex]),
+                        tempLen) != (rlInt32_t)tempLen)
         {
             /* set error code */
             retVal = RL_RET_CODE_RADAR_IF_ERROR;
@@ -1529,22 +1518,22 @@ rlReturnVal_t rlDriverMsgWrite(rlDriverData_t* rlDrvData, rlUInt8_t devIndex,
 }
 
 /** @fn rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
-*                           rlInt32_t *syncType)
-*
-*   @brief: Parse received msg' header
-*
-*   @param[in] comIfHdl - Communication interface handle
-*   @param[in] syncBuf  - Sync buffer
-*   @param[in] syncType - sync type
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*    Parse received msg'header
-*/
+ *                           rlInt32_t *syncType)
+ *
+ *   @brief: Parse received msg' header
+ *
+ *   @param[in] comIfHdl - Communication interface handle
+ *   @param[in] syncBuf  - Sync buffer
+ *   @param[in] syncType - sync type
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *    Parse received msg'header
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-777 */
 static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
-                                 rlInt32_t *syncType)
+                                     rlInt32_t *syncType)
 {
     rlUInt8_t count = 0;
     rlInt32_t retVal;
@@ -1554,11 +1543,11 @@ static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
     RL_LOGV_ARG0("rlDriverReceiveSync starts...\n");
 
     /* check for NULL pointer */
-    if (syncType != (rlInt32_t*)RL_NULL)
+    if (syncType != (rlInt32_t *)RL_NULL)
     {
         /* Read 4 bytes SYNC Pattern) */
-        if (RL_IF_READ(comIfHdl, &syncBuf[0U], (rlUInt16_t)SYNC_PATTERN_LEN) != \
-           (rlInt32_t)SYNC_PATTERN_LEN)
+        if (RL_IF_READ(comIfHdl, &syncBuf[0U], (rlUInt16_t)SYNC_PATTERN_LEN) !=
+            (rlInt32_t)SYNC_PATTERN_LEN)
         {
             /* set error code */
             errVal = RL_RET_CODE_RADAR_IF_ERROR;
@@ -1576,9 +1565,9 @@ static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
         {
             /* check if matched with SYNC pattern Host-to-device or device-to-Host */
             if (((recSyncPattern.sync1 == H2D_SYNC_PATTERN_1) &&
-                (recSyncPattern.sync2 == H2D_SYNC_PATTERN_2) ) || \
+                 (recSyncPattern.sync2 == H2D_SYNC_PATTERN_2)) ||
                 ((recSyncPattern.sync1 == D2H_SYNC_PATTERN_1) &&
-                (recSyncPattern.sync2 == D2H_SYNC_PATTERN_2)))
+                 (recSyncPattern.sync2 == D2H_SYNC_PATTERN_2)))
             {
                 /* set to SYNC Matched flag if H2D or D2H SYNC pattern is matching
                     for big/little endian data */
@@ -1589,7 +1578,7 @@ static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
                 /* if mmwavelink running on device and connect to Host over SPI then
                    it may recieve CNYS to send data */
                 if ((recSyncPattern.sync1 == H2D_CNYS_PATTERN_1) &&
-                   (recSyncPattern.sync2 == H2D_CNYS_PATTERN_2))
+                    (recSyncPattern.sync2 == H2D_CNYS_PATTERN_2))
                 {
                     /* set to CNYS Matched flag if H2D CNYS pattern is matching
                         for big/little endian data */
@@ -1599,10 +1588,10 @@ static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
                 else if (count >= (rlUInt16_t)RL_SYNC_SCAN_THRESHOLD)
                 {
                     rlUInt16_t crcLen = (2U << (rl_driverData.clientCtx.crcType & 0x3U));
-                    /* If pattern not found then read few extra bytes (CRC Len) to make 
+                    /* If pattern not found then read few extra bytes (CRC Len) to make
                        whole read count [4n+CRCLen] aligned */
-                    if (RL_IF_READ(comIfHdl, &syncBuf[SYNC_PATTERN_LEN], (rlUInt16_t)crcLen) != \
-                       (rlInt32_t)crcLen)
+                    if (RL_IF_READ(comIfHdl, &syncBuf[SYNC_PATTERN_LEN], (rlUInt16_t)crcLen) !=
+                        (rlInt32_t)crcLen)
                     {
                         /* Set error code to terminate this loop */
                         errVal += RL_RET_CODE_RADAR_IF_ERROR;
@@ -1619,9 +1608,9 @@ static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
                     if (0 == (count % SYNC_PATTERN_LEN))
                     {
                         /* Read 4 bytes SYNC Pattern) */
-                        if (RL_IF_READ(comIfHdl, &syncBuf[SYNC_PATTERN_LEN],\
-                           (rlUInt16_t)SYNC_PATTERN_LEN) != \
-                           (rlInt32_t)SYNC_PATTERN_LEN)
+                        if (RL_IF_READ(comIfHdl, &syncBuf[SYNC_PATTERN_LEN],
+                                       (rlUInt16_t)SYNC_PATTERN_LEN) !=
+                            (rlInt32_t)SYNC_PATTERN_LEN)
                         {
                             /* Set error code to terminate this loop */
                             errVal += RL_RET_CODE_RADAR_IF_ERROR;
@@ -1655,15 +1644,15 @@ static rlUInt8_t rlDriverReceiveSync(rlComIfHdl_t comIfHdl, rlUInt8_t syncBuf[],
 }
 
 /** @fn rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t comIfHdl)
-*
-*   @brief Read SYNC and Header from communication channel
-*   @param[in] comIfHdl - Communication interface handle
-*   @param[out] hdrBuf - Buffer to hold SyncPattern+header information
-*
-*   @return rlReturnVal_t pattern matched type, Failure - Error Code
-*
-*   Read SYNC and Header from communication channel
-*/
+ *
+ *   @brief Read SYNC and Header from communication channel
+ *   @param[in] comIfHdl - Communication interface handle
+ *   @param[out] hdrBuf - Buffer to hold SyncPattern+header information
+ *
+ *   @return rlReturnVal_t pattern matched type, Failure - Error Code
+ *
+ *   Read SYNC and Header from communication channel
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-777 */
 /*AR_CODE_REVIEW MR:R.2.2 <APPROVED> "errVal is re initialized under different
@@ -1682,8 +1671,8 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
        be read by Host.
      */
     rlUInt16_t cnysBuf[8U] = {H2D_CNYS_PATTERN_1, H2D_CNYS_PATTERN_2,
-                               0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU};
-    rlInt32_t syncType     = PATTERN_NOT_MATCHED;
+                              0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU, 0xFFFFU};
+    rlInt32_t syncType = PATTERN_NOT_MATCHED;
     rlUInt8_t syncCnt;
     rlInt32_t errVal;
 
@@ -1702,7 +1691,7 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
         {
             /* Write CNYS pattern to mmWave Radar  */
             if (RL_IF_WRITE(comIfHdl,
-                (rlUInt8_t*)&cnysBuf[0U], (rlUInt16_t)(SYNC_PATTERN_LEN+ RHCP_HEADER_LEN)) !=\
+                            (rlUInt8_t *)&cnysBuf[0U], (rlUInt16_t)(SYNC_PATTERN_LEN + RHCP_HEADER_LEN)) !=
                 (rlInt32_t)(SYNC_PATTERN_LEN + RHCP_HEADER_LEN))
             {
                 /* Set error code if data write function fails to write SYNC pattern */
@@ -1713,18 +1702,19 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
                 errVal = RL_RET_CODE_OK;
             }
 
-            RL_LOGV_ARG2("Platform = %d, delay = %d \n",\
-                         rl_driverData.clientCtx.platform, \
+            RL_LOGV_ARG2("Platform = %d, delay = %d \n",
+                         rl_driverData.clientCtx.platform,
                          rl_driverData.clientCtx.timerCb.rlDelay);
-             /* Need to wait till host Irq is down */
-             /* Check if Host Irq Status can be polled, else use fixed delay */
+            /* Need to wait till host Irq is down */
+            /* Check if Host Irq Status can be polled, else use fixed delay */
             if ((rl_driverData.clientCtx.devCtrlCb.rlDeviceWaitIrqStatus != NULL) &&
                 (rl_driverData.clientCtx.devCtrlCb.rlDeviceWaitIrqStatus(comIfHdl,
-                0U) != RL_RET_CODE_OK) && (errVal == RL_RET_CODE_OK))
+                                                                         0U) != RL_RET_CODE_OK) &&
+                (errVal == RL_RET_CODE_OK))
             {
                 /* If IRQ polling timed out then re-write the CNYS pattern to mmwave Radar */
                 if (RL_IF_WRITE(comIfHdl,
-                    (rlUInt8_t*)&cnysBuf[0U], (rlUInt16_t)(SYNC_PATTERN_LEN+ RHCP_HEADER_LEN)) !=\
+                                (rlUInt8_t *)&cnysBuf[0U], (rlUInt16_t)(SYNC_PATTERN_LEN + RHCP_HEADER_LEN)) !=
                     (rlInt32_t)(SYNC_PATTERN_LEN + RHCP_HEADER_LEN))
                 {
                     /* Set error code if data write function fails to write SYNC pattern */
@@ -1746,7 +1736,7 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
                     /* add 1 mSec delay */
                     (void)rl_driverData.clientCtx.timerCb.rlDelay(1U);
                 }
-             }
+            }
         }
         else
         {
@@ -1764,7 +1754,7 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
             if ((CNYS_PATTERN_MATCHED == syncType) || (SYNC_PATTERN_MATCHED == syncType))
             {
                 rlUInt16_t tempLen;
-                rlUInt8_t* payloadBuf;
+                rlUInt8_t *payloadBuf;
                 /* copying shifted data to hdrBuf */
                 payloadBuf = &syncBuf[0U];
                 if (RL_NULL_PTR != payloadBuf)
@@ -1776,8 +1766,8 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
                 }
                 tempLen = RHCP_HEADER_LEN - (0x00FFU & syncCnt);
                 /*  Here we've read Sync Pattern. Read the remaining header */
-                if (RL_IF_READ(comIfHdl, (&hdrBuf[(SYNC_PATTERN_LEN + syncCnt)]), \
-                                 tempLen) != (rlInt32_t)tempLen)
+                if (RL_IF_READ(comIfHdl, (&hdrBuf[(SYNC_PATTERN_LEN + syncCnt)]),
+                               tempLen) != (rlInt32_t)tempLen)
                 {
                     syncType += RL_RET_CODE_RADAR_IF_ERROR;
                 }
@@ -1792,7 +1782,6 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
         {
             syncType += errVal;
         }
-
     }
 
     RL_LOGV_ARG0("rlDriverRxHdrRead ends...\n");
@@ -1801,13 +1790,13 @@ rlReturnVal_t rlDriverRxHdrRead(rlUInt8_t hdrBuf[RHCP_HEADER_LEN], rlComIfHdl_t 
 }
 
 /** @fn rlReturnVal_t rlDriverOsiInit(void)
-*
-*   @brief Initializes the OSI layer abstraction for mmwavelink
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Initializes the OS mutex, semaphore and queue interface for mmwavelink
-*/
+ *
+ *   @brief Initializes the OSI layer abstraction for mmwavelink
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Initializes the OS mutex, semaphore and queue interface for mmwavelink
+ */
 /* DesignId : MMWL_DesignId_002 */
 /* Requirements : AUTORADAR_REQ-784 */
 rlReturnVal_t rlDriverOsiInit(void)
@@ -1823,22 +1812,22 @@ rlReturnVal_t rlDriverOsiInit(void)
         /* Create Command Semaphore */
         /* AR_CODE_REVIEW MR:R.10.8 <INSPECTED> "conversion required" */
         /*LDRA_INSPECTED 444 S */
-        CmdSemStr[7] = (rlInt8_t)(index+48U);
+        CmdSemStr[7] = (rlInt8_t)(index + 48U);
         /* AR_CODE_REVIEW MR:R.18.1 <INSPECTED> "Array size not exceeded. Tool issue" */
         /*LDRA_INSPECTED 69 X */
         CmdSemStr[8] = (rlInt8_t)'\0';
         funcRetVal += rl_driverData.clientCtx.osiCb.sem.rlOsiSemCreate(
-                                             &rl_driverData.cmdSem[index], CmdSemStr);
+            &rl_driverData.cmdSem[index], CmdSemStr);
 
         /* Create Command Mutex */
         /* AR_CODE_REVIEW MR:R.10.8 <INSPECTED> "conversion required" */
         /*LDRA_INSPECTED 444 S */
-        devMutexStr[9] = (rlInt8_t)(index+48U);
+        devMutexStr[9] = (rlInt8_t)(index + 48U);
         /* AR_CODE_REVIEW MR:R.18.1 <INSPECTED> "Array size not exceeded. Tool issue" */
         /*LDRA_INSPECTED 69 X */
         devMutexStr[10] = (rlInt8_t)'\0';
         funcRetVal += rl_driverData.clientCtx.osiCb.mutex.rlOsiMutexCreate(
-                                &rl_driverData.devMutex[index], devMutexStr);
+            &rl_driverData.devMutex[index], devMutexStr);
     }
 
     /* check for above function call return value */
@@ -1861,7 +1850,7 @@ static rlReturnVal_t rlDriverOsiCbCheck(rlClientCbs_t clientCb)
 
     /* Check if application has passed mutex interace functions */
     if ((RL_NULL_PTR == clientCb.osiCb.mutex.rlOsiMutexCreate) ||
-        (RL_NULL_PTR == clientCb.osiCb.mutex.rlOsiMutexLock  ) ||
+        (RL_NULL_PTR == clientCb.osiCb.mutex.rlOsiMutexLock) ||
         (RL_NULL_PTR == clientCb.osiCb.mutex.rlOsiMutexUnLock) ||
         (RL_NULL_PTR == clientCb.osiCb.mutex.rlOsiMutexDelete))
     {
@@ -1869,16 +1858,16 @@ static rlReturnVal_t rlDriverOsiCbCheck(rlClientCbs_t clientCb)
     }
     /* Check if application has passed semaphore interface functions */
     else if ((RL_NULL_PTR == clientCb.osiCb.sem.rlOsiSemCreate) ||
-             (RL_NULL_PTR == clientCb.osiCb.sem.rlOsiSemWait  ) ||
+             (RL_NULL_PTR == clientCb.osiCb.sem.rlOsiSemWait) ||
              (RL_NULL_PTR == clientCb.osiCb.sem.rlOsiSemSignal) ||
              (RL_NULL_PTR == clientCb.osiCb.sem.rlOsiSemDelete))
     {
         retVal = RL_RET_CODE_INTERFACE_CB_NULL;
     }
     /* Check if application has passed communication interface functions */
-    else if ((RL_NULL_PTR == (void*)clientCb.comIfCb.rlComIfOpen ) ||
+    else if ((RL_NULL_PTR == (void *)clientCb.comIfCb.rlComIfOpen) ||
              (RL_NULL_PTR == clientCb.comIfCb.rlComIfClose) ||
-             (RL_NULL_PTR == clientCb.comIfCb.rlComIfRead ) ||
+             (RL_NULL_PTR == clientCb.comIfCb.rlComIfRead) ||
              (RL_NULL_PTR == clientCb.comIfCb.rlComIfWrite))
     {
         retVal = RL_RET_CODE_INTERFACE_CB_NULL;
@@ -1893,14 +1882,14 @@ static rlReturnVal_t rlDriverOsiCbCheck(rlClientCbs_t clientCb)
 }
 
 /** @fn rlReturnVal_t rlDriverClientCbCheck(rlClientCbs_t clientCb)
-*
-*   @brief Check for interace callbacks passed by application during rlDevicePowerOn.
-*   @param[in] clientCb - Client callbacks
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Check for interace functions passed by application during rlDevicePowerOn.
-*/
+ *
+ *   @brief Check for interace callbacks passed by application during rlDevicePowerOn.
+ *   @param[in] clientCb - Client callbacks
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Check for interace functions passed by application during rlDevicePowerOn.
+ */
 static rlReturnVal_t rlDriverClientCbCheck(rlClientCbs_t clientCb)
 {
     rlReturnVal_t retVal;
@@ -1910,18 +1899,18 @@ static rlReturnVal_t rlDriverClientCbCheck(rlClientCbs_t clientCb)
         retVal = RL_RET_CODE_INTERFACE_CB_NULL;
     }
     /* Check if application has passed device interace functions */
-    else if ((RL_NULL_PTR == clientCb.eventCb.rlAsyncEvent           ) ||
-             (RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceDisable      ) ||
-             (RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceEnable       ) ||
-             (RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceMaskHostIrq  ))
+    else if ((RL_NULL_PTR == clientCb.eventCb.rlAsyncEvent) ||
+             (RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceDisable) ||
+             (RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceEnable) ||
+             (RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceMaskHostIrq))
     {
         retVal = RL_RET_CODE_INTERFACE_CB_NULL;
     }
     /* When mmWaveLink instance is running on HOST, check for interface for IRQ and delay */
     else if (((clientCb.platform == RL_PLATFORM_HOST) &&
-             (((RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceWaitIrqStatus) &&
-              (RL_NULL_PTR == clientCb.timerCb.rlDelay))))  ||
-              (RL_NULL_PTR == clientCb.osiCb.queue.rlOsiSpawn))
+              (((RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceWaitIrqStatus) &&
+                (RL_NULL_PTR == clientCb.timerCb.rlDelay)))) ||
+             (RL_NULL_PTR == clientCb.osiCb.queue.rlOsiSpawn))
     {
         retVal = RL_RET_CODE_INTERFACE_CB_NULL;
     }
@@ -1929,7 +1918,7 @@ static rlReturnVal_t rlDriverClientCbCheck(rlClientCbs_t clientCb)
     else if ((RL_NULL_PTR == clientCb.devCtrlCb.rlDeviceUnMaskHostIrq) ||
              (RL_NULL_PTR == clientCb.devCtrlCb.rlRegisterInterruptHandler) ||
              ((RL_CRC_TYPE_NO_CRC != clientCb.crcType) &&
-             (RL_NULL_PTR == clientCb.crcCb.rlComputeCRC)))
+              (RL_NULL_PTR == clientCb.crcCb.rlComputeCRC)))
     {
         retVal = RL_RET_CODE_INTERFACE_CB_NULL;
     }
@@ -1942,16 +1931,16 @@ static rlReturnVal_t rlDriverClientCbCheck(rlClientCbs_t clientCb)
 }
 
 /** @fn rlReturnVal_t rlDriverInit(rlClientCbs_t clientCb, rlUInt8_t deviceMap)
-*
-*   @brief Initializes the mmwave radar Driver
-*   @param[in] clientCb - Client callbacks
-*   @param[in] deviceMap - Bitmap of devices to be connected
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Initializes the mmwave radar Driver. Initialize memory, create OS objects,
-*   Open communication channel, Register Interrupt Handler
-*/
+ *
+ *   @brief Initializes the mmwave radar Driver
+ *   @param[in] clientCb - Client callbacks
+ *   @param[in] deviceMap - Bitmap of devices to be connected
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Initializes the mmwave radar Driver. Initialize memory, create OS objects,
+ *   Open communication channel, Register Interrupt Handler
+ */
 /* DesignId : MMWL_DesignId_003 */
 /* Requirements : AUTORADAR_REQ-707 */
 rlReturnVal_t rlDriverInit(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
@@ -1990,7 +1979,7 @@ rlReturnVal_t rlDriverInit(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
         rl_driverData.deviceMap = deviceMap;
         /* Set command retry count */
         rl_driverData.retryCount = RL_API_CMD_RETRY_COUNT;
-        
+
         /* intialize and stitch all OS interfaces */
         retVal = rlDriverOsiInit();
 
@@ -2006,7 +1995,7 @@ rlReturnVal_t rlDriverInit(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
                 /* store the deviceIndex in a global structure */
                 rl_driverData.commDevIdx.rlDevIndex[index] = index;
                 /* Open communication interface handle */
-                rl_driverData.commDevIdx.comIfHdl[index]   =
+                rl_driverData.commDevIdx.comIfHdl[index] =
                     rl_driverData.clientCtx.comIfCb.rlComIfOpen(index, 0U);
 
                 /* check for NULL pointer */
@@ -2017,11 +2006,11 @@ rlReturnVal_t rlDriverInit(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
                 else
                 {
                     /* Register Host Interrupt Handler */
-                    if (rl_driverData.clientCtx.devCtrlCb.rlRegisterInterruptHandler(\
-                                 index, (RL_P_EVENT_HANDLER)rlDriverHostIrqHandler, \
-                                 (void*)RL_NULL) != RL_RET_CODE_OK)
+                    if (rl_driverData.clientCtx.devCtrlCb.rlRegisterInterruptHandler(
+                            index, (RL_P_EVENT_HANDLER)rlDriverHostIrqHandler,
+                            (void *)RL_NULL) != RL_RET_CODE_OK)
                     {
-                        retVal +=RL_RET_CODE_RADAR_IF_ERROR;
+                        retVal += RL_RET_CODE_RADAR_IF_ERROR;
                     }
                 }
                 /* Get next Device Map based on index */
@@ -2036,8 +2025,7 @@ rlReturnVal_t rlDriverInit(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
             }
             /* increment Device Index */
             index++;
-       }
-       while ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));
+        } while ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));
     }
     else
     {
@@ -2059,15 +2047,15 @@ rlReturnVal_t rlDriverInit(rlUInt8_t deviceMap, rlClientCbs_t clientCb)
 }
 
 /** @fn rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
-*
-*   @brief Adds mmwave radar device
-*   @param[in] deviceMap - Bitmap of device to be connected
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Adds mmwave radar device
-*   Open communication channel, Register Interrupt Handler with device
-*/
+ *
+ *   @brief Adds mmwave radar device
+ *   @param[in] deviceMap - Bitmap of device to be connected
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Adds mmwave radar device
+ *   Open communication channel, Register Interrupt Handler with device
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
@@ -2077,7 +2065,7 @@ rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
 
     RL_LOGV_ARG0("rlDriverAddDevice starts\n");
 
-    if ((rl_driverData.isDriverInitialized != (rlUInt8_t)0U) && \
+    if ((rl_driverData.isDriverInitialized != (rlUInt8_t)0U) &&
         (deviceMap <= ((1U << RL_DEVICE_CONNECTED_MAX) - 0x1U)))
     {
         /* Add to the global device map */
@@ -2093,16 +2081,16 @@ rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
                 /* store the deviceIndex in a global structure */
                 rl_driverData.commDevIdx.rlDevIndex[index] = index;
                 /* Open communication interface handle */
-                rl_driverData.commDevIdx.comIfHdl[index] = \
-                                    rl_driverData.clientCtx.comIfCb.rlComIfOpen(index, 0U);
+                rl_driverData.commDevIdx.comIfHdl[index] =
+                    rl_driverData.clientCtx.comIfCb.rlComIfOpen(index, 0U);
 
                 if ((rlComIfHdl_t)RL_NULL_PTR != rl_driverData.commDevIdx.comIfHdl[index])
                 {
                     /* register Interrupt handler */
-                    if ((rl_driverData.clientCtx.devCtrlCb.rlRegisterInterruptHandler(\
-                                    index, (RL_P_EVENT_HANDLER)rlDriverHostIrqHandler, \
-                                    (void*)RL_NULL) != RL_RET_CODE_OK) ||
-                                    (rl_driverData.clientCtx.devCtrlCb.rlDeviceEnable(index) < 0))
+                    if ((rl_driverData.clientCtx.devCtrlCb.rlRegisterInterruptHandler(
+                             index, (RL_P_EVENT_HANDLER)rlDriverHostIrqHandler,
+                             (void *)RL_NULL) != RL_RET_CODE_OK) ||
+                        (rl_driverData.clientCtx.devCtrlCb.rlDeviceEnable(index) < 0))
                     {
                         /* set the error code */
                         retVal = RL_RET_CODE_RADAR_IF_ERROR;
@@ -2114,7 +2102,7 @@ rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
                 }
                 else
                 {
-                    retVal =RL_RET_CODE_RADAR_IF_ERROR;
+                    retVal = RL_RET_CODE_RADAR_IF_ERROR;
                 }
                 deviceMap &= ~(1U << index);
             }
@@ -2130,8 +2118,7 @@ rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
             }
             /* increment device index */
             index++;
-       }
-       while ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));
+        } while ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));
     }
     else
     {
@@ -2142,7 +2129,7 @@ rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
         }
         else
         {
-            retVal =  RL_RET_CODE_INVALID_STATE_ERROR;
+            retVal = RL_RET_CODE_INVALID_STATE_ERROR;
             RL_LOGE_ARG0("rlDriverAddDevice, Invalid state \n");
         }
     }
@@ -2152,15 +2139,15 @@ rlReturnVal_t rlDriverAddDevice(rlUInt8_t deviceMap)
 }
 
 /** @fn rlReturnVal_t rlDriverRemoveDevices(rlUInt8_t deviceMap)
-*
-*   @brief Disconnects the mmwave radar devices
-*   @param[in] deviceMap - Bitmap of mmwave devices to be disconnected
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   disconnects the mmwave radar devices
-*   Close communication channel, Unregister Interrupt Handler
-*/
+ *
+ *   @brief Disconnects the mmwave radar devices
+ *   @param[in] deviceMap - Bitmap of mmwave devices to be disconnected
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   disconnects the mmwave radar devices
+ *   Close communication channel, Unregister Interrupt Handler
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlReturnVal_t rlDriverRemoveDevices(rlUInt8_t deviceMap)
@@ -2173,16 +2160,16 @@ rlReturnVal_t rlDriverRemoveDevices(rlUInt8_t deviceMap)
     /* Clear the device map from driver data */
     rl_driverData.deviceMap &= ~deviceMap;
 
-    for (index = 0U; ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));\
-        index++)
+    for (index = 0U; ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));
+         index++)
     {
         if ((deviceMap & (1U << index)) != 0U)
         {
             /* Close mmwave radar device communication Channel */
             if (rl_driverData.commDevIdx.comIfHdl[index] != RL_NULL_PTR)
             {
-                retVal += rl_driverData.clientCtx.comIfCb.rlComIfClose( \
-                                         rl_driverData.commDevIdx.comIfHdl[index]);
+                retVal += rl_driverData.clientCtx.comIfCb.rlComIfClose(
+                    rl_driverData.commDevIdx.comIfHdl[index]);
                 rl_driverData.commDevIdx.comIfHdl[index] = RL_NULL_PTR;
             }
 
@@ -2198,14 +2185,14 @@ rlReturnVal_t rlDriverRemoveDevices(rlUInt8_t deviceMap)
 }
 
 /** @fn rlReturnVal_t rlDriverDeInit(void)
-*
-*   @brief De Initializes the mmwave radar Driver
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   DeInitializes the mmwave radar Driver. Clear memory, destroy OS objects,
-*   Close communication channel, Unregister Interrupt Handler
-*/
+ *
+ *   @brief De Initializes the mmwave radar Driver
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   DeInitializes the mmwave radar Driver. Clear memory, destroy OS objects,
+ *   Close communication channel, Unregister Interrupt Handler
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-711 */
 rlReturnVal_t rlDriverDeInit(void)
@@ -2216,22 +2203,22 @@ rlReturnVal_t rlDriverDeInit(void)
 
     RL_LOGV_ARG0("rlDriverDeInit starts...\n");
 
-    for (index = 0U; ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));\
-        index++)
+    for (index = 0U; ((deviceMap != 0U) && (index < RL_DEVICE_CONNECTED_MAX));
+         index++)
     {
         if ((deviceMap & (1U << index)) != 0U)
         {
             /* Close mmwave radar device communication Channel */
             if (rl_driverData.commDevIdx.comIfHdl[index] != RL_NULL_PTR)
             {
-                retVal += rl_driverData.clientCtx.comIfCb.rlComIfClose( \
-                                     rl_driverData.commDevIdx.comIfHdl[index]);
+                retVal += rl_driverData.clientCtx.comIfCb.rlComIfClose(
+                    rl_driverData.commDevIdx.comIfHdl[index]);
                 rl_driverData.commDevIdx.comIfHdl[index] = RL_NULL_PTR;
             }
 
             /* Un Register Interrupt Handler */
             (void)rl_driverData.clientCtx.devCtrlCb.rlRegisterInterruptHandler(
-                                                      index, RL_NULL, RL_NULL);
+                index, RL_NULL, RL_NULL);
 
             deviceMap &= ~(1U << index);
         }
@@ -2239,20 +2226,20 @@ rlReturnVal_t rlDriverDeInit(void)
     /* Destroy per command mutexes */
     for (devCnt = 0U; devCnt < RL_CASCADE_NUM_DEVICES; devCnt++)
     {
-        /* AR_CODE_REVIEW MR:D.4.1 <REVIEWED> "function Pointer is being checked 
+        /* AR_CODE_REVIEW MR:D.4.1 <REVIEWED> "function Pointer is being checked
                                                 in rlDriverOsiCbCheck " */
         /*LDRA_INSPECTED 128 D */
         retVal += rl_driverData.clientCtx.osiCb.mutex.rlOsiMutexDelete(
-                                                &rl_driverData.devMutex[devCnt]);
+            &rl_driverData.devMutex[devCnt]);
         rl_driverData.devMutex[devCnt] = RL_NULL_PTR;
 
         RL_LOGD_ARG0("Destroy Per CMD Mutex\n");
-        
+
         /* Destroy Command Semaphore */
         if (rl_driverData.cmdSem[devCnt] != RL_NULL_PTR)
         {
-            retVal += rl_driverData.clientCtx.osiCb.sem.rlOsiSemDelete(\
-                                                    &rl_driverData.cmdSem[devCnt]);
+            retVal += rl_driverData.clientCtx.osiCb.sem.rlOsiSemDelete(
+                &rl_driverData.cmdSem[devCnt]);
             rl_driverData.cmdSem[devCnt] = RL_NULL_PTR;
             RL_LOGD_ARG0("Destroy Command Semaphore\n");
         }
@@ -2266,29 +2253,29 @@ rlReturnVal_t rlDriverDeInit(void)
 }
 
 /** @fn rlDriverData_t* rlDriverGetHandle(void)
-*
-*   @brief Returns mmwave radar Driver Global Structure
-*
-*   @return rlDriverData_t Pointer to mmwave radar Driver Global Structure
-*
-*   Returns mmwave radar Driver Global Structure
-*/
+ *
+ *   @brief Returns mmwave radar Driver Global Structure
+ *
+ *   @return rlDriverData_t Pointer to mmwave radar Driver Global Structure
+ *
+ *   Returns mmwave radar Driver Global Structure
+ */
 /* DesignId :  */
 /* Requirements :  */
-rlDriverData_t* rlDriverGetHandle(void)
+rlDriverData_t *rlDriverGetHandle(void)
 {
     /* return driverData pointer/handle */
     return (&rl_driverData);
 }
 
 /** @fn rlDriverGetPlatformId(void)
-*
-*   @brief Returns RL Platform ID (i.e. where mmWaveLink is executing)
-*
-*   @return rlUInt8_t platform
-*
-*   Returns Device run ID (i.e. where mmWaveLink is executing)
-*/
+ *
+ *   @brief Returns RL Platform ID (i.e. where mmWaveLink is executing)
+ *
+ *   @return rlUInt8_t platform
+ *
+ *   Returns Device run ID (i.e. where mmWaveLink is executing)
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlUInt8_t rlDriverGetPlatformId(void)
@@ -2298,15 +2285,14 @@ rlUInt8_t rlDriverGetPlatformId(void)
     return (rl_driverData.clientCtx.platform);
 }
 
-
 /** @fn rlDriverGetArDeviceType(void)
-*
-*   @brief Returns AR device type which mmWavelink is communicating
-*
-*   @return rlUInt8_t platform
-*
-*   Returns AR device type which mmWavelink is communicating
-*/
+ *
+ *   @brief Returns AR device type which mmWavelink is communicating
+ *
+ *   @return rlUInt8_t platform
+ *
+ *   Returns AR device type which mmWavelink is communicating
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlUInt8_t rlDriverGetArDeviceType(void)
@@ -2317,15 +2303,15 @@ rlUInt8_t rlDriverGetArDeviceType(void)
 }
 
 /** @fn rlUInt8_t rlDriverIsDeviceMapValid(rlUInt8_t deviceMap)
-*
-*   @brief Checks if given deviecMap is valid wrt to global DeviceMap
+ *
+ *   @brief Checks if given deviecMap is valid wrt to global DeviceMap
  *         set to mmWaveLink
-*   @param[in] deviceMap - Bitmap of devices to send the message
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   @brief It enables RF/Analog Subsystem.
-*/
+ *   @param[in] deviceMap - Bitmap of devices to send the message
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   @brief It enables RF/Analog Subsystem.
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlReturnVal_t rlDriverIsDeviceMapValid(rlUInt8_t deviceMap)
@@ -2355,24 +2341,24 @@ rlReturnVal_t rlDriverIsDeviceMapValid(rlUInt8_t deviceMap)
 }
 
 /** @fn rlReturnVal_t rlDriverWaitForResponse(rlUInt8_t devIndex,
-*                                             rlDriverMsg_t* outMsg)
-*
-*   @brief: Wait for Device's response
-*
-*   @param[in ] devIndex - devIndex is index of device not the deviceMap
-*   @param[out] outMsg   - Driver msg
-*
-*   @return Success : 0, Fail : Error code
-*
-*   Wait for driver response
-*/
+ *                                             rlDriverMsg_t* outMsg)
+ *
+ *   @brief: Wait for Device's response
+ *
+ *   @param[in ] devIndex - devIndex is index of device not the deviceMap
+ *   @param[out] outMsg   - Driver msg
+ *
+ *   @return Success : 0, Fail : Error code
+ *
+ *   Wait for driver response
+ */
 /* DesignId : MMWL_DesignId_024 */
 /* Requirements : AUTORADAR_REQ-774 */
 /*AR_CODE_REVIEW MR:R.2.2 <APPROVED> "payloadLen is re initialized after each pass to the
   rlGetSubBlock fucntion as it is passed again to the function" */
 /*LDRA_INSPECTED 8 D */
 rlReturnVal_t rlDriverWaitForResponse(rlUInt8_t devIndex,
-                            rlDriverMsg_t* outMsg)
+                                      rlDriverMsg_t *outMsg)
 {
     rlUInt16_t rspChunks;
     rlPayloadSb_t errorSB;
@@ -2406,7 +2392,6 @@ rlReturnVal_t rlDriverWaitForResponse(rlUInt8_t devIndex,
                                         &(outMsg->subblocks[indx].len),
                                         outMsg->subblocks[indx].pSblkData);
                     payloadLen += (rlUInt8_t)(outMsg->subblocks[indx].len);
-
                 }
             }
             retVal = retVal1;
@@ -2421,21 +2406,20 @@ rlReturnVal_t rlDriverWaitForResponse(rlUInt8_t devIndex,
             /* Initialize with zero which will set with valid value in next function call */
             errorSB.sbid = 0U;
             errorSB.len = 0U;
-            errorSB.pSblkData = (rlUInt8_t* )&errMsgSbData;
+            errorSB.pSblkData = (rlUInt8_t *)&errMsgSbData;
 
             /* Copy Payload to local variable*/
             /* AR_CODE_REVIEW MR:R.18.4 <APPROVED> "pointer arithmetic required" */
             /*LDRA_INSPECTED 87 S */
             (void)rlGetSubBlock(rl_rxMsg[devIndex].payload + payloadLen,
-                            &(errorSB.sbid), &(errorSB.len),
-                            errorSB.pSblkData);
+                                &(errorSB.sbid), &(errorSB.len),
+                                errorSB.pSblkData);
 
             /* Return Error to indicate command failure */
             retVal = (rlReturnVal_t)(errMsgSbData.errorType);
             rspChunks = 0U;
 
             RL_LOGE_ARG0("msg id mis-match, command failure\n");
-
         }
         else
         {
@@ -2444,15 +2428,14 @@ rlReturnVal_t rlDriverWaitForResponse(rlUInt8_t devIndex,
             retVal = retVal1;
             RL_LOGE_ARG0("Timeout in receiving response\n");
         }
-    }
-    while (rspChunks > 0U);
+    } while (rspChunks > 0U);
 
     RL_LOGV_ARG0("rlDriverWaitForResponse ends... \n");
 
     return retVal;
 }
 
-static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t* outMsg)
+static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t *outMsg)
 {
     rlReturnVal_t retVal;
     rlUInt8_t retryCount = 0U;
@@ -2468,17 +2451,17 @@ static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t* outMsg
             /*LDRA_INSPECTED 105 D */
             /* AR_CODE_REVIEW MR:D.4.1,D.4.14 <APPROVED> "rlDrvData Can't be NULL" */
             /*LDRA_INSPECTED 45 D */
-             rlDrvData->txMsgPtr[devIndex]->hdr.flags.b2RetryFlag = RL_HDR_FLAG_RETRY;
+            rlDrvData->txMsgPtr[devIndex]->hdr.flags.b2RetryFlag = RL_HDR_FLAG_RETRY;
         }
         retryCount++;
 
-        if ( rlDrvData->clientCtx.ackTimeout != 0U)
+        if (rlDrvData->clientCtx.ackTimeout != 0U)
         {
             /* Set flag to true and check for it in Host IRQ  handler routine*/
             /* AR_CODE_REVIEW MR:R.2.2 <APPROVED> "Global variable is used by
             other function" */
             /*LDRA_INSPECTED 105 D */
-             rlDrvData->isCmdRespWaited[devIndex] = RL_TRUE;
+            rlDrvData->isCmdRespWaited[devIndex] = RL_TRUE;
         }
         /* send the command to mmWave Radar device */
         retVal = rlDriverMsgWrite(rlDrvData, devIndex, rlDrvData->commDevIdx.comIfHdl[devIndex]);
@@ -2494,14 +2477,14 @@ static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t* outMsg
             }
 
             /* Response received Successfully */
-            if ((RL_RET_CODE_OK == retVal) || \
-               ((RL_RET_CODE_CRC_FAILED != retVal) && \
-               (RL_RET_CODE_RESP_TIMEOUT != retVal)))
+            if ((RL_RET_CODE_OK == retVal) ||
+                ((RL_RET_CODE_CRC_FAILED != retVal) &&
+                 (RL_RET_CODE_RESP_TIMEOUT != retVal)))
             {
                 /* AR_CODE_REVIEW MR:R.2.2 <APPROVED> "Global variable is used by
                    other function" */
                 /*LDRA_INSPECTED 105 D */
-                 rlDrvData->isCmdRespWaited[devIndex] = RL_FALSE;
+                rlDrvData->isCmdRespWaited[devIndex] = RL_FALSE;
                 /* Increment the Sequence Number */
                 rlDrvData->cmdSeqNum[devIndex]++;
                 /* If device sends NACK then mmWaveLink needs to resend same
@@ -2516,7 +2499,7 @@ static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t* outMsg
                     /*LDRA_INSPECTED 105 D */
                     /*LDRA_INSPECTED 8 D */
                     rlDrvData->txMsgPtr[devIndex]->hdr.flags.b4SeqNum =
-                                    rlDrvData->cmdSeqNum[devIndex] % 16U;
+                        rlDrvData->cmdSeqNum[devIndex] % 16U;
                 }
                 else
                 {
@@ -2546,27 +2529,26 @@ static rlReturnVal_t rlDriverCmdWriter(rlUInt8_t devIndex, rlDriverMsg_t* outMsg
             RL_LOGE_ARG0("rlDriverCmdWriter, Error in cmd msg write\n");
             break;
         }
-    }
-    while ((retryCount < (rl_driverData.retryCount + 1U)) && (isPayloadValid == RL_FALSE));
+    } while ((retryCount < (rl_driverData.retryCount + 1U)) && (isPayloadValid == RL_FALSE));
 
     return retVal;
 }
 
 /** @fn rlReturnVal_t rlDriverCmdSendRetry(rlUInt8_t devIndex, rlDriverMsg_t* outMsg)
-*
-*   @brief: Send command and wait for response
-*
-*   @param[in ] devIndex - device index (device connected)
-*   @param[out] outMsg   - output msg
-*
-*   @return Success : 0, Fail : Error code
-*
-*   Send command and wait for response
-*/
+ *
+ *   @brief: Send command and wait for response
+ *
+ *   @param[in ] devIndex - device index (device connected)
+ *   @param[out] outMsg   - output msg
+ *
+ *   @return Success : 0, Fail : Error code
+ *
+ *   Send command and wait for response
+ */
 /* DesignId : MMWL_DesignId_023 */
 /* Requirements : AUTORADAR_REQ-772, AUTORADAR_REQ-774, AUTORADAR_REQ-775, AUTORADAR_REQ-778,\
  AUTORADAR_REQ-781 */
-rlReturnVal_t rlDriverCmdSendRetry(rlUInt8_t devIndex, rlDriverMsg_t* outMsg)
+rlReturnVal_t rlDriverCmdSendRetry(rlUInt8_t devIndex, rlDriverMsg_t *outMsg)
 {
     rlReturnVal_t retVal;
     rlDriverData_t *rlDrvData = rlDriverGetHandle();
@@ -2589,7 +2571,7 @@ rlReturnVal_t rlDriverCmdSendRetry(rlUInt8_t devIndex, rlDriverMsg_t* outMsg)
     /*LDRA_INSPECTED 105 D */
     /*LDRA_INSPECTED 8 D */
     rlDrvData->txMsgPtr[devIndex]->hdr.flags.b4SeqNum =
-                            rlDrvData->cmdSeqNum[devIndex] % 16U;
+        rlDrvData->cmdSeqNum[devIndex] % 16U;
 
     /* Write command to slave device */
     retVal += rlDriverCmdWriter(devIndex, outMsg);
@@ -2602,29 +2584,28 @@ rlReturnVal_t rlDriverCmdSendRetry(rlUInt8_t devIndex, rlDriverMsg_t* outMsg)
 }
 
 /** @fn void rlDriverAppendDummyByte(rlUInt8_t devIndex)
-*
-*   @brief Append the dummy bytes to payload part of message
-*
-*   @param[in] devIndex - device index
-*
-*   @return None.
-*
-*   Append the dummy bytes to payload part of message if required based on CRC type used.
-*/
+ *
+ *   @brief Append the dummy bytes to payload part of message
+ *
+ *   @param[in] devIndex - device index
+ *
+ *   @return None.
+ *
+ *   Append the dummy bytes to payload part of message if required based on CRC type used.
+ */
 /* DesignId : MMWL_DesignId_023 */
 /* Requirements : AUTORADAR_REQ-772, AUTORADAR_REQ-774, AUTORADAR_REQ-776 */
 static void rlDriverAppendDummyByte(rlUInt8_t devIndex)
 {
     rlUInt8_t protAlignSize;
     rlUInt16_t msgCrcLen;
-    
+
     rl_txMsg[devIndex].hdr.flags.b2CrcLen = rl_driverData.clientCtx.crcType;
 
     /* It may be size 2/4/8 based on 16/32/64 bit */
     msgCrcLen = (2U << (rl_driverData.clientCtx.crcType & 0x3U));
 
-    protAlignSize = (rl_driverData.clientCtx.crcType < RL_CRC_TYPE_64BIT_ISO) ? \
-                     RL_PAYLOAD_MSG_4BYTE_MULT : RL_PAYLOAD_MSG_8BYTE_MULT;
+    protAlignSize = (rl_driverData.clientCtx.crcType < RL_CRC_TYPE_64BIT_ISO) ? RL_PAYLOAD_MSG_4BYTE_MULT : RL_PAYLOAD_MSG_8BYTE_MULT;
 
     /* cmd pointer is assigned to rl_rxMsg, which can't be NULL as it's global structure. */
     if (rl_driverData.txMsgPtr[devIndex] != RL_NULL_PTR)
@@ -2642,12 +2623,12 @@ static void rlDriverAppendDummyByte(rlUInt8_t devIndex)
             /*LDRA_INSPECTED 95 S */
             /*LDRA_INSPECTED 440 S */
             /*LDRA_INSPECTED 93 S */
-            (void)rlAppendDummy((rlUInt8_t*)(((rlUInt8_t*)rl_driverData.txMsgPtr[devIndex]) + \
-                 rl_driverData.txMsgPtr[devIndex]->hdr.len + SYNC_PATTERN_LEN), \
-                 (rlUInt8_t)(protAlignSize - \
-                 (rlUInt8_t)(rl_driverData.txMsgPtr[devIndex]->hdr.len % protAlignSize)));
-            rl_driverData.txMsgPtr[devIndex]->hdr.len += (rlUInt16_t)(protAlignSize - \
-                (rlUInt16_t)(rl_driverData.txMsgPtr[devIndex]->hdr.len % protAlignSize));
+            (void)rlAppendDummy((rlUInt8_t *)(((rlUInt8_t *)rl_driverData.txMsgPtr[devIndex]) +
+                                              rl_driverData.txMsgPtr[devIndex]->hdr.len + SYNC_PATTERN_LEN),
+                                (rlUInt8_t)(protAlignSize -
+                                            (rlUInt8_t)(rl_driverData.txMsgPtr[devIndex]->hdr.len % protAlignSize)));
+            rl_driverData.txMsgPtr[devIndex]->hdr.len += (rlUInt16_t)(protAlignSize -
+                                                                      (rlUInt16_t)(rl_driverData.txMsgPtr[devIndex]->hdr.len % protAlignSize));
         }
         /* add on crc length to header length field */
         rl_driverData.txMsgPtr[devIndex]->hdr.len += msgCrcLen;
@@ -2656,25 +2637,25 @@ static void rlDriverAppendDummyByte(rlUInt8_t devIndex)
 }
 
 /** @fn rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap,
-*                        rlDriverMsg_t inMsg, rlDriverMsg_t* outMsg)
-*
-*   @brief Invokes a command to mmwave radar Device. Implements mmwave radar
-*          Host Communication Protocol(RHCP)
-*
-*   @param[in] deviceMap - Bitmap of devices to send the message
-*   @param[in] inMsg - Command Opcode(Direction, Class, MsgId) and Subblocks
-*   @param[out] outMsg - Response Opcode(Direction, Class, MsgId) and Subblocks
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Invokes a command to mmwave radar Device. Waits for Response if ACK is
-*   requested. Computes
-*   CRC/Checksum according to mmwave radar Host Communication Protocol(RHCP)
-*/
+ *                        rlDriverMsg_t inMsg, rlDriverMsg_t* outMsg)
+ *
+ *   @brief Invokes a command to mmwave radar Device. Implements mmwave radar
+ *          Host Communication Protocol(RHCP)
+ *
+ *   @param[in] deviceMap - Bitmap of devices to send the message
+ *   @param[in] inMsg - Command Opcode(Direction, Class, MsgId) and Subblocks
+ *   @param[out] outMsg - Response Opcode(Direction, Class, MsgId) and Subblocks
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Invokes a command to mmwave radar Device. Waits for Response if ACK is
+ *   requested. Computes
+ *   CRC/Checksum according to mmwave radar Host Communication Protocol(RHCP)
+ */
 /* DesignId : MMWL_DesignId_023 */
 /* Requirements : AUTORADAR_REQ-772, AUTORADAR_REQ-774, AUTORADAR_REQ-776 */
 rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap, rlDriverMsg_t inMsg,
-                              rlDriverMsg_t* outMsg)
+                                rlDriverMsg_t *outMsg)
 {
     rlReturnVal_t retVal = RL_RET_CODE_OK;
     rlUInt8_t devIndex = 0U;
@@ -2693,12 +2674,11 @@ rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap, rlDriverMsg_t inMsg,
             if ((deviceMap & (1U << devIndex)) != 0U)
             {
                 /* If Mutex lock is failed then return with error code */
-                if (RL_RET_CODE_OK != rl_driverData.clientCtx.osiCb.mutex.rlOsiMutexLock
-                    (&(rl_driverData.devMutex[devIndex]), (rlOsiTime_t)RL_OSI_WAIT_FOREVER))
+                if (RL_RET_CODE_OK != rl_driverData.clientCtx.osiCb.mutex.rlOsiMutexLock(&(rl_driverData.devMutex[devIndex]), (rlOsiTime_t)RL_OSI_WAIT_FOREVER))
                 {
-                      /* If MutexLock returns non-zero then treat this as error and 
-                         set error code to retVal */
-                      retVal = RL_RET_CODE_RADAR_OSIF_ERROR;
+                    /* If MutexLock returns non-zero then treat this as error and
+                       set error code to retVal */
+                    retVal = RL_RET_CODE_RADAR_OSIF_ERROR;
                 }
                 else
                 {
@@ -2710,12 +2690,12 @@ rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap, rlDriverMsg_t inMsg,
                             on different conditions."*/
                     /*LDRA_INSPECTED 8 D */
                     rl_txMsg[devIndex].hdr.opcode.b4Direction = inMsg.opcode.dir;
-                    rl_txMsg[devIndex].hdr.opcode.b2MsgType   = inMsg.opcode.msgType;
-                    rl_txMsg[devIndex].hdr.opcode.b10MsgId    = \
-                                          ((rl_txMsg[devIndex].hdr.opcode.b10MsgId & 0x000U)|\
-                                          (inMsg.opcode.msgId & 0x3FFU));
-                    rl_txMsg[devIndex].hdr.remChunks          = inMsg.remChunks;
-                    rl_txMsg[devIndex].hdr.nsbc               = inMsg.opcode.nsbc;
+                    rl_txMsg[devIndex].hdr.opcode.b2MsgType = inMsg.opcode.msgType;
+                    rl_txMsg[devIndex].hdr.opcode.b10MsgId =
+                        ((rl_txMsg[devIndex].hdr.opcode.b10MsgId & 0x000U) |
+                         (inMsg.opcode.msgId & 0x3FFU));
+                    rl_txMsg[devIndex].hdr.remChunks = inMsg.remChunks;
+                    rl_txMsg[devIndex].hdr.nsbc = inMsg.opcode.nsbc;
                     rl_txMsg[devIndex].hdr.flags.b2AckFlag = 0U;
                     rl_txMsg[devIndex].hdr.flags.b2Crc = 0U;
                     rl_txMsg[devIndex].hdr.flags.b2CrcLen = 0U;
@@ -2728,13 +2708,13 @@ rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap, rlDriverMsg_t inMsg,
                     {
                         /* append all subblock len, id and data to one global structure */
                         retVal1 += rlAppendSubBlock(&rl_txMsg[devIndex].payload[payloadLen],
-                                                inMsg.subblocks[indx].sbid,
-                                                inMsg.subblocks[indx].len,
-                                                inMsg.subblocks[indx].pSblkData);
+                                                    inMsg.subblocks[indx].sbid,
+                                                    inMsg.subblocks[indx].len,
+                                                    inMsg.subblocks[indx].pSblkData);
                         /* increment payload length as appending each sub-block data in a
                            message */
-                        payloadLen += inMsg.subblocks[indx].len + \
-                                                    (rlUInt16_t)(RL_SBC_ID_SIZE + RL_SBC_LEN_SIZE);
+                        payloadLen += inMsg.subblocks[indx].len +
+                                      (rlUInt16_t)(RL_SBC_ID_SIZE + RL_SBC_LEN_SIZE);
                         if (RL_RET_CODE_OK != retVal1)
                         {
                             break;
@@ -2745,7 +2725,7 @@ rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap, rlDriverMsg_t inMsg,
                     if (indx == inMsg.opcode.nsbc)
                     {
                         rl_txMsg[devIndex].hdr.len = RHCP_HEADER_LEN + payloadLen;
-            
+
                         /* Check if ACK is Requested*/
                         if (rl_driverData.clientCtx.ackTimeout == 0U)
                         {
@@ -2768,8 +2748,8 @@ rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap, rlDriverMsg_t inMsg,
 
                         retVal = rlDriverCmdSendRetry(devIndex, outMsg);
                         /* Release the per CMD Mutex */
-                        (void)rl_driverData.clientCtx.osiCb.mutex.rlOsiMutexUnLock(\
-                                                            &(rl_driverData.devMutex[devIndex]));
+                        (void)rl_driverData.clientCtx.osiCb.mutex.rlOsiMutexUnLock(
+                            &(rl_driverData.devMutex[devIndex]));
                     }
                     else
                     {
@@ -2793,14 +2773,14 @@ rlReturnVal_t rlDriverCmdInvoke(rlUInt8_t deviceMap, rlDriverMsg_t inMsg,
 }
 
 /** @fn rlReturnVal_t rlDriverConfigureCrc(rlCrcType_t crcType)
-*
-*   @brief  Configures the CRC Type in mmwavelink Driver
-*   @param[in] crcType - CRC Types
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Configures the CRC Type in mmwavelink Driver
-*/
+ *
+ *   @brief  Configures the CRC Type in mmwavelink Driver
+ *   @param[in] crcType - CRC Types
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Configures the CRC Type in mmwavelink Driver
+ */
 rlReturnVal_t rlDriverConfigureCrc(rlCrcType_t crcType)
 {
     rlReturnVal_t retVal;
@@ -2816,7 +2796,7 @@ rlReturnVal_t rlDriverConfigureCrc(rlCrcType_t crcType)
     }
     else
     {
-         /* if driver is not initialized then return and error value */
+        /* if driver is not initialized then return and error value */
         retVal = RL_RET_CODE_INVALID_STATE_ERROR;
     }
     RL_LOGV_ARG0("rlDriverConfigureCrc ends... \n");
@@ -2825,14 +2805,14 @@ rlReturnVal_t rlDriverConfigureCrc(rlCrcType_t crcType)
 }
 
 /** @fn rlReturnVal_t rlDriverConfigureAckTimeout(rlUInt32_t ackTimeout)
-*
-*   @brief  Configures the Acknowledgement timeout in mmwavelink Driver
-*   @param[in] ackTimeout - ACK timeout, 0 - No ACK
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Configures the Acknowledgement timeout in mmwavelink Driver
-*/
+ *
+ *   @brief  Configures the Acknowledgement timeout in mmwavelink Driver
+ *   @param[in] ackTimeout - ACK timeout, 0 - No ACK
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Configures the Acknowledgement timeout in mmwavelink Driver
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlReturnVal_t rlDriverConfigureAckTimeout(rlUInt32_t ackTimeout)
@@ -2859,15 +2839,15 @@ rlReturnVal_t rlDriverConfigureAckTimeout(rlUInt32_t ackTimeout)
 }
 
 /** @fn rlPrintFptr rlGetLogFptr(rlUInt8_t dbgLevel)
-*
-*   @brief: Configure loggin function to print error message
-*   @param[in] dbgLevel - Debug level
-*
-*   @return rlPrintFptr Success - valid fucntion pointer,
-*                       Failure - NULL
-*
-*   Configures the logging function for error in mmwavelink Driver
-*/
+ *
+ *   @brief: Configure loggin function to print error message
+ *   @param[in] dbgLevel - Debug level
+ *
+ *   @return rlPrintFptr Success - valid fucntion pointer,
+ *                       Failure - NULL
+ *
+ *   Configures the logging function for error in mmwavelink Driver
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlPrintFptr rlGetLogFptr(rlUInt8_t dbgLevel)
@@ -2888,59 +2868,59 @@ rlPrintFptr rlGetLogFptr(rlUInt8_t dbgLevel)
 }
 
 /** @fn rlReturnVal_t rlLogInit(void)
-*
-*   @brief: Initialise logging function pointers.
-*
-*   @return rlReturnVal_t Success - ( 0),
-*                         Failure - (-1)
-*
-*   Initialise logging functions in mmwavelink Driver
-*/
+ *
+ *   @brief: Initialise logging function pointers.
+ *
+ *   @return rlReturnVal_t Success - ( 0),
+ *                         Failure - (-1)
+ *
+ *   Initialise logging functions in mmwavelink Driver
+ */
 /* DesignId : MMWL_DesignId_031 */
 /* Requirements : AUTORADAR_REQ-712 */
 rlReturnVal_t rlLogInit(void)
 {
     rlReturnVal_t retVal;
-    rlDriverData_t* rlDrvData = &rl_driverData;
+    rlDriverData_t *rlDrvData = &rl_driverData;
     rlPrintFptr fPtr;
     rlUInt8_t level, idx;
     /* store debug level to local variable */
     level = rlDrvData->clientCtx.dbgCb.dbgLevel;
     /* store Function pointer to local variable */
-    fPtr  = rlDrvData->clientCtx.dbgCb.rlPrint;
+    fPtr = rlDrvData->clientCtx.dbgCb.rlPrint;
 
     /* check for Function pointer for NON-NULL */
     if (fPtr != RL_NULL_PTR)
     {
         switch (level)
         {
-            case RL_DBG_LEVEL_VERBOSE :
-            case RL_DBG_LEVEL_DEBUG   :
-            case RL_DBG_LEVEL_INFO    :
-            case RL_DBG_LEVEL_WARNING :
-            case RL_DBG_LEVEL_ERROR   :
-                for (idx = level; idx > RL_DBG_LEVEL_NONE; idx--)
-                {
-                    rlDrvData->logObj.rlPrintAr[idx - 1U] = fPtr;
-                }
-                break;
-            case RL_DBG_LEVEL_NONE    :
+        case RL_DBG_LEVEL_VERBOSE:
+        case RL_DBG_LEVEL_DEBUG:
+        case RL_DBG_LEVEL_INFO:
+        case RL_DBG_LEVEL_WARNING:
+        case RL_DBG_LEVEL_ERROR:
+            for (idx = level; idx > RL_DBG_LEVEL_NONE; idx--)
             {
-                (void)fPtr("INFO: MMWAVELINK Logging is disabled\n");
-                /* reset all function pointers to NULL */
-                (void)memset(&rlDrvData->logObj.rlPrintAr[0], 0U, sizeof(rlLogCtx_t));
-                break;
+                rlDrvData->logObj.rlPrintAr[idx - 1U] = fPtr;
             }
-            default                   :
-            {
-                (void)fPtr("INFO: Invalid MMWAVELINK Logging, hence disbled\n");
-                /* if dbgLevel is set beyond expected value then assign NONE */
-                rlDrvData->clientCtx.dbgCb.dbgLevel = RL_DBG_LEVEL_NONE;
+            break;
+        case RL_DBG_LEVEL_NONE:
+        {
+            (void)fPtr("INFO: MMWAVELINK Logging is disabled\n");
+            /* reset all function pointers to NULL */
+            (void)memset(&rlDrvData->logObj.rlPrintAr[0], 0U, sizeof(rlLogCtx_t));
+            break;
+        }
+        default:
+        {
+            (void)fPtr("INFO: Invalid MMWAVELINK Logging, hence disbled\n");
+            /* if dbgLevel is set beyond expected value then assign NONE */
+            rlDrvData->clientCtx.dbgCb.dbgLevel = RL_DBG_LEVEL_NONE;
 
-                /* reset all function pointers to NULL */
-                (void)memset(&rlDrvData->logObj.rlPrintAr[0], 0U, sizeof(rlLogCtx_t));
-                break;
-            }
+            /* reset all function pointers to NULL */
+            (void)memset(&rlDrvData->logObj.rlPrintAr[0], 0U, sizeof(rlLogCtx_t));
+            break;
+        }
         }
         retVal = RL_RET_CODE_OK;
     }
@@ -2955,18 +2935,18 @@ rlReturnVal_t rlLogInit(void)
 }
 
 /** @fn void rlDriverConstructInMsg(rlUInt16_t msgId, rlDriverMsg_t* inMsg,
-*    rlPayloadSb_t* payloadPtr)
-*
-*   @brief: Construct command packet (inMsg) based on given message-ID and payload
-*
-*   @param[in] msgId - message ID of command packet
-*   @param[out] inMsg - Message structure input pointer
-*   @param[in] payloadPtr - payload data pointer
-*   @return - none
-*
-*   Construct Set command packet based on given message-ID and payload
-*/
-void rlDriverConstructInMsg(rlUInt16_t msgId, rlDriverMsg_t* inMsg, rlPayloadSb_t* payloadPtr)
+ *    rlPayloadSb_t* payloadPtr)
+ *
+ *   @brief: Construct command packet (inMsg) based on given message-ID and payload
+ *
+ *   @param[in] msgId - message ID of command packet
+ *   @param[out] inMsg - Message structure input pointer
+ *   @param[in] payloadPtr - payload data pointer
+ *   @return - none
+ *
+ *   Construct Set command packet based on given message-ID and payload
+ */
+void rlDriverConstructInMsg(rlUInt16_t msgId, rlDriverMsg_t *inMsg, rlPayloadSb_t *payloadPtr)
 {
     /* check for NULL pointer */
     if (inMsg != NULL)
@@ -2990,19 +2970,19 @@ void rlDriverConstructInMsg(rlUInt16_t msgId, rlDriverMsg_t* inMsg, rlPayloadSb_
 }
 
 /** @fn void rlDriverConstructOutMsg(rlUInt16_t numSblk, rlDriverMsg_t* outMsg,
-*                                       rlPayloadSb_t* payloadPtr)
-*
-*   @brief: Construct command packet based on given message-ID and payload
-*
-*   @param[in] numSblk - number of sub-blocks in message
-*   @param[out] outMsg - Message structure input pointer
-*   @param[in] payloadPtr - payload data pointer
-*   @return - none
-*
-*   Construct Get command packet based on given message-ID and payload
-*/
-void rlDriverConstructOutMsg(rlUInt16_t numSblk, rlDriverMsg_t* outMsg,
-                                                        rlPayloadSb_t* payloadPtr)
+ *                                       rlPayloadSb_t* payloadPtr)
+ *
+ *   @brief: Construct command packet based on given message-ID and payload
+ *
+ *   @param[in] numSblk - number of sub-blocks in message
+ *   @param[out] outMsg - Message structure input pointer
+ *   @param[in] payloadPtr - payload data pointer
+ *   @return - none
+ *
+ *   Construct Get command packet based on given message-ID and payload
+ */
+void rlDriverConstructOutMsg(rlUInt16_t numSblk, rlDriverMsg_t *outMsg,
+                             rlPayloadSb_t *payloadPtr)
 {
     /* check for NULL pointer */
     if (outMsg != NULL)
@@ -3020,20 +3000,20 @@ void rlDriverConstructOutMsg(rlUInt16_t numSblk, rlDriverMsg_t* outMsg,
 }
 
 /** @fn void rlDriverFillPayload(rlUInt16_t msgId, rlUInt16_t sbcID, rlPayloadSb_t* payloadPtr,
-*    rlUInt8_t* data, rlUInt16_t inLen)
-*
-*   @brief: Fill payload based on given message-ID, sub-block ID and data.
-*   @param[in] msgId - message ID of command packet
-*   @param[in] sbcID  - sub block ID of command packet
-*   @param[in] payloadPtr - payload data pointer
-*   @param[out] data - data pointer
-*   @param[in] inLen - lenght of data
-*   @return - none
-*
-*   Fill payload based on given message-ID, sub-block ID and data.
-*/
-void rlDriverFillPayload(rlUInt16_t msgId, rlUInt16_t sbcID, rlPayloadSb_t* payloadPtr,
-                                rlUInt8_t* data, rlUInt16_t inLen)
+ *    rlUInt8_t* data, rlUInt16_t inLen)
+ *
+ *   @brief: Fill payload based on given message-ID, sub-block ID and data.
+ *   @param[in] msgId - message ID of command packet
+ *   @param[in] sbcID  - sub block ID of command packet
+ *   @param[in] payloadPtr - payload data pointer
+ *   @param[out] data - data pointer
+ *   @param[in] inLen - lenght of data
+ *   @return - none
+ *
+ *   Fill payload based on given message-ID, sub-block ID and data.
+ */
+void rlDriverFillPayload(rlUInt16_t msgId, rlUInt16_t sbcID, rlPayloadSb_t *payloadPtr,
+                         rlUInt8_t *data, rlUInt16_t inLen)
 {
     /* check for NULL pointer */
     if (payloadPtr != NULL)
@@ -3041,9 +3021,9 @@ void rlDriverFillPayload(rlUInt16_t msgId, rlUInt16_t sbcID, rlPayloadSb_t* payl
         /* get Unique Sub-Block ID and asign it to Command Sub Block */
         payloadPtr->sbid = (rlUInt16_t)RL_GET_UNIQUE_SBID(msgId, sbcID);
 
-         /* set Command Sub-block length to sizeof command strcuture type */
-        payloadPtr->len  = inLen;
-         /* set sub-block data pointer to payload structure */
+        /* set Command Sub-block length to sizeof command strcuture type */
+        payloadPtr->len = inLen;
+        /* set sub-block data pointer to payload structure */
         payloadPtr->pSblkData = data;
     }
     else
@@ -3053,20 +3033,20 @@ void rlDriverFillPayload(rlUInt16_t msgId, rlUInt16_t sbcID, rlPayloadSb_t* payl
 }
 
 /** @fn rlReturnVal_t rlDriverExecuteGetApi(rlUInt8_t deviceMap, rlUInt16_t msgId,
-*                          rlUInt16_t sbcID, rlUInt8_t *msgData, rlUInt16_t inLen)
-*
-*   @brief: Construct get message and invoke command.
-*   @param[in] deviceMap - Bitmap of devices to send the message
-*   @param[in] msgId - message ID of command packet
-*   @param[in] sbcID  - sub block ID of command packet
-*   @param[out] msgData - message data pointer
-*   @param[in] inLen - message payload length
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Construct get message and invoke command where it waits for response from device.
-*/
+ *                          rlUInt16_t sbcID, rlUInt8_t *msgData, rlUInt16_t inLen)
+ *
+ *   @brief: Construct get message and invoke command.
+ *   @param[in] deviceMap - Bitmap of devices to send the message
+ *   @param[in] msgId - message ID of command packet
+ *   @param[in] sbcID  - sub block ID of command packet
+ *   @param[out] msgData - message data pointer
+ *   @param[in] inLen - message payload length
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Construct get message and invoke command where it waits for response from device.
+ */
 rlReturnVal_t rlDriverExecuteGetApi(rlUInt8_t deviceMap, rlUInt16_t msgId,
-                                     rlUInt16_t sbcID, rlUInt8_t *msgData, rlUInt16_t inLen)
+                                    rlUInt16_t sbcID, rlUInt8_t *msgData, rlUInt16_t inLen)
 {
     /*LDRA waiver   8 D - DD data flow anomalies found- */
     rlReturnVal_t retVal;
@@ -3090,7 +3070,7 @@ rlReturnVal_t rlDriverExecuteGetApi(rlUInt8_t deviceMap, rlUInt16_t msgId,
     /* Fill in-message Payload */
     /* AR_CODE_REVIEW MR:R.2.2 <APPROVED> "Values are used by called function. LDRA Tool Issue" */
     /*LDRA_INSPECTED 105 D */
-    rlDriverFillPayload(msgId, sbcID, &inPayloadSb, NULL , 0U);
+    rlDriverFillPayload(msgId, sbcID, &inPayloadSb, NULL, 0U);
 
     /* Construct response packet */
     rlDriverConstructOutMsg(1U, &outMsg, &outPayloadSb);
@@ -3109,18 +3089,18 @@ rlReturnVal_t rlDriverExecuteGetApi(rlUInt8_t deviceMap, rlUInt16_t msgId,
 }
 
 /** @fn rlReturnVal_t rlDriverExecuteSetApi(rlUInt8_t deviceMap, rlUInt16_t msgId,
-*                                         rlUInt16_t sbcID, rlUInt8_t *msgData, rlUInt16_t inLen)
-*
-*   @brief: Construct set message and invoke command.
-*   @param[in] deviceMap - Bitmap of devices to send the message
-*   @param[in] msgId - message ID of command packet
-*   @param[in] sbcID  - sub block ID of command packet
-*   @param[in] msgData - message data pointer
-*   @param[in] inLen - message payload length
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Construct set message and invoke command where it waits for response from device.
-*/
+ *                                         rlUInt16_t sbcID, rlUInt8_t *msgData, rlUInt16_t inLen)
+ *
+ *   @brief: Construct set message and invoke command.
+ *   @param[in] deviceMap - Bitmap of devices to send the message
+ *   @param[in] msgId - message ID of command packet
+ *   @param[in] sbcID  - sub block ID of command packet
+ *   @param[in] msgData - message data pointer
+ *   @param[in] inLen - message payload length
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Construct set message and invoke command where it waits for response from device.
+ */
 rlReturnVal_t rlDriverExecuteSetApi(rlUInt8_t deviceMap, rlUInt16_t msgId,
                                     rlUInt16_t sbcID, rlUInt8_t *msgData, rlUInt16_t inLen)
 {
@@ -3154,15 +3134,15 @@ rlReturnVal_t rlDriverExecuteSetApi(rlUInt8_t deviceMap, rlUInt16_t msgId,
 }
 
 /** @fn rlReturnVal_t rlDriverSetRetryCount(rlUInt8_t retryCnt)
-*
-*   @brief: Set the retry count for re-sending command
-*   @param[in] retryCnt - Retry count [0: no retry, n: no. of retries]
-*                         value limit to RL_API_CMD_RETRY_COUNT(3)
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code(-2)
-*
-*   Set the retry count to global rlDriverData_t structure.
-*/
+ *
+ *   @brief: Set the retry count for re-sending command
+ *   @param[in] retryCnt - Retry count [0: no retry, n: no. of retries]
+ *                         value limit to RL_API_CMD_RETRY_COUNT(3)
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code(-2)
+ *
+ *   Set the retry count to global rlDriverData_t structure.
+ */
 rlReturnVal_t rlDriverSetRetryCount(rlUInt8_t retryCnt)
 {
     rlReturnVal_t retVal;
@@ -3181,7 +3161,7 @@ rlReturnVal_t rlDriverSetRetryCount(rlUInt8_t retryCnt)
         else
         {
             /* Retry count can be set to max pre-defined value,
-             * else return an error 
+             * else return an error
              */
             retVal = RL_RET_CODE_INVALID_INPUT;
         }

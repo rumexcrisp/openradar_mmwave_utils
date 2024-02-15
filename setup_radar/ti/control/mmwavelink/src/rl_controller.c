@@ -34,19 +34,19 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
- /*
- ****************************************************************************************
- * Revision History   :
- *---------------------------------------------------------------------------------------
- * Version  Date        Author             Defect No               Description
- *---------------------------------------------------------------------------------------
- * 0.1.0    12May2015   Kaushal Kukkar                    Initial Version
- *
- * 0.6.0    15Nov2016   Kaushal Kukkar    AUTORADAR-666   Logging Feature
- *
- * 0.9.1                Jitendra Gupta    MMWL-5          Code size optimization
- ****************************************************************************************
- */
+/*
+****************************************************************************************
+* Revision History   :
+*---------------------------------------------------------------------------------------
+* Version  Date        Author             Defect No               Description
+*---------------------------------------------------------------------------------------
+* 0.1.0    12May2015   Kaushal Kukkar                    Initial Version
+*
+* 0.6.0    15Nov2016   Kaushal Kukkar    AUTORADAR-666   Logging Feature
+*
+* 0.9.1                Jitendra Gupta    MMWL-5          Code size optimization
+****************************************************************************************
+*/
 
 /******************************************************************************
  * INCLUDE FILES
@@ -54,6 +54,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <ti/control/mmwavelink/include/rl_datatypes.h>
 #include <ti/control/mmwavelink/include/rl_controller.h>
 #include <ti/control/mmwavelink/include/rl_driver.h>
@@ -70,22 +71,22 @@
  */
 
 /** @fn rlReturnVal_t rlAppendSubBlock(rlUInt8_t rhcpPayload[],
-*                       rlUInt16_t sbId, rlUInt16_t sbLen, rlUInt8_t *sbData)
-*
-*   @brief Appends sub block data to payload buffer
-*   @param[out] rhcpPayload - payload buffer
-*   @param[in] sbId - sub block Id
-*   @param[in] sbLen - sub block Length
-*   @param[in] sbData - sub block data
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Appends sub block data to payload buffer
-*/
+ *                       rlUInt16_t sbId, rlUInt16_t sbLen, rlUInt8_t *sbData)
+ *
+ *   @brief Appends sub block data to payload buffer
+ *   @param[out] rhcpPayload - payload buffer
+ *   @param[in] sbId - sub block Id
+ *   @param[in] sbLen - sub block Length
+ *   @param[in] sbData - sub block data
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Appends sub block data to payload buffer
+ */
 /* DesignId :  */
 /* Requirements : AUTORADAR_REQ-772 */
 rlReturnVal_t rlAppendSubBlock(rlUInt8_t rhcpPayload[],
-                    rlUInt16_t sblkId, rlUInt16_t sbLen, rlUInt8_t* sbData)
+                               rlUInt16_t sblkId, rlUInt16_t sbLen, rlUInt8_t *sbData)
 {
     rlReturnVal_t retVal;
     /* check for null pointer */
@@ -98,22 +99,22 @@ rlReturnVal_t rlAppendSubBlock(rlUInt8_t rhcpPayload[],
     {
         /* Append SB Id  */
         /*AR_CODE_REVIEW MR:R.11.2 <APPROVED> "The Payload SbId is of type UINT16,
-            * so pointer conversion type to UINT16*
-            * is required" */
+         * so pointer conversion type to UINT16*
+         * is required" */
         /*LDRA_INSPECTED 94 S */
         /*LDRA_INSPECTED 95 S */
         /*LDRA_INSPECTED 87 S */
-        *((rlUInt16_t*)(rhcpPayload + RL_SBC_ID_INDEX)) = sblkId;
+        *((rlUInt16_t *)(rhcpPayload + RL_SBC_ID_INDEX)) = sblkId;
 
         /* Append SB Len */
         /*AR_CODE_REVIEW MR:R.11.2 <APPROVED> "The Payload SbLen is of type UINT16,
-            * so pointer conversion type to UINT16*
-            * is required" */
+         * so pointer conversion type to UINT16*
+         * is required" */
         /*LDRA_INSPECTED 94 S */
         /*LDRA_INSPECTED 95 S */
         /*LDRA_INSPECTED 87 S */
-        *((rlUInt16_t*)(rhcpPayload + RL_SBC_LEN_INDEX)) = sbLen + \
-            RL_SBC_ID_SIZE + RL_SBC_LEN_SIZE;
+        *((rlUInt16_t *)(rhcpPayload + RL_SBC_LEN_INDEX)) = sbLen +
+                                                            RL_SBC_ID_SIZE + RL_SBC_LEN_SIZE;
 
         /* Append SB Payload */
         if ((sbLen > 0U) && (RL_NULL_PTR != sbData))
@@ -138,15 +139,15 @@ rlReturnVal_t rlAppendSubBlock(rlUInt8_t rhcpPayload[],
 }
 
 /** @fn rlReturnVal_t rlAppendDummy(rlUInt8_t rhcpPayload[], rlUInt8_t dummyLen)
-*
-*   @brief Appends dummy bytes to Payload buffer
-*   @param[out] rhcpPayload - payload buffer
-*   @param[in] dummyLen - numnber of dummy bytes
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Appends dummy bytes to Payload buffer
-*/
+ *
+ *   @brief Appends dummy bytes to Payload buffer
+ *   @param[out] rhcpPayload - payload buffer
+ *   @param[in] dummyLen - numnber of dummy bytes
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Appends dummy bytes to Payload buffer
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlReturnVal_t rlAppendDummy(rlUInt8_t rhcpPayload[], rlUInt8_t dummyLen)
@@ -167,30 +168,30 @@ rlReturnVal_t rlAppendDummy(rlUInt8_t rhcpPayload[], rlUInt8_t dummyLen)
 }
 
 /** @fn rlReturnVal_t rlGetSubBlock(rlUInt8_t rhcpPayload[],
-*                 rlUInt16_t* sbId, rlUInt16_t* sbLen, rlUInt8_t* sbData)
-*
-*   @brief Reads sub block data from payload buffer
-*   @param[in] rhcpPayload - payload buffer
-*   @param[out] sbId - sub block Id
-*   @param[out] sbLen - sub block Length
-*   @param[out] sbData - sub block data
-*
-*   @return rlReturnVal_t Success - 0, Failure - Error Code
-*
-*   Reads sub block data from payload buffer
-*/
+ *                 rlUInt16_t* sbId, rlUInt16_t* sbLen, rlUInt8_t* sbData)
+ *
+ *   @brief Reads sub block data from payload buffer
+ *   @param[in] rhcpPayload - payload buffer
+ *   @param[out] sbId - sub block Id
+ *   @param[out] sbLen - sub block Length
+ *   @param[out] sbData - sub block data
+ *
+ *   @return rlReturnVal_t Success - 0, Failure - Error Code
+ *
+ *   Reads sub block data from payload buffer
+ */
 /* DesignId :  */
 /* Requirements :  */
 rlReturnVal_t rlGetSubBlock(rlUInt8_t rhcpPayload[],
-                   rlUInt16_t* sbcId, rlUInt16_t* sbLen, rlUInt8_t* sbData)
+                            rlUInt16_t *sbcId, rlUInt16_t *sbLen, rlUInt8_t *sbData)
 {
     rlReturnVal_t retVal;
-    rlUInt8_t* payloadBuf;
+    rlUInt8_t *payloadBuf;
 
     RL_LOGV_ARG0("rlGetSubBlock starts...\n");
 
     /* check for NULL prointer for all input parameters */
-    if ((RL_NULL_PTR == rhcpPayload) || (RL_NULL_PTR == sbcId) ||\
+    if ((RL_NULL_PTR == rhcpPayload) || (RL_NULL_PTR == sbcId) ||
         (RL_NULL_PTR == sbLen) || (RL_NULL_PTR == sbData))
     {
         /* set error code */
@@ -200,21 +201,21 @@ rlReturnVal_t rlGetSubBlock(rlUInt8_t rhcpPayload[],
     {
         /* Get SB Id */
         /*AR_CODE_REVIEW MR:R.11.2 <APPROVED> "The Payload SbId is of type UINT16,
-            * so pointer conversion type to UINT16*
-            * is required" */
+         * so pointer conversion type to UINT16*
+         * is required" */
         /*LDRA_INSPECTED 94 S */
         /*LDRA_INSPECTED 95 S */
         /*LDRA_INSPECTED 87 S */
-        *sbcId = *((rlUInt16_t*)(rhcpPayload + RL_SBC_ID_INDEX));
+        *sbcId = *((rlUInt16_t *)(rhcpPayload + RL_SBC_ID_INDEX));
 
         /* Get SB Len */
         /*AR_CODE_REVIEW MR:R.11.2 <APPROVED> "The Payload SbLen is of type UINT16,
-            * so pointer conversion type to UINT16*
-            * is required" */
+         * so pointer conversion type to UINT16*
+         * is required" */
         /*LDRA_INSPECTED 94 S */
         /*LDRA_INSPECTED 95 S */
         /*LDRA_INSPECTED 87 S */
-        *sbLen = *((rlUInt16_t*)(rhcpPayload + RL_SBC_LEN_INDEX));
+        *sbLen = *((rlUInt16_t *)(rhcpPayload + RL_SBC_LEN_INDEX));
         /* check if sub-block length is beyond defined limit */
         if ((*sbLen > RL_CMD_PL_LEN_MAX))
         {
@@ -225,12 +226,11 @@ rlReturnVal_t rlGetSubBlock(rlUInt8_t rhcpPayload[],
         {
             payloadBuf = &rhcpPayload[RL_SBC_PL_INDEX];
             /* Get SB Payload */
-            if ((*sbLen > 0U) && (RL_NULL_PTR != sbData) && \
+            if ((*sbLen > 0U) && (RL_NULL_PTR != sbData) &&
                 (RL_NULL_PTR != payloadBuf))
             {
                 /* copy input payload to sub-block data buffer */
-                (void)memcpy(sbData, payloadBuf, (*sbLen -
-                                    (RL_SBC_ID_SIZE + RL_SBC_LEN_SIZE)));
+                (void)memcpy(sbData, payloadBuf, (*sbLen - (RL_SBC_ID_SIZE + RL_SBC_LEN_SIZE)));
                 RL_LOGD_ARG0("rhcpPayload is copied\n");
             }
             retVal = RL_RET_CODE_OK;
@@ -241,52 +241,52 @@ rlReturnVal_t rlGetSubBlock(rlUInt8_t rhcpPayload[],
 }
 
 /** @fn void rlGetSubBlockId(rlUInt8_t rhcpPayload[], rlUInt16_t* sbId)
-*
-*   @brief Reads sub block Id from payload buffer
-*   @param[in] rhcpPayload - payload buffer
-*   @param[out] sbId - sub block Id
-*
-*   @return NONE
-*
-*   Reads sub block Id from payload buffer
-*/
+ *
+ *   @brief Reads sub block Id from payload buffer
+ *   @param[in] rhcpPayload - payload buffer
+ *   @param[out] sbId - sub block Id
+ *
+ *   @return NONE
+ *
+ *   Reads sub block Id from payload buffer
+ */
 /* DesignId :  */
 /* Requirements :  */
-void rlGetSubBlockId(const rlUInt8_t rhcpPayload[], rlUInt16_t* sbcId)
+void rlGetSubBlockId(const rlUInt8_t rhcpPayload[], rlUInt16_t *sbcId)
 {
     /* Get SB Id */
     /*AR_CODE_REVIEW MR:R.11.2 <APPROVED> "The Payload SbId is of type UINT16,
-        * so pointer conversion type to UINT16*
-        * is required" */
+     * so pointer conversion type to UINT16*
+     * is required" */
     /*LDRA_INSPECTED 94 S */
     /*LDRA_INSPECTED 95 S */
     /*LDRA_INSPECTED 87 S */
-    *sbcId = *((rlUInt16_t*)(rhcpPayload + RL_SBC_ID_INDEX));
+    *sbcId = *((rlUInt16_t *)(rhcpPayload + RL_SBC_ID_INDEX));
     RL_LOGD_ARG0("DEBUG: Parsed sub block ID\n");
 }
 
 /** @fn void rlGetSubBlockLen(rlUInt8_t rhcpPayload[], rlUInt16_t* sbLen)
-*
-*   @brief Reads sub block Length from payload buffer
-*   @param[in] rhcpPayload - payload buffer
-*   @param[out] sbLen - sub block Len
-*
-*   @return NONE
-*
-*   Reads sub block Length from payload buffer
-*/
+ *
+ *   @brief Reads sub block Length from payload buffer
+ *   @param[in] rhcpPayload - payload buffer
+ *   @param[out] sbLen - sub block Len
+ *
+ *   @return NONE
+ *
+ *   Reads sub block Length from payload buffer
+ */
 /* DesignId :  */
 /* Requirements :  */
-void rlGetSubBlockLen(const rlUInt8_t rhcpPayload[], rlUInt16_t* sbcLen)
+void rlGetSubBlockLen(const rlUInt8_t rhcpPayload[], rlUInt16_t *sbcLen)
 {
     /* Get SB Len */
     /*AR_CODE_REVIEW MR:R.11.2 <APPROVED> "The Payload SbLen is of type UINT16,
-        * so pointer conversion type to UINT16*
-        * is required" */
+     * so pointer conversion type to UINT16*
+     * is required" */
     /*LDRA_INSPECTED 94 S */
     /*LDRA_INSPECTED 95 S */
     /*LDRA_INSPECTED 87 S */
-    *sbcLen = *((rlUInt16_t*)(rhcpPayload + RL_SBC_LEN_INDEX));
+    *sbcLen = *((rlUInt16_t *)(rhcpPayload + RL_SBC_LEN_INDEX));
     RL_LOGD_ARG0("DEBUG: Parsed sub block len\n");
 }
 /*

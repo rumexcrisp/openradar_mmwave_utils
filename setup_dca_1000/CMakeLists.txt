@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-project(untitled2)
+project(dca1000-setup)
 
 set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_CXX_FLAGS -pthread)
-
 
 add_executable(setup_dca_1000 cli_setup.cpp
         Common/Osal_Utils/osal.h

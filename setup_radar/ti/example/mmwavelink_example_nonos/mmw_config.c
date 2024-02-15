@@ -44,6 +44,7 @@
 // #include <share.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "mmw_config.h"
 
 /****************************************************************************************
