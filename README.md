@@ -45,68 +45,10 @@ sudo useradd -G usb $USER$
 sudo usermod -a -G usb $USER$
 ```
 
-### Build and run the code
+### Build the code
 
-There are two utils that need to be built:
+1. Create and enter build folder: `mkdir build && cd build`
+2. Setup cmake, use Ninja for generator: `cmake -G Ninja ..`
+3. Build source: `ninja`
 
-* MMWavelink - sets up the radar
-* DCA1000 - Starts the stream
-  
-#### Build and run the MMWavelink code
-
-To build and setup the code, follow the common CMAKE-way of doing it:
-
-```bash
-cd setup_radar  
-mkdir build
-cd build
-cmake -G Ninja ..
-ninja
-```
-
-And then, run the following to setup the radar:
-
-```bash
-sudo ./setup_radar
-```
-
-This takes a bit of time, but the output should end with:
-
-```bash
-=========== mmWaveLink Example Application execution Successful ===========
-```
-
-A full printout of the output is [here](./docs/mmwavelink_setup.md)
-
-#### Build and run the DCA1000 utils
-
-To build and setup the code, follow the common CMAKE-way of doing it:
-
-```bash
-cd setup_dca_1000  
-mkdir build
-cd build
-cmake -G Ninja ..
-ninja
-```
-
-And then, run the following to setup the DCA1000 to stream:
-
-```bash
-./setup_dca_1000
-```
-
-The output should be:
-
-```bash
-RDFCard Configure RDFCard_FPGA sendt!
-Sendt message
-
-FPGA Configuration command : Success
-Handshake sendt!
-Sendt message
-Start Record Data sendt
-Sendt message
-```
-
-And the DCA1000 should start blinking - which is a great sign!
+You will find two binaries `setup_dca_1000` and `setup_radar` inside a newly created bin folder.
