@@ -1792,14 +1792,15 @@ void stopRecording(SINT8 *json)
 
 SINT32 main(SINT32 argc, SINT8 *argv[])
 {
+    jsonFile = "../cf_0.json";
     if (argc == 2)
     {
-        do_command(argv[1], "../cf.json");
+        do_command(argv[1], jsonFile);
     }
     else if (argc == 3)
     {
-        jsonFile = argv[1];
-        if (strcmp(argv[2], CMD_RUN_TASK) == 0)
+        jsonFile = argv[2];
+        if (strcmp(argv[1], CMD_RUN_TASK) == 0)
         {
             startRecording(jsonFile);
             std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -1810,12 +1811,12 @@ SINT32 main(SINT32 argc, SINT8 *argv[])
         }
         else
         {
-            do_command(argv[2], jsonFile);
+            do_command(argv[1], jsonFile);
         }
     }
     else
     {
-        do_command(CMD_HELP_CLI_APP, "../cf.json");
+        do_command(CMD_HELP_CLI_APP, jsonFile);
     }
     return 1;
 }
