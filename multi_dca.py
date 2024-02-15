@@ -5,6 +5,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 
 
 class MyParser(argparse.ArgumentParser):
@@ -37,7 +38,7 @@ def start_process(executable, config_file):
     subprocess.Popen(command)
 
 
-def parse_dca_config(config):
+def parse_dca_config(config) -> dict[str, str]:
     with open(config, 'r') as file:
         content = file.read()
         parsed_config = json.loads(content)
@@ -48,7 +49,7 @@ def parse_dca_config(config):
         ip_update = eth_config_update["DCA1000IPAddress"]
         mac_update = eth_config_update["DCA1000MACAddress"]
         # print(f"ip: {ip} <-> new ip: {ip_update}, mac: {mac_update}")
-        return {"config": config, "ip": ip, "ip_update": ip_update, "mac_update": mac_update}
+        return {"ip": ip, "ip_update": ip_update, "mac_update": mac_update}
 
 
 def main(config_files, executables):
@@ -65,21 +66,39 @@ def setup(config_files, executables):
     print(f"Found {len(config_files)} config files: {config_files}")
     print(f"Going to setup {len(config_files)} radar modules:")
     for i, config in enumerate(config_files):
-        parsed = parse_dca_config(config)
-        print(f"{colors.CYAN}Radar {i+1}{colors.END}: Please connect a single radar which should be assigned the ip adress: {parsed['ip_update']}")
+        parsed_dict = parse_dca_config(config)
+        print(f"{colors.CYAN}Radar {i+1}{colors.END}: Please connect a single radar which should be assigned the ip adress: {parsed_dict['ip_update']}")
         input(" Press enter when connected...")
 
-        temp_conf = config_files[i]
-        print(type(temp_conf))
-        continue
-        try:
-            result = subprocess.run([executables['dca'], "reset_fpga", temp_conf], capture_output=True, timeout=0.5)
-            print(result)
-        except subprocess.TimeoutExpired:
-            continue
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # create temp config file to change ip and test for dca reachability
+            with tempfile.NamedTemporaryFile(dir=temp_dir, prefix="dca_config_", suffix=".json") as temp_config:                
+                ip_tmp = parsed_dict['ip']
+                config_temp = config
+                ip_found = None
+                print("Checking DCA reachability, please be patient...")
+                for i in range(11):
+                    # dump json to temp config and test
+                    json.dump(config_temp, temp_config)
+                    try:
+                        result = subprocess.run([executables['dca'], "reset_fpga", temp_config], capture_output=True, timeout=0.5)
+                        if result.returncode == 0:
+                            print(f"found dca on ip: {ip_tmp}")
+                            ip_found = ip_tmp
+                            break
+                    except subprocess.TimeoutExpired:
+                        continue
+                    ip_tmp = ip_tmp.split(".")
+                    ip_tmp[-1] = str(int(ip_tmp[-1]) + 1)
+                    ip_tmp = ".".join(ip_tmp)
+                    config_temp["DCA1000Config"]["ethernetConfig"]["DCA1000IPAddress"] = ip_tmp
+
+                if ip_found is None:
+                    print("Could not reach DCA, check connection")
 
         # print(f"{colors.CYAN}Radar {i}{colors.END}: Please disconnect the radar")
         # input(" Press enter when disconnected...")
+
 
 if __name__ == "__main__":
     parser = MyParser(description='mmWave Radar Wrapper')
