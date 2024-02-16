@@ -1818,5 +1818,5 @@ SINT32 main(SINT32 argc, SINT8 *argv[])
     {
         do_command(CMD_HELP_CLI_APP, jsonFile);
     }
-    return 1;
+    return 0;
 }
